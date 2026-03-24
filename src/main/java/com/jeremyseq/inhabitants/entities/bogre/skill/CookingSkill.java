@@ -24,7 +24,7 @@ import net.minecraft.core.BlockPos;
 import java.util.List;
 
 public class CookingSkill extends BogreSkills.Skill {
-    public static float howFarFromCauldron = 1.5f; // Distance from cauldron to start cooking (MOVING_TO_TARGET state)
+    public static float howFarFromCauldron = 2.3f; // Distance from cauldron to start cooking (MOVING_TO_TARGET state)
     public static float howFarFromItem = 2.25f; // Distance from item to start cooking (MOVING_TO_TARGET state)
     public static float dropResultOffset = 3.5f; // Distance from cauldron to drop result (DELIVERING state)
 
@@ -208,7 +208,7 @@ public class CookingSkill extends BogreSkills.Skill {
 
         bogre.setLastPos(currentPos);
 
-        if (bogre.getStuckTicks() > 40 && bogre.entrancePos != null) {
+        if (bogre.getStuckTicks() > 80 && bogre.entrancePos != null) {
             Vec3 tp = Vec3.atCenterOf(bogre.entrancePos);
             bogre.setPos(tp.x, tp.y, tp.z);
             bogre.getNavigation().stop();

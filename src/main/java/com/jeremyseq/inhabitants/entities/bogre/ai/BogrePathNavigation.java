@@ -23,6 +23,8 @@ import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.level.PathNavigationRegion;
+import net.minecraft.tags.BlockTags;
 
 import java.util.*;
 
@@ -31,15 +33,21 @@ import java.util.*;
  * - Simplified for smoother movement while retaining precise final arrival
  * - Added support for invisible cauldron blocks
  * - Added support for chain blocks
- * - Added support for Carving to target nearest side
- * 
- * need to fix:
- * - avoiding fire and lava
+ * - Added support for Carving to target the nearest side
  */
 public class BogrePathNavigation extends GroundPathNavigation {
 
     private Vec3 preciseTarget = null;
     private static final double TOLERANCE_SQ = 0.1D * 0.1D;
+    private static final double STUCK_THRESHOLD_SQ = 0.015D * 0.015D;
+    private static final int MAX_REPATH_ATTEMPTS = 3;
+    private static final int STUCK_REPATH_INTERVAL = 30;
+
+    private Vec3 lastPos = Vec3.ZERO;
+    private int stuckTicks = 0;
+    private int preciseArrivalTicks = 0;
+    private int repathAttempts = 0;
+    private boolean isNearEnough = false;
 
     public BogrePathNavigation(Mob mob, Level level) {
         super(mob, level);
@@ -49,11 +57,27 @@ public class BogrePathNavigation extends GroundPathNavigation {
     protected PathFinder createPathFinder(int pRange) {
         this.nodeEvaluator = new WalkNodeEvaluator() {
             @Override
+            public void prepare(PathNavigationRegion region, Mob mob) {
+                super.prepare(region, mob);
+                this.entityWidth = 2;
+                this.entityDepth = 2;
+            }
+
+            @Override
             public BlockPathTypes getBlockPathType(BlockGetter level, int x, int y, int z) {
                 BlockPathTypes type = super.getBlockPathType(level, x, y, z);
                 
                 BlockPos pos = new BlockPos(x, y, z);
-                
+                BlockState state = level.getBlockState(pos);
+
+                //avoid fire, lava, magma block
+                if (state.is(Blocks.FIRE) || state.is(Blocks.LAVA) ||
+                        state.is(Blocks.MAGMA_BLOCK)) {
+                    return BlockPathTypes.DAMAGE_FIRE;
+                }
+
+
+                // avoid chain blocks above cauldron blocks
                 if (level.getBlockState(pos).is(Blocks.CHAIN)) {
                     for (int i = 1; i <= 4; i++) {
                         if (level.getBlockState(pos.below(i)).is(ModBlocks.INVISIBLE_CAULDRON_BLOCK.get())) {
@@ -62,12 +86,20 @@ public class BogrePathNavigation extends GroundPathNavigation {
                     }
                 }
                 
-                for (int dx = -1; dx <= 0; dx++) {
-                    for (int dz = -1; dz <= 0; dz++) {
+                for (int dx = -1; dx <= 1; dx++) {
+                    for (int dz = -1; dz <= 1; dz++) {
                         if (level.getBlockState(pos.offset(dx, 0, dz)).is(ModBlocks.INVISIBLE_CAULDRON_BLOCK.get())) {
                             return BlockPathTypes.BLOCKED;
                         }
                     }
+                }
+                
+                boolean isClimbable = state.is(BlockTags.CLIMBABLE);
+                boolean isFloorClimbable = level.getBlockState(pos.below())
+                .is(BlockTags.CLIMBABLE);
+
+                if (isClimbable || isFloorClimbable) {
+                    return BlockPathTypes.BLOCKED;
                 }
                 
                 return type;
@@ -99,13 +131,25 @@ public class BogrePathNavigation extends GroundPathNavigation {
         }
 
         this.preciseTarget = target;
+        this.isNearEnough = false;
         return super.moveTo(target.x, target.y, target.z, speed);
+    }
+
+    @Override
+    public boolean moveTo(Path path, double speed) {
+        this.isNearEnough = false;
+        this.preciseArrivalTicks = 0;
+        this.stuckTicks = 0;
+        return super.moveTo(path, speed);
     }
 
     @Override
     public void stop() {
         super.stop();
         this.preciseTarget = null;
+        this.preciseArrivalTicks = 0;
+        this.stuckTicks = 0;
+        this.repathAttempts = 0;
     }
 
     @Override
@@ -115,12 +159,72 @@ public class BogrePathNavigation extends GroundPathNavigation {
         if (DevMode.bogrePathfinding() &&
         this.level instanceof ServerLevel serverLevel &&
         this.tick % 5 == 0) {
-            BogreDebugRenderer.renderPath(serverLevel, this.path, this.preciseTarget, this.mob.position());
+            BogreDebugRenderer.renderPath(serverLevel,
+            this.path, this.preciseTarget, this.mob.position());
         }
+
+        Vec3 currentPos = this.mob.position();
+        boolean isPathActive = (!this.isDone() && this.path != null);
+        boolean isPreciseArrival = (this.isDone() && this.preciseTarget != null);
+        
+        if (isPreciseArrival) {
+            this.preciseArrivalTicks++;
+            if (this.preciseArrivalTicks >= 30) {
+                this.abortAndConsiderArrived();
+                return;
+            }
+        } else {
+            this.preciseArrivalTicks = 0;
+        }
+        
+        if (isPathActive) {
+            if (currentPos.distanceToSqr(this.lastPos) < STUCK_THRESHOLD_SQ &&
+            !this.mob.isNoGravity()) {
+                this.stuckTicks++;
+                if (this.stuckTicks >= STUCK_REPATH_INTERVAL) {
+                    if (this.repathAttempts < MAX_REPATH_ATTEMPTS) {
+                        this.repathAttempts++;
+                        this.stuckTicks = 0;
+                        Path currentPath = this.path;
+                        if (currentPath != null && currentPath.getTarget() != null) {
+                            BlockPos target = currentPath.getTarget();
+                            int savedAttempts = this.repathAttempts;
+                            this.stop();
+                            this.repathAttempts = savedAttempts;
+
+                            this.moveTo(target.getX() + 0.5D,
+                            target.getY(),
+                            target.getZ() + 0.5D,
+                            this.speedModifier);
+                        }
+                    } else {
+                        this.abortAndConsiderArrived();
+                    }
+                }
+            } else {
+                this.stuckTicks = 0;
+                this.repathAttempts = 0;
+            }
+        } else {
+            this.stuckTicks = 0;
+        }
+        
+        this.lastPos = currentPos;
 
         if (this.isDone() && this.preciseTarget != null) {
             handlePreciseArrival();
         }
+    }
+
+    private void abortAndConsiderArrived() {
+        this.isNearEnough = true;
+        this.stop();
+        
+        this.mob.getMoveControl().setWantedPosition(this.mob.getX(),
+        this.mob.getY(),
+        this.mob.getZ(), 0);
+        this.mob.setZza(0.0F);
+        this.mob.setXxa(0.0F);
     }
 
     private void handlePreciseArrival() {
@@ -223,7 +327,14 @@ public class BogrePathNavigation extends GroundPathNavigation {
         double distToSpotSq = bogre.position().distanceToSqr(moveTarget.x, bogre.getY(), moveTarget.z);
         double yDist = Math.abs(bogre.getY() - moveTarget.y);
 
-        if (distToSpotSq > 0.3 * 0.3 || yDist > 1.5D) {
+        boolean isArrived = distToSpotSq <= 0.3 * 0.3 &&
+        yDist <= 1.5D;
+
+        if (this.isNearEnough && distToSpotSq <= 2.25D && yDist <= 1.5D) {
+            isArrived = true;
+        }
+
+        if (!isArrived) {
             this.preciseMoveTo(moveTarget, 1.0D);
             bogre.incrementAiTicks();
             return false;
