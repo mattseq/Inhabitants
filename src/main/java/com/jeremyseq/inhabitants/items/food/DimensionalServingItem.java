@@ -18,8 +18,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public class DimensionalSnackItem extends BowlFoodItem {
-    public DimensionalSnackItem() {
+public class DimensionalServingItem extends BowlFoodItem {
+    public DimensionalServingItem() {
         super(new Item.Properties().stacksTo(1).food(
             new FoodProperties.Builder()
             .nutrition(2)

@@ -185,19 +185,19 @@ public class BogreRecipeManager extends SimpleJsonResourceReloadListener {
 
             addCookingFallback(cookingList, 
                 List.of(Items.SPIDER_EYE, Items.FERMENTED_SPIDER_EYE, Items.SLIME_BALL),
-                ModItems.SPIDER_SOUP, 30);
+                ModItems.MARINATED_SPIDER, 30);
                 
             addCookingFallback(cookingList,
                 List.of(Items.POISONOUS_POTATO, Items.FERMENTED_SPIDER_EYE, Items.BONE),
-                ModItems.BANEFUL_POTATO, 100);
+                ModItems.UNCANNY_POTTAGE, 100);
                 
             addCookingFallback(cookingList,
                 List.of(Items.GUNPOWDER, Items.ROTTEN_FLESH, Items.ROTTEN_FLESH),
-                ModItems.MONSTER_MEAL, 100);
+                ModItems.BAKED_BRAINS, 100);
                 
             addCookingFallback(cookingList,
                 List.of(Items.PHANTOM_MEMBRANE, Items.PHANTOM_MEMBRANE,
-                Items.ENDER_PEARL), ModItems.DIMENSIONAL_SNACK, 100);
+                Items.ENDER_PEARL), ModItems.DIMENSIONAL_SERVING, 100);
         }
     }
 

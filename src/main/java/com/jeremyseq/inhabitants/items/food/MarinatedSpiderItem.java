@@ -12,14 +12,14 @@ import net.minecraft.world.level.Level;
 
 import org.jetbrains.annotations.NotNull;
 
-public class SpiderSoupItem extends BowlFoodItem {
-    public SpiderSoupItem() {
+public class MarinatedSpiderItem extends BowlFoodItem {
+    public MarinatedSpiderItem() {
         super(new Item.Properties().stacksTo(1).food(
                 new FoodProperties.Builder()
-                        .nutrition(6)
-                        .saturationMod(0.6f)
-                        .alwaysEat()
-                        .build()));
+                .nutrition(6)
+                .saturationMod(0.6f)
+                .alwaysEat()
+                .build()));
     }
 
     @Override

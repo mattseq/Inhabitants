@@ -26,10 +26,9 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.IMPALER_SPAWN_EGG.get());
                         pOutput.accept(ModItems.IMPALER_SPIKE.get());
                         pOutput.accept(ModItems.MUSIC_DISC_BOGRE.get());
-                        pOutput.accept(ModItems.MONSTER_MEAL.get());
-                        pOutput.accept(ModItems.BANEFUL_POTATO.get());
-                        pOutput.accept(ModItems.SPIDER_SOUP.get());
-                        pOutput.accept(ModItems.DIMENSIONAL_SNACK.get());
+                        pOutput.accept(ModItems.BAKED_BRAINS.get());
+                        pOutput.accept(ModItems.MARINATED_SPIDER.get());
+                        pOutput.accept(ModItems.DIMENSIONAL_SERVING.get());
                     })
                     .build());
 

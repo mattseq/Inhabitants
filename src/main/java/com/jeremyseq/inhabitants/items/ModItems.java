@@ -22,14 +22,12 @@ public class ModItems {
             FishSnotChowderItem::new);
     public static final RegistryObject<Item> UNCANNY_POTTAGE = ITEMS.register("uncanny_pottage",
             UncannyPottageItem::new);
-    public static final RegistryObject<Item> SPIDER_SOUP = ITEMS.register("spider_soup",
-            SpiderSoupItem::new);
-    public static final RegistryObject<Item> BANEFUL_POTATO = ITEMS.register("baneful_potato",
-            BanefulPotatoItem::new);
-    public static final RegistryObject<Item> MONSTER_MEAL = ITEMS.register("monster_meal",
-            MonsterMealItem::new);
-    public static final RegistryObject<Item> DIMENSIONAL_SNACK = ITEMS.register("dimensional_snack",
-            DimensionalSnackItem::new);
+    public static final RegistryObject<Item> MARINATED_SPIDER = ITEMS.register("marinated_spider",
+            MarinatedSpiderItem::new);
+    public static final RegistryObject<Item> BAKED_BRAINS = ITEMS.register("baked_brains",
+            BakedBrainsItem::new);
+    public static final RegistryObject<Item> DIMENSIONAL_SERVING = ITEMS.register("dimensional_serving",
+            DimensionalServingItem::new);
 
     public static final RegistryObject<Item> CREATIVE_TAB = ITEMS.register("creative_tab",
             () -> new Item(new Item.Properties().stacksTo(1)));
