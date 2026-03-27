@@ -1,35 +1,22 @@
 package com.jeremyseq.inhabitants.entities.bogre.ai;
 
-import com.jeremyseq.inhabitants.debug.DevMode;
-
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
-import com.jeremyseq.inhabitants.ModSoundEvents;
-import com.jeremyseq.inhabitants.entities.EntityUtil;
 import com.jeremyseq.inhabitants.entities.bogre.utilities.*;
-import com.jeremyseq.inhabitants.entities.bogre.ai.BogreNeutralGoal;
-import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
-import com.jeremyseq.inhabitants.entities.bogre.recipe.BogreRecipe;
-import com.jeremyseq.inhabitants.entities.bogre.recipe.BogreRecipeManager;
 import com.jeremyseq.inhabitants.entities.bogre.skill.*;
-import com.jeremyseq.inhabitants.entities.bogre.utilities.BogreDetectionHelper;
+import com.jeremyseq.inhabitants.recipe.*;
 
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Vec3i;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.*;
 
 /**
  * The brain of the bogre.
+ * 
  * @jeremy should we name it bogreBrain.java ?
  */
 
@@ -37,30 +24,44 @@ public class BogreAi {
     private final BogreEntity bogre;
 
     // --- AI States ---
-    public enum State { NEUTRAL, AGGRESSIVE, SKILLING }
+    public enum State {
+        NEUTRAL, AGGRESSIVE, SKILLING
+    }
+
     // --- AI Sub-States ---
-    public enum NeutralState { IDLE, WANDERING, DANCING }
-    public enum AggressiveState { ATTACKING, ROARING, CHASING }
-    public enum SkillingState { NONE, COOKING, CARVING, TRANSFORMATION,
-    DELIVERING, MOVING_TO_TARGET, PLACING_ITEM }
+    public enum NeutralState {
+        IDLE, WANDERING, DANCING
+    }
+
+    public enum AggressiveState {
+        ATTACKING, ROARING, CHASING
+    }
+
+    public enum SkillingState {
+        NONE, COOKING, CARVING, TRANSFORMATION,
+        DELIVERING, MOVING_TO_TARGET, PLACING_ITEM
+    }
+
+    public enum DeliveryState {
+        SEARCHING, DELIVERING_TO_PLAYER, MOVING_TO_CHEST,
+        OPENING_CHEST, DEPOSITING, CLOSING_CHEST
+    }
+
+    private DeliveryState deliveryState = DeliveryState.SEARCHING;
 
     // --- AI Constants ---
     public static final float FORGET_RANGE = 20f;
     public static final float ROAR_RANGE = 12f;
-    public static final float HOSTILE_RANGE = 10f;
 
-    private BogreRecipe activeRecipe = null;
-    private ItemEntity droppedIngredientItem = null;
-    private Player droppedIngredientPlayer = null;
-    private int cookingItemThrowDelay = -1;
-
-    // GUI Future TODO: remove this and make list in the cauldron entity
-    private ItemStack cookingIngredientInCauldron = ItemStack.EMPTY; 
+    private IBogreRecipe activeRecipe = null;
+    private ItemStack storedSkillResult = ItemStack.EMPTY;
+    private UUID resultOwnerUUID = null; // Player who initiated the current recipe
 
     private Vec3 lastPos = null;
     private int stuckTicks = 0;
     private boolean pathSet = false;
     private int skillingMoveSide = 0; // 1: +X, -1: -X, 2: +Z, -2: -Z (0: NONE)
+    private int deliveryFailures = 0;
 
     public BogreAi(BogreEntity bogre) {
         this.bogre = bogre;
@@ -94,18 +95,19 @@ public class BogreAi {
                 bogre.setTarget(null);
 
             } else if (bogre.getTarget() instanceof Player player &&
-                    !BogreUtil.isPlayerHoldingWeapon(player) &&
-                    (bogre.getAttackGoal() == null ||
-                    !bogre.getAttackGoal().getAttackedByPlayers().contains(player.getUUID())) &&
-                    bogre.getAIState() != State.AGGRESSIVE) {
-                        bogre.setTarget(null);
+                !BogreUtil.isPlayerHoldingWeapon(player) &&
+                (bogre.getAttackGoal() == null ||
+                !bogre.getAttackGoal().getAttackedByPlayers().contains(player.getUUID())) &&
+                bogre.getAIState() != State.AGGRESSIVE) {
+                    bogre.setTarget(null);
 
                 if (bogre.getAttackGoal() != null) {
                     bogre.getAttackGoal().getWarnedPlayers().remove(player);
                 }
             } else {
                 if (bogre.getAIState() != State.AGGRESSIVE) {
-                    if (bogre.getAttackGoal() != null) bogre.getAttackGoal().enterAttacking();
+                    if (bogre.getAttackGoal() != null)
+                        bogre.getAttackGoal().enterAttacking();
                 }
                 return;
             }
@@ -153,10 +155,11 @@ public class BogreAi {
     public void handleHandItem() {
         // Handle hand item logic
     }
+
     public void enterSkilling() {
         bogre.setAIState(State.SKILLING);
     }
-    
+
     public boolean hasProgress() {
         State state = bogre.getAIState();
         if (state == State.AGGRESSIVE) {
@@ -166,46 +169,31 @@ public class BogreAi {
         }
         if (state == State.SKILLING) {
             SkillingState skill = bogre.getCraftingState();
-            return skill == SkillingState.COOKING || 
-                   skill == SkillingState.CARVING || 
-                   skill == SkillingState.TRANSFORMATION || 
-                   skill == SkillingState.PLACING_ITEM;
+            return skill == SkillingState.COOKING ||
+                    skill == SkillingState.CARVING ||
+                    skill == SkillingState.TRANSFORMATION ||
+                    skill == SkillingState.PLACING_ITEM ||
+                    skill == SkillingState.DELIVERING;
         }
         return false;
     }
 
     public void interruptSkilling() {
         if (bogre.getAIState() == State.SKILLING) {
-            BogreRecipe recipe = getActiveRecipe();
-            if (recipe != null && recipe.type() == BogreRecipe.Type.CARVING) {
+            IBogreRecipe recipe = getActiveRecipe();
+            if (recipe != null && recipe.getBogreRecipeType() == IBogreRecipe.Type.CARVING) {
                 CarvingSkill.clearCracks(bogre);
             }
 
-            stopAnimation();
+            stopAnimation("all");
             if (!bogre.getItemHeld().isEmpty()) {
                 bogre.throwHeldItem();
             }
 
-            // drop item from cauldron if interrupted
-            if (!this.getCookingIngredientInCauldron().isEmpty() && bogre.cauldronPos != null) {
-                EntityUtil.throwItemStack(
-                    bogre.level(), 
-                    Vec3.atCenterOf(bogre.cauldronPos).add(0, 0.8, 0),
-                    Vec3.ZERO,
-                    this.getCookingIngredientInCauldron(), 
-                    0.0f, 
-                    0.1f
-                );
-
-                this.setCookingIngredientInCauldron(ItemStack.EMPTY);
-            }
-
             bogre.setCraftingState(SkillingState.NONE);
             bogre.getEntityData().set(BogreEntity.TARGET_POS, BlockPos.ZERO);
-            
+
             this.setActiveRecipe(null);
-            this.setDroppedIngredientPlayer(null);
-            this.setDroppedIngredientItem(null);
             this.setPathSet(false);
             this.resetStuckTicks();
             this.setSkillingMoveSide(0);
@@ -219,22 +207,26 @@ public class BogreAi {
                 case "carving" -> bogre.getEntityData().set(BogreEntity.CARVING_ANIM, false);
                 case "dancing" -> {
                     if (bogre.getNeutralState() == NeutralState.DANCING) {
-                        if (bogre.getNeutralGoal() != null) bogre.getNeutralGoal().enterIdle();
+                        if (bogre.getNeutralGoal() != null)
+                            bogre.getNeutralGoal().enterIdle();
                     }
                 }
                 case "roar" -> {
                     if (bogre.getAggressiveState() == AggressiveState.ROARING) {
-                        if (bogre.getAttackGoal() != null) bogre.getAttackGoal().enterChasing();
+                        if (bogre.getAttackGoal() != null)
+                            bogre.getAttackGoal().enterChasing();
                     }
                 }
                 case "all" -> {
                     bogre.getEntityData().set(BogreEntity.COOKING_ANIM, false);
                     bogre.getEntityData().set(BogreEntity.CARVING_ANIM, false);
                     if (bogre.getNeutralState() == NeutralState.DANCING) {
-                        if (bogre.getNeutralGoal() != null) bogre.getNeutralGoal().enterIdle();
+                        if (bogre.getNeutralGoal() != null)
+                            bogre.getNeutralGoal().enterIdle();
                     }
                     if (bogre.getAggressiveState() == AggressiveState.ROARING) {
-                        if (bogre.getAttackGoal() != null) bogre.getAttackGoal().enterChasing();
+                        if (bogre.getAttackGoal() != null)
+                            bogre.getAttackGoal().enterChasing();
                     }
                     bogre.resetAiTicks();
                 }
@@ -242,68 +234,42 @@ public class BogreAi {
         }
     }
 
-    public BogreRecipe getActiveRecipe() {
+    public IBogreRecipe getActiveRecipe() {
         return activeRecipe;
     }
 
-    public void setActiveRecipe(BogreRecipe recipe) {
+    public void setActiveRecipe(IBogreRecipe recipe) {
         this.activeRecipe = recipe;
         if (recipe != null) {
             bogre.getEntityData().set(BogreEntity.SKILL_DURATION, BogreSkills
-            .forType(recipe.type()).getDuration(bogre));
+                    .forType(recipe.getBogreRecipeType()).getDuration(bogre));
 
-            bogre.getEntityData().set(BogreEntity.HAMMER_HITS, recipe.hammer_hits());
-
-            if (recipe.hammerSound().isPresent()) {
-                bogre.getEntityData().set(BogreEntity.HAMMER_SOUND,
-                recipe.hammerSound().get().getLocation().toString());
-                
+            if (recipe instanceof CarvingRecipe carving) {
+                bogre.getEntityData().set(BogreEntity.HAMMER_HITS, carving.hammer_hits());
+                if (carving.hammerSound().isPresent()) {
+                    bogre.getEntityData().set(BogreEntity.HAMMER_SOUND,
+                            carving.hammerSound().get().getLocation().toString());
+                } else {
+                    bogre.getEntityData().set(BogreEntity.HAMMER_SOUND, "");
+                }
+            } else if (recipe instanceof TransformationRecipe transformation) {
+                bogre.getEntityData().set(BogreEntity.HAMMER_HITS, transformation.hammer_hits());
+                if (transformation.hammerSound().isPresent()) {
+                    bogre.getEntityData().set(BogreEntity.HAMMER_SOUND,
+                            transformation.hammerSound().get().getLocation().toString());
+                } else {
+                    bogre.getEntityData().set(BogreEntity.HAMMER_SOUND, "");
+                }
             } else {
+                bogre.getEntityData().set(BogreEntity.HAMMER_HITS, 1);
                 bogre.getEntityData().set(BogreEntity.HAMMER_SOUND, "");
             }
         } else {
             bogre.getEntityData().set(BogreEntity.SKILL_DURATION, 130);
             bogre.getEntityData().set(BogreEntity.HAMMER_HITS, 1);
             bogre.getEntityData().set(BogreEntity.HAMMER_SOUND, "");
+            this.resultOwnerUUID = null;
         }
-    }
-
-    public ItemEntity getDroppedIngredientItem() {
-        return droppedIngredientItem;
-    }
-
-    public void setDroppedIngredientItem(ItemEntity droppedIngredientItem) {
-        this.droppedIngredientItem = droppedIngredientItem;
-    }
-
-    public Player getDroppedIngredientPlayer() {
-        return droppedIngredientPlayer;
-    }
-
-    public void setDroppedIngredientPlayer(Player droppedIngredientPlayer) {
-        this.droppedIngredientPlayer = droppedIngredientPlayer;
-    }
-
-    public int getCookingItemThrowDelay() {
-        return cookingItemThrowDelay;
-    }
-
-    public void setCookingItemThrowDelay(int cookingItemThrowDelay) {
-        this.cookingItemThrowDelay = cookingItemThrowDelay;
-    }
-
-    public void decrementCookingItemThrowDelay() {
-        if (this.cookingItemThrowDelay >= 0) {
-            this.cookingItemThrowDelay--;
-        }
-    }
-
-    public ItemStack getCookingIngredientInCauldron() {
-        return cookingIngredientInCauldron;
-    }
-
-    public void setCookingIngredientInCauldron(ItemStack stack) {
-        this.cookingIngredientInCauldron = stack != null ? stack : ItemStack.EMPTY;
     }
 
     public Vec3 getLastPos() {
@@ -342,6 +308,14 @@ public class BogreAi {
         this.skillingMoveSide = skillingMoveSide;
     }
 
+    public UUID getResultOwnerUUID() {
+        return resultOwnerUUID;
+    }
+
+    public void setResultOwnerUUID(UUID ownerUUID) {
+        this.resultOwnerUUID = ownerUUID;
+    }
+
     private boolean shouldDance() {
         return BogreNeutralGoal.shouldDance(this.bogre);
     }
@@ -364,5 +338,42 @@ public class BogreAi {
         public void tick() {
             BogreSkillingGoal.aiStep(bogre);
         }
+    }
+
+    public void setDeliveryState(DeliveryState state) {
+        this.deliveryState = state;
+        bogre.getEntityData().set(BogreEntity.DELIVERY_STATE, state.ordinal());
+    }
+
+    public DeliveryState getDeliveryState() {
+        return DeliveryState.values()[bogre.getEntityData().get(BogreEntity.DELIVERY_STATE)];
+    }
+
+    public void setStoredSkillResult(ItemStack stack) {
+        this.storedSkillResult = stack;
+    }
+
+    public ItemStack getStoredSkillResult() {
+        return storedSkillResult;
+    }
+
+    public static boolean playAnimation(BogreEntity bogre, String name) {
+        if (name == null || name.isEmpty())
+            return false;
+
+        bogre.triggerAnim("trigger_controller", name);
+        return true;
+    }
+
+    public int getDeliveryFailures() {
+        return deliveryFailures;
+    }
+
+    public void setDeliveryFailures(int deliveryFailures) {
+        this.deliveryFailures = deliveryFailures;
+    }
+
+    public void incrementDeliveryFailures() {
+        this.deliveryFailures++;
     }
 }

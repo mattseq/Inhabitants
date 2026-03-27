@@ -1,12 +1,8 @@
 package com.jeremyseq.inhabitants.entities.bogre;
 
-import com.jeremyseq.inhabitants.ModSoundEvents;
 import com.jeremyseq.inhabitants.entities.EntityUtil;
-import com.jeremyseq.inhabitants.entities.PrecisePathNavigation;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
 import com.jeremyseq.inhabitants.items.ModItems;
-import com.jeremyseq.inhabitants.networking.ModNetworking;
-import com.jeremyseq.inhabitants.networking.ScreenShakePacketS2C;
 import com.jeremyseq.inhabitants.entities.bogre.ai.*;
 import com.jeremyseq.inhabitants.entities.bogre.render.BogreAnimationHandler;
 import com.jeremyseq.inhabitants.entities.bogre.utilities.*;
@@ -79,6 +75,7 @@ public class BogreEntity extends Monster implements GeoEntity {
     public static final EntityDataAccessor<Integer> HAMMER_HITS = defineAccessor(EntityDataSerializers.INT);
     public static final EntityDataAccessor<Boolean> IS_TRANSFORMING_DISC = defineAccessor(EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Integer> AI_TICKS = defineAccessor(EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Integer> DELIVERY_STATE = defineAccessor(EntityDataSerializers.INT);
 
     // --- State & Position Info ---
     public BlockPos cauldronPos = null;
@@ -145,6 +142,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         entityData.define(HAMMER_HITS, 1);
         entityData.define(IS_TRANSFORMING_DISC, false);
         entityData.define(AI_TICKS, 0);
+        entityData.define(DELIVERY_STATE, 0);
     }
 
     // --- Combat & Attack Interaction ---
@@ -323,7 +321,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         assert !this.level().isClientSide();
         this.triggerAnim("trigger_controller", "grab");
         EntityUtil.throwItemStack(this.level(), this, this.getItemHeld(), .3f, 0);
-        setItemHeld(ItemStack.EMPTY);
+        setItemHeld(ItemStack.EMPTY, false);
     }
 
     // --- Cooking & Cauldron ---

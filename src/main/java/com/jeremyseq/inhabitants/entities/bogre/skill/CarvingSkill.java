@@ -1,7 +1,9 @@
 package com.jeremyseq.inhabitants.entities.bogre.skill;
 
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
-import com.jeremyseq.inhabitants.entities.bogre.recipe.BogreRecipe;
+import com.jeremyseq.inhabitants.recipe.BogreRecipeManager;
+import com.jeremyseq.inhabitants.recipe.CarvingRecipe;
+import com.jeremyseq.inhabitants.recipe.IBogreRecipe;
 import com.jeremyseq.inhabitants.entities.bogre.ai.BogrePathNavigation;
 import com.jeremyseq.inhabitants.entities.bogre.render.HammerEffectsRenderer;
 import com.jeremyseq.inhabitants.ModSoundEvents;
@@ -12,7 +14,6 @@ import com.jeremyseq.inhabitants.entities.bogre.ai.BogreSkillingGoal;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.level.block.state.BlockState;
@@ -35,17 +36,17 @@ public class CarvingSkill extends BogreSkills.Skill {
 
     @Override
     public int getDuration(BogreEntity bogre) {
-        BogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
-        if (activeRecipe != null) {
+        IBogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
+        if (activeRecipe instanceof CarvingRecipe carving) {
             // START + (10 * hits)
-            return getAnimationDuration(Animation.START) + (getAnimationDuration(Animation.LOOP) * activeRecipe.hammer_hits());
+            return getAnimationDuration(Animation.START) + (getAnimationDuration(Animation.LOOP) * carving.hammer_hits());
         }
         return getAnimationDuration(Animation.START) + 70;
     }
     
     @Override
-    public BogreRecipe.Type getType() {
-        return BogreRecipe.Type.CARVING;
+    public IBogreRecipe.Type getType() {
+        return IBogreRecipe.Type.CARVING;
     }
 
     @Override
@@ -66,7 +67,7 @@ public class CarvingSkill extends BogreSkills.Skill {
 
     @Override
     public void aiStep(BogreEntity bogre) {
-        BogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
+        IBogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
         if (activeRecipe == null) {
             finishSkill(bogre);
             return;
@@ -121,7 +122,7 @@ public class CarvingSkill extends BogreSkills.Skill {
 
     @Override
     public void handleSkilling(BogreEntity bogre) {
-        BogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
+        IBogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
         if (activeRecipe == null) {
             finishSkill(bogre);
             return;
@@ -173,7 +174,7 @@ public class CarvingSkill extends BogreSkills.Skill {
     public void keyframeTriggered(BogreEntity bogre, String name) {
         if (name.equals("skill_finished")) {
             if (!bogre.level().isClientSide) {
-                BogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
+                IBogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
                 if (activeRecipe != null) {
                     bogre.setItemHeld(activeRecipe.result().copy());
                     List<BlockPos> blocks = BogreDetectionHelper.findCarvableBlocks(bogre, 5);
@@ -184,7 +185,7 @@ public class CarvingSkill extends BogreSkills.Skill {
                 }
 
                 bogre.getEntityData().set(BogreEntity.CARVING_ANIM, false);
-                bogre.triggerAnim("trigger_controller", "grab");
+                BogreAi.playAnimation(bogre, "grab");
                 bogre.getEntityData().set(BogreEntity.TARGET_POS, BlockPos.ZERO);
                 bogre.setCraftingState(BogreAi.SkillingState.DELIVERING);
                 bogre.resetCookingTicks();
@@ -195,14 +196,14 @@ public class CarvingSkill extends BogreSkills.Skill {
         if (!name.equals("hammer_sound")) return;
 
         if (bogre.getCraftingState() == BogreAi.SkillingState.CARVING) {
-            BogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
+            IBogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
             if (!bogre.level().isClientSide && activeRecipe == null) return;
             
-            if (!bogre.level().isClientSide) {
+            if (!bogre.level().isClientSide && activeRecipe instanceof CarvingRecipe carving) {
                 int currentHits = bogre.getEntityData().get(BogreEntity.SKILL_HITS) + 1;
                 bogre.getEntityData().set(BogreEntity.SKILL_HITS, currentHits);
                 
-                int hammerHits = activeRecipe.hammer_hits();
+                int hammerHits = carving.hammer_hits();
                 if (hammerHits < 1) hammerHits = 1;
 
                 List<BlockPos> blocks = BogreDetectionHelper.findCarvableBlocks(bogre, 5);

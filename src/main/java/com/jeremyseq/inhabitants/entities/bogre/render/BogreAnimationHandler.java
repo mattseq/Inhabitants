@@ -70,6 +70,8 @@ public class BogreAnimationHandler {
     private static final String KEYFRAME_HAMMER_SOUND = "hammer_sound";
     private static final String KEYFRAME_ROAR = "roar";
     private static final String KEYFRAME_SKILL_FINISHED = "skill_finished";
+    private static final String KEYFRAME_COOKING_START_SOUND = "cooking_start_sound";
+    private static final String KEYFRAME_COOKING_LOOP_SOUND = "cooking_loop_sound";
 
 
     public static void registerControllers(BogreEntity bogre, AnimatableManager.ControllerRegistrar registrar) {
@@ -289,6 +291,10 @@ public class BogreAnimationHandler {
             handleHammerSound(bogre, soundName);
         } else if (soundName.equals(KEYFRAME_ROAR)) {
             handleRoarSound(bogre);
+        } else if (soundName.contains(KEYFRAME_COOKING_START_SOUND)) {
+            handleCookingSounds(bogre, soundName);
+        } else if (soundName.contains(KEYFRAME_COOKING_LOOP_SOUND)) {
+            handleCookingSounds(bogre, soundName);
         }
     }
 
@@ -335,4 +341,16 @@ public class BogreAnimationHandler {
     private static void handleRoarSound(BogreEntity bogre) {
         bogre.playSound(ModSoundEvents.BOGRE_ROAR.get(), 1f, 1f);
     }
+
+    private static void handleCookingSounds(BogreEntity bogre, String soundName) {
+        Player player = ClientUtils.getClientPlayer();
+        if (player == null) return;
+
+        if (soundName.contains(KEYFRAME_COOKING_START_SOUND)) {
+            player.playSound(ModSoundEvents.BOGRE_COOKING_START.get(), 1.0f, 1.0f);
+        } else if (soundName.contains(KEYFRAME_COOKING_LOOP_SOUND)) {
+            player.playSound(ModSoundEvents.BOGRE_COOKING_LOOP.get(), 1.2f, 1.0f);
+        }
+    }
+    // TODO: make playSound(bogre, soundName) for all sound keyframes instead of having multiple functions
 }

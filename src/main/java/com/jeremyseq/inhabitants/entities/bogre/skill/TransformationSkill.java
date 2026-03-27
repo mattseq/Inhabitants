@@ -1,10 +1,11 @@
 package com.jeremyseq.inhabitants.entities.bogre.skill;
 
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
-import com.jeremyseq.inhabitants.entities.bogre.recipe.BogreRecipe;
+import com.jeremyseq.inhabitants.recipe.BogreRecipeManager;
+import com.jeremyseq.inhabitants.recipe.TransformationRecipe;
+import com.jeremyseq.inhabitants.recipe.IBogreRecipe;
 import com.jeremyseq.inhabitants.entities.bogre.ai.*;
 import com.jeremyseq.inhabitants.entities.bogre.ai.BogreSkillingGoal;
-import com.jeremyseq.inhabitants.entities.bogre.recipe.BogreRecipe;
 import com.jeremyseq.inhabitants.entities.bogre.ai.BogrePathNavigation;
 import com.jeremyseq.inhabitants.entities.bogre.render.HammerEffectsRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.render.BogreAnimationHandler;
@@ -15,9 +16,6 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.sounds.SoundEvents;
-
-import java.util.*;
 
 public class TransformationSkill extends BogreSkills.Skill {
     public static final float detectionRadius = 20.0f;
@@ -35,17 +33,17 @@ public class TransformationSkill extends BogreSkills.Skill {
 
     @Override
     public int getDuration(BogreEntity bogre) {
-        BogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
-        if (activeRecipe != null) {
+        IBogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
+        if (activeRecipe instanceof TransformationRecipe transformation) {
             // START + (10 * hits)
-            return getAnimationDuration(Animation.START) + (10 * activeRecipe.hammer_hits());
+            return getAnimationDuration(Animation.START) + (10 * transformation.hammer_hits());
         }
         return getAnimationDuration(Animation.START) + 70;
     }
 
     @Override
-    public BogreRecipe.Type getType() {
-        return BogreRecipe.Type.TRANSFORMATION;
+    public IBogreRecipe.Type getType() {
+        return IBogreRecipe.Type.TRANSFORMATION;
     }
 
     @Override
@@ -60,13 +58,9 @@ public class TransformationSkill extends BogreSkills.Skill {
 
     @Override
     public void aiStep(BogreEntity bogre) {
-        BogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
+        IBogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
         if (activeRecipe == null) {
             finishSkill(bogre);
-            return;
-        }
-
-        if (BogreSkillingGoal.handleThrowingResult(bogre)) {
             return;
         }
 
@@ -124,7 +118,7 @@ public class TransformationSkill extends BogreSkills.Skill {
 
     @Override
     public void handleSkilling(BogreEntity bogre) {
-        BogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
+        IBogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
         if (activeRecipe == null) {
             finishSkill(bogre);
             return;
@@ -154,7 +148,8 @@ public class TransformationSkill extends BogreSkills.Skill {
             bogre.getEntityData().set(BogreEntity.CARVING_ANIM, true);
 
             // special flag for music disc transformation visuals
-            if (activeRecipe.triggerItem().isPresent() && activeRecipe.triggerItem().get().toString().equals("music_disc_11")) {
+            if (activeRecipe instanceof TransformationRecipe transformation && 
+                transformation.ingredient().toString().equals("music_disc_11")) {
                 bogre.getEntityData().set(BogreEntity.IS_TRANSFORMING_DISC, true);
                 nearestTransformationItem.setInvisible(true);
             }
@@ -169,7 +164,7 @@ public class TransformationSkill extends BogreSkills.Skill {
     public void keyframeTriggered(BogreEntity bogre, String name) {
         if (name.equals("skill_finished")) {
             if (!bogre.level().isClientSide) {
-                BogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
+                IBogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
                 ItemEntity nearestTransformationItem = BogreSkillingGoal.findTransformationItem(bogre, (int) BogreAi.ROAR_RANGE);
                 if (activeRecipe != null && nearestTransformationItem != null) {
                     Vec3 dropPos = nearestTransformationItem.position();
@@ -197,7 +192,7 @@ public class TransformationSkill extends BogreSkills.Skill {
                 bogre.getEntityData().set(BogreEntity.CARVING_ANIM, false);
                 setTransformationTicks(bogre, 0);
                 bogre.resetCookingTicks();
-                bogre.triggerAnim("trigger_controller", "grab");
+                BogreAi.playAnimation(bogre, "grab");
                 bogre.getEntityData().set(BogreEntity.TARGET_POS, BlockPos.ZERO);
                 bogre.getEntityData().set(BogreEntity.TARGET_ENTITY_ID, -1);
                 bogre.getEntityData().set(BogreEntity.IS_TRANSFORMING_DISC, false);
@@ -209,14 +204,14 @@ public class TransformationSkill extends BogreSkills.Skill {
         if (!name.equals("hammer_sound")) return;
 
         if (bogre.getCraftingState() == BogreAi.SkillingState.TRANSFORMATION) {
-            BogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
+            IBogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
             if (!bogre.level().isClientSide && activeRecipe == null) return;
             
-            if (!bogre.level().isClientSide) {
+            if (!bogre.level().isClientSide && activeRecipe instanceof TransformationRecipe transformation) {
                 int currentHits = bogre.getEntityData().get(BogreEntity.SKILL_HITS) + 1;
                 bogre.getEntityData().set(BogreEntity.SKILL_HITS, currentHits);
                 
-                int expectedHits = activeRecipe.hammer_hits();
+                int expectedHits = transformation.hammer_hits();
                 if (expectedHits < 1) expectedHits = 1;
 
                 ItemEntity nearestTransformationItem = BogreSkillingGoal.findTransformationItem(bogre, (int) BogreAi.ROAR_RANGE);

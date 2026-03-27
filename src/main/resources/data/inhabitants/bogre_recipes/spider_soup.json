@@ -1,7 +1,10 @@
 {
   "type": "cooking",
-  "ingredient": "minecraft:spider_eye",
+  "ingredients": [
+    "minecraft:spider_eye",
+    "minecraft:fermented_spider_eye",
+    "minecraft:slime_ball"
+  ],
   "result": "inhabitants:spider_soup",
-  "suspicious_stew_chance": 0.3,
   "time_ticks": 30
 }

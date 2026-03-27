@@ -78,48 +78,9 @@ public class BogreUtil {
     }
 
     public static void throwHeldItem(BogreEntity bogre) {
-        bogre.triggerAnim("trigger_controller", "grab");
+        BogreAi.playAnimation(bogre, "grab");
         EntityUtil.throwItemStack(bogre.level(), bogre, bogre.getItemHeld(), .3f, 0);
-        bogre.setItemHeld(ItemStack.EMPTY);
-    }
-
-    public static boolean handleThrowingResult(BogreEntity bogre) {
-        if (!bogre.getItemHeld().isEmpty() && bogre.getAi().getCookingItemThrowDelay() != -1) {
-            Player droppedIngredientPlayer = bogre.getAi().getDroppedIngredientPlayer();
-
-            if (droppedIngredientPlayer != null) {
-                if (bogre.getAi().getCookingItemThrowDelay() > 0) {
-                    bogre.lookAt(EntityAnchorArgument.Anchor.FEET,
-                    droppedIngredientPlayer.position());
-                    
-                    bogre.getAi().decrementCookingItemThrowDelay();
-
-                    return true;
-                } else if (bogre.getAi().getCookingItemThrowDelay() == 0) {
-                    throwHeldItem(bogre);
-                    bogre.setAIState(BogreAi.State.NEUTRAL);
-                    bogre.setCraftingState(BogreAi.SkillingState.NONE);
-                    bogre.getAi().setActiveRecipe(null);
-                    bogre.getAi().setDroppedIngredientPlayer(null);
-                    bogre.getAi().setDroppedIngredientItem(null); // Clear item reference
-                    bogre.getAi().setCookingItemThrowDelay(-1);
-                    bogre.getAi().setPathSet(false);
-                    bogre.getAi().resetStuckTicks();
-                    return true;
-                }
-            } else {
-                throwHeldItem(bogre);
-                bogre.setAIState(BogreAi.State.NEUTRAL);
-                bogre.setCraftingState(BogreAi.SkillingState.NONE);
-                bogre.getAi().setActiveRecipe(null);
-                bogre.getAi().setDroppedIngredientItem(null); // Clear item reference
-                bogre.getAi().setCookingItemThrowDelay(-1);
-                bogre.getAi().setPathSet(false);
-                bogre.getAi().resetStuckTicks();
-                return true;
-            }
-        }
-        return false;
+        bogre.setItemHeld(ItemStack.EMPTY, false);
     }
 
     public static BlockPos getAveragePosition(List<BlockPos> positions) {

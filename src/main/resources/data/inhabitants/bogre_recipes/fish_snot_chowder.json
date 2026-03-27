@@ -1,0 +1,10 @@
+{
+  "type": "cooking",
+  "ingredients": [
+    "#inhabitants:cauldron_fish",
+    "#inhabitants:cauldron_fish",
+    "#inhabitants:cauldron_fish"
+  ],
+  "result": "inhabitants:fish_snot_chowder",
+  "time_ticks": 100
+}

@@ -1,6 +1,6 @@
 package com.jeremyseq.inhabitants.entities.bogre.skill;
 
-import com.jeremyseq.inhabitants.entities.bogre.recipe.BogreRecipe;
+import com.jeremyseq.inhabitants.recipe.IBogreRecipe;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.ai.BogreAi;
 
@@ -16,7 +16,7 @@ public final class BogreSkills {
 
     private BogreSkills() {}
 
-    public static Skill forType(BogreRecipe.Type type) {
+    public static Skill forType(IBogreRecipe.Type type) {
         return ALL.stream()
         .filter(s -> s.getType() == type)
         .findFirst()
@@ -25,7 +25,7 @@ public final class BogreSkills {
 
     public static void cancelCurrentSkill(BogreEntity bogre) {
         if (bogre.getAi().getActiveRecipe() == null) return;
-        Skill skill = forType(bogre.getAi().getActiveRecipe().type());
+        Skill skill = forType(bogre.getAi().getActiveRecipe().getBogreRecipeType());
         skill.cancel(bogre);
     }
 
@@ -33,7 +33,7 @@ public final class BogreSkills {
         public enum Animation { START, LOOP, END }
 
         public abstract int getAnimationDuration(Animation animation);
-        public abstract BogreRecipe.Type getType();
+        public abstract IBogreRecipe.Type getType();
         public abstract void aiStep(BogreEntity bogre);
 
         public abstract void handleMovement(BogreEntity bogre);
@@ -52,8 +52,6 @@ public final class BogreSkills {
             bogre.setAIState(BogreAi.State.NEUTRAL);
             bogre.setCraftingState(BogreAi.SkillingState.NONE);
             bogre.getAi().setActiveRecipe(null);
-            bogre.getAi().setDroppedIngredientItem(null);
-            bogre.getAi().setDroppedIngredientPlayer(null);
             bogre.getAi().setPathSet(false);
             bogre.getAi().resetStuckTicks();
             bogre.getAi().setSkillingMoveSide(0);

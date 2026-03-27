@@ -1,7 +1,10 @@
 {
   "type": "cooking",
-  "ingredient": "minecraft:rotten_flesh",
+  "ingredients": [
+    "minecraft:gunpowder",
+    "minecraft:rotten_flesh",
+    "minecraft:rotten_flesh"
+  ],
   "result": "inhabitants:monster_meal",
-  "suspicious_stew_chance": 0.4,
   "time_ticks": 100
 }

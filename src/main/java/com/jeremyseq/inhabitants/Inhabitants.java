@@ -14,14 +14,17 @@ import com.jeremyseq.inhabitants.networking.ModNetworking;
 import com.jeremyseq.inhabitants.paintings.ModPaintings;
 import com.jeremyseq.inhabitants.particles.ModParticles;
 import com.jeremyseq.inhabitants.potions.ModPotions;
-import com.jeremyseq.inhabitants.entities.bogre.recipe.BogreRecipeManager;
+import com.jeremyseq.inhabitants.recipe.BogreRecipeManager;
+import com.jeremyseq.inhabitants.gui.cauldron.CauldronScreen;
 
-import com.mojang.logging.LogUtils;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.DispenserBlock;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.server.level.ServerPlayer;
+
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
@@ -32,8 +35,12 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.event.AddReloadListenerEvent; 
+import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+
 import org.slf4j.Logger;
+
+import com.mojang.logging.LogUtils;
 
 @Mod(Inhabitants.MODID)
 public class Inhabitants
@@ -98,7 +105,11 @@ public class Inhabitants
         public static void onClientSetup(FMLClientSetupEvent event)
         {
             event.enqueueWork(() -> {
-                DispenserBlock.registerBehavior(ModItems.IMPALER_SPIKE.get(), new ImpalerSpikeDispenserBehavior());
+                DispenserBlock.registerBehavior(ModItems.IMPALER_SPIKE.get(),
+                new ImpalerSpikeDispenserBehavior());
+                
+                MenuScreens.register(ModMenuTypes.CAULDRON_MENU.get(),
+                CauldronScreen::new);
             });
 
             ItemProperties.register(Items.CROSSBOW, ResourceLocation.fromNamespaceAndPath(MODID,"spike_loaded"), (stack, level, entity, seed) -> {
@@ -109,6 +120,14 @@ public class Inhabitants
                 }
                 return 0.0F;
             });
+        }
+    }
+
+    @SubscribeEvent
+    public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event)
+    {
+        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+            BogreRecipeManager.sendBogreRecipesToPlayer(serverPlayer);
         }
     }
 }

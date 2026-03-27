@@ -1,7 +1,10 @@
 {
   "type": "cooking",
-  "ingredient": "minecraft:poisonous_potato",
+  "ingredients": [
+    "minecraft:poisonous_potato",
+    "minecraft:fermented_spider_eye",
+    "minecraft:bone"
+  ],
   "result": "inhabitants:baneful_potato",
-  "suspicious_stew_chance": 0.3,
   "time_ticks": 100
 }

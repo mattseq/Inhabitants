@@ -2,10 +2,7 @@ package com.jeremyseq.inhabitants.debug;
 
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.ai.BogreAi;
-import com.jeremyseq.inhabitants.entities.bogre.ai.BogreSkillingGoal;
-import com.jeremyseq.inhabitants.entities.bogre.ai.BogreAttackGoal;
-import com.jeremyseq.inhabitants.entities.bogre.skill.CarvingSkill;
-import com.jeremyseq.inhabitants.entities.bogre.skill.TransformationSkill;
+import com.jeremyseq.inhabitants.entities.bogre.skill.CookingSkill;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -64,14 +61,29 @@ public class BogreDebugRenderer {
             stateText += " (" + entity.getAggressiveState() + ")";
         } else if (entity.getAIState() == BogreAi.State.SKILLING) {
             stateText += " (" + entity.getCraftingState() + ")";
+            if (entity.getCraftingState() == BogreAi.SkillingState.DELIVERING) {
+                stateText += " (" + entity.getAi().getDeliveryState() + ")";
+            }
         }
 
         if (entity.getAi().hasProgress()) {
             int ticks = entity.getAiTicks();
             int total = entity.getEntityData().get(BogreEntity.SKILL_DURATION);
-            stateText += " [" + ticks + "/" + total + "]";
             
             BogreAi.SkillingState skillState = entity.getCraftingState();
+            if (skillState == BogreAi.SkillingState.DELIVERING) {
+                total = switch (entity.getAi().getDeliveryState()) {
+                    case OPENING_CHEST -> CookingSkill.chestOpeningDuration;
+                    case DEPOSITING -> CookingSkill.chestDepositingDuration;
+                    case CLOSING_CHEST -> CookingSkill.chestClosingDuration;
+                    default -> 0;
+                };
+            }
+            
+            if (total > 0) {
+                stateText += " [" + ticks + "/" + total + "]";
+            }
+            
             if (entity.getAIState() == BogreAi.State.SKILLING && 
                 (skillState == BogreAi.SkillingState.CARVING || skillState == BogreAi.SkillingState.TRANSFORMATION)) {
                 int hits = entity.getEntityData().get(BogreEntity.SKILL_HITS);
@@ -93,7 +105,8 @@ public class BogreDebugRenderer {
         int backgroundColor = (int) (backgroundOpacity * 255.0F) << 24;
         float textX = (float) (-font.width(label) / 2);
 
-        font.drawInBatch(label, textX, 0, -1, false, matrix4f, bufferSource, Font.DisplayMode.NORMAL, backgroundColor, packedLight);
+        font.drawInBatch(label, textX, 0, -1, false, matrix4f, bufferSource,
+                Font.DisplayMode.NORMAL, backgroundColor, packedLight);
 
         poseStack.popPose();
     }

@@ -2,17 +2,21 @@ package com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron;
 
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import com.jeremyseq.inhabitants.items.ModItems;
+import com.jeremyseq.inhabitants.gui.cauldron.CauldronMenu;
+import com.jeremyseq.inhabitants.recipe.BogreRecipeManager;
+import com.jeremyseq.inhabitants.recipe.CookingRecipe;
+import com.jeremyseq.inhabitants.entities.bogre.ai.BogreAi;
+import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
+import com.jeremyseq.inhabitants.Inhabitants;
+import com.jeremyseq.inhabitants.ModSoundEvents;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.network.syncher.*;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.sounds.*;
+import net.minecraft.world.*;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
@@ -20,7 +24,25 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.*;
+import net.minecraft.tags.TagKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.registries.Registries;
+
+import net.minecraftforge.common.capabilities.*;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.network.NetworkHooks;
+
+import org.jetbrains.annotations.*;
+
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
@@ -28,12 +50,31 @@ import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.object.PlayState;
 
-public class BogreCauldronEntity extends Entity implements GeoEntity {
+import java.util.*;
+
+public class BogreCauldronEntity extends Entity implements GeoEntity, MenuProvider {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
 
     private boolean placedBlock = false;
     private float health;
-    private static final EntityDataAccessor<Boolean> COOKING = SynchedEntityData.defineId(BogreCauldronEntity.class, EntityDataSerializers.BOOLEAN);
+
+    private static final EntityDataAccessor<Boolean> COOKING =
+    SynchedEntityData.defineId(BogreCauldronEntity.class, EntityDataSerializers.BOOLEAN);
+
+    public static final EntityDataAccessor<Integer> COOKING_PROGRESS =
+    SynchedEntityData.defineId(BogreCauldronEntity.class, EntityDataSerializers.INT);
+
+    public static final EntityDataAccessor<Boolean> HAS_HEAT_SOURCE =
+    SynchedEntityData.defineId(BogreCauldronEntity.class, EntityDataSerializers.BOOLEAN);
+
+    // 5 slots: 4 for ingredients, 1 for the bowl/output
+    private final ItemStackHandler itemHandler = new ItemStackHandler(5);
+    private final LazyOptional<IItemHandler> optionalItemHandler =
+        LazyOptional.of(() -> itemHandler);
+
+    private static final TagKey<Block> CAULDRON_HEAT_SOURCES =
+        TagKey.create(Registries.BLOCK,
+        ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "cauldron_heat_sources"));
 
     public BogreCauldronEntity(EntityType<?> type, Level level) {
         super(type, level);
@@ -60,7 +101,16 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
             return InteractionResult.SUCCESS;
         }
 
-        return super.interact(pPlayer, pHand);
+        if (!this.level().isClientSide && pPlayer instanceof ServerPlayer serverPlayer) {
+            this.level().playSound(null, this.blockPosition(), ModSoundEvents.CAULDRON_GUI_OPEN.get(),
+            SoundSource.BLOCKS, 1.0f, 1.0f);
+            
+            // open Cauldron Gui
+            NetworkHooks.openScreen(serverPlayer, this, buf ->
+            buf.writeBlockPos(this.blockPosition()));
+        }
+
+        return InteractionResult.sidedSuccess(this.level().isClientSide);
     }
 
     @Override
@@ -106,8 +156,10 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
                 BlockPos pos = center.offset(dx, 0, dz);
                 BlockState state = level().getBlockState(pos);
 
-                if (state.hasProperty(BlockStateProperties.WATERLOGGED) && state.getValue(BlockStateProperties.WATERLOGGED)) {
-                    level().setBlock(pos, state.setValue(BlockStateProperties.WATERLOGGED, false), 3);
+                if (state.hasProperty(BlockStateProperties.WATERLOGGED) &&
+                state.getValue(BlockStateProperties.WATERLOGGED)) {
+                    level().setBlock(pos,
+                            state.setValue(BlockStateProperties.WATERLOGGED, false), 3);
                 }
             }
         }
@@ -143,6 +195,10 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
             placedBlock = true;
         }
 
+        if (!level().isClientSide) {
+            checkHeatSourceServer();
+            tickCookingLogic();
+        }
 
         if (level().isClientSide) {
             double x = getX();
@@ -178,28 +234,35 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
                 // Particle: same as lava pop
                 level().addParticle(ParticleTypes.LAVA, px, py, pz, vx, vy, vz);
             }
+            
+            if (this.hasHeatSource()) {
+                double px = x - 1 + level().random.nextDouble() * 2.0;
+                double pz = z - 1 + level().random.nextDouble() * 2.0;
+                double py = y + 1.5;
 
-
-            double px = x - 1 + level().random.nextDouble() * 2.0;
-            double pz = z - 1 + level().random.nextDouble() * 2.0;
-            double py = y + 1.5;
-
-            if (this.entityData.get(COOKING)) {
-                // more bubbles when cooking + effect particles
-                if (level().random.nextFloat() < 0.5f) {
-                    level().addParticle(ParticleTypes.BUBBLE_POP, px, py - 0.5, pz, 0, 0.05, 0);
-                    level().addParticle(ParticleTypes.EFFECT, px, py, pz, 0, 0.05, 0);
+                if (this.entityData.get(COOKING)) {
+                    // more bubbles when cooking + effect particles
+                    if (level().random.nextFloat() < 0.5f) {
+                        level().addParticle(ParticleTypes.BUBBLE_POP, px, py - 0.5, pz, 0, 0.05, 0);
+                        level().addParticle(ParticleTypes.EFFECT, px, py, pz, 0, 0.05, 0);
+                    }
+                } else {
+                    // infrequent bubbles when not cooking
+                    if (level().random.nextFloat() < 0.5f) {
+                        level().addParticle(ParticleTypes.BUBBLE_POP, px, py - 0.5, pz, 0, 0.05, 0);
+                    }
                 }
-            } else {
-                // infrequent bubbles when not cooking
-                if (level().random.nextFloat() < 0.5f) {
-                    level().addParticle(ParticleTypes.BUBBLE_POP, px, py - 0.5, pz, 0, 0.05, 0);
-                }
+                level().playLocalSound(px, py, pz,
+                    SoundEvents.FIRE_AMBIENT,
+                    SoundSource.BLOCKS,
+                    0.4f, 0.8f + level().random.nextFloat() * 0.4f, false);
             }
 
-            level().playLocalSound(px, py, pz, SoundEvents.FIRE_AMBIENT, SoundSource.BLOCKS, 0.4f, 0.8f + level().random.nextFloat() * 0.4f, false);
-
         }
+    }
+
+    public boolean isCooking() {
+        return this.entityData.get(COOKING);
     }
 
     public void setCooking(boolean cooking) {
@@ -209,16 +272,194 @@ public class BogreCauldronEntity extends Entity implements GeoEntity {
     @Override
     protected void defineSynchedData() {
         entityData.define(COOKING, false);
+        entityData.define(COOKING_PROGRESS, 0);
+        entityData.define(HAS_HEAT_SOURCE, false);
+    }
+
+    private void checkHeatSourceServer() {
+        if (this.level() != null && this.tickCount % 10 == 0) {
+            BlockState belowState = this.level().getBlockState(this.blockPosition().below());
+            entityData.set(HAS_HEAT_SOURCE, belowState.is(CAULDRON_HEAT_SOURCES));
+        }
+    }
+
+    private void tickCookingLogic() {
+        if (!canStartCooking()) {
+            entityData.set(COOKING_PROGRESS, 0);
+            if (!isBeingCookedByBogre()) setCooking(false);
+        }
+    }
+
+    private boolean isBeingCookedByBogre() {
+        return entityData.get(COOKING);
+    }
+
+    public boolean hasHeatSource() {
+        return entityData.get(HAS_HEAT_SOURCE);
+    }
+
+    public boolean isReadyToCook() {
+        if (!hasHeatSource()) return false;
+        
+        List<Item> items = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            ItemStack stack = itemHandler.getStackInSlot(i);
+            if (!stack.isEmpty()) items.add(stack.getItem());
+        }
+        
+        Optional<CookingRecipe> recipeOpt = BogreRecipeManager.getCookingRecipe(items);
+        if (recipeOpt.isEmpty()) return false;
+
+        ItemStack bowlSlot = itemHandler.getStackInSlot(4);
+        return !bowlSlot.isEmpty() && bowlSlot.is(Items.BOWL);
+    }
+
+    public int getItemCount() {
+        int count = 0;
+        for (int i = 0; i < 4; i++) {
+            if (!itemHandler.getStackInSlot(i).isEmpty()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public void setCookingProgress(int progress) {
+        entityData.set(COOKING_PROGRESS, progress);
+    }
+
+    private boolean canStartCooking() {
+        List<Item> items = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            ItemStack stack = itemHandler.getStackInSlot(i);
+            if (!stack.isEmpty()) items.add(stack.getItem());
+        }
+        
+        boolean hasRecipe = BogreRecipeManager.getCookingRecipe(items).isPresent();
+        ItemStack bowl = itemHandler.getStackInSlot(4);
+
+        return hasRecipe && !bowl.isEmpty() && bowl.is(Items.BOWL) && hasHeatSource();
+    }
+
+    public void notifyTheft(Player player) {
+        if (this.level().isClientSide) return;
+        
+        this.setCooking(false);
+        this.getEntityData().set(COOKING_PROGRESS, 0);
+        
+        List<BogreEntity> nearbyBogres = this.level().getEntitiesOfClass(BogreEntity.class, 
+            this.getBoundingBox().inflate(10),
+            bogre -> bogre.isAlive() && bogre.getAIState() == BogreAi.State.SKILLING
+        );
+
+        for (BogreEntity bogre : nearbyBogres) {
+            if (bogre.cauldronPos != null && bogre.cauldronPos.distSqr(this.blockPosition()) < 4) {
+                bogre.getAi().interruptSkilling();
+
+                if (!player.isCreative() && !player.isSpectator()) {
+                    var attackGoal = bogre.getAttackGoal();
+                    if (attackGoal != null) {
+                        attackGoal.getAttackedByPlayers().add(player.getUUID());
+                        bogre.setTarget(player);
+                        attackGoal.enterRoaring(player);
+                    } else {
+                        bogre.setTarget(player);
+                        bogre.setAIState(BogreAi.State.AGGRESSIVE);
+                    }
+                }
+            }
+        }
+    }
+
+    public ItemStack finishCooking() {
+        List<Item> items = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            ItemStack stack = itemHandler.getStackInSlot(i);
+            if (!stack.isEmpty()) items.add(stack.getItem());
+        }
+        
+        Optional<CookingRecipe> recipeOpt = BogreRecipeManager.getCookingRecipe(items);
+        ItemStack result = ItemStack.EMPTY;
+        
+        if (recipeOpt.isPresent()) {
+            CookingRecipe recipe = recipeOpt.get();
+            result = recipe.result().copy();
+
+            // consume ingredients 0-3
+            for (int i = 0; i < 4; i++) {
+                itemHandler.getStackInSlot(i).shrink(1);
+            }
+            // consume bowl 4
+            itemHandler.getStackInSlot(4).shrink(1);
+
+            // put result in bowl slot 4, replaces the consumed bowl
+            itemHandler.setStackInSlot(4, result);
+            
+            level().playSound(null, blockPosition(), SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT,
+            SoundSource.BLOCKS, 1.0F, 0.8F);
+        }
+
+        entityData.set(COOKING_PROGRESS, 0);
+        return result;
+    }
+
+    public int getCookingProgress() {
+        return entityData.get(COOKING_PROGRESS);
+    }
+
+    public ItemStackHandler getItemHandler() {
+        return itemHandler;
     }
 
     @Override
     protected void readAdditionalSaveData(@NotNull CompoundTag compoundTag) {
-
+        if (compoundTag.contains("Inventory")) {
+            CompoundTag invTag = compoundTag.getCompound("Inventory");
+            int savedSize = invTag.getInt("Size");
+            
+            if (savedSize != 5) {
+                ItemStackHandler legacyHandler = new ItemStackHandler(savedSize);
+                legacyHandler.deserializeNBT(invTag);
+                for (int i = 0; i < Math.min(savedSize, 5); i++) {
+                    itemHandler.setStackInSlot(i, legacyHandler.getStackInSlot(i));
+                }
+            } else {
+                itemHandler.deserializeNBT(invTag);
+            }
+        }
     }
 
     @Override
     protected void addAdditionalSaveData(@NotNull CompoundTag compoundTag) {
+        compoundTag.put("Inventory", itemHandler.serializeNBT());
+    }
 
+    @Override
+    public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap,
+        @Nullable Direction side) {
+
+        if (cap == ForgeCapabilities.ITEM_HANDLER) {
+            return optionalItemHandler.cast();
+        }
+        return super.getCapability(cap, side);
+    }
+    
+    @Override
+    public void invalidateCaps() {
+        super.invalidateCaps();
+        optionalItemHandler.invalidate();
+    }
+
+    @Override
+    public @NotNull Component getDisplayName() {
+        return Component.empty();
+    }
+
+    @Nullable
+    @Override
+    public AbstractContainerMenu
+        createMenu(int id, @NotNull Inventory inventory, @NotNull Player player) {
+        return new CauldronMenu(id, inventory, this.itemHandler, this.blockPosition());
     }
 
     @Override

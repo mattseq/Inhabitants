@@ -4,13 +4,10 @@ import com.jeremyseq.inhabitants.debug.DevMode;
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import com.jeremyseq.inhabitants.debug.BogreDebugRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
-import com.jeremyseq.inhabitants.entities.bogre.ai.BogreAi;
 
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.protocol.game.DebugPackets;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
@@ -22,7 +19,6 @@ import net.minecraft.world.level.pathfinder.PathFinder;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.level.PathNavigationRegion;
 import net.minecraft.tags.BlockTags;
 
@@ -133,6 +129,22 @@ public class BogrePathNavigation extends GroundPathNavigation {
         this.preciseTarget = target;
         this.isNearEnough = false;
         return super.moveTo(target.x, target.y, target.z, speed);
+    }
+
+    public boolean moveToCauldronPrecise(Vec3 target, float maxDist) {
+        if (target == null) return false;
+        double distSq = this.mob.position()
+                .distanceToSqr(target.x, this.mob.getY(), target.z);
+
+        double yDist = Math.abs(this.mob.getY() - target.y);
+
+        if (distSq <= TOLERANCE_SQ && yDist < 1.5D) {
+            this.stop();
+            return true;
+        }
+
+        this.preciseMoveTo(target, 1.0D);
+        return false;
     }
 
     @Override

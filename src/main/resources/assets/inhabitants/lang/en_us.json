@@ -60,5 +60,7 @@
   "painting.inhabitants.my_precious.title": "My Precious",
   "painting.inhabitants.my_precious.author": "Catalyst",
   "painting.inhabitants.endermans_last_day.title": "Enderman's Last Day",
-  "painting.inhabitants.endermans_last_day.author": "Cucuber"
+  "painting.inhabitants.endermans_last_day.author": "Cucuber",
+
+  "gui.inhabitants.missing_heat_source": "Needs Heat Source (e.g. Campfire)"
 }

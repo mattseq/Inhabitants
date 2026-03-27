@@ -178,6 +178,48 @@
     "volume": 1.0,
     "pitch": 1.0
   },
+  "bogre.cooking_start": {
+    "subtitle": "subtitles.inhabitants.bogre.cooking",
+    "sounds": [
+      {
+        "name": "inhabitants:bogre/skilling/bogre_cooking_start",
+        "weight": 1
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
+  "bogre.cooking_loop": {
+    "subtitle": "subtitles.inhabitants.bogre.cooking",
+    "sounds": [
+      {
+        "name": "inhabitants:bogre/skilling/bogre_cooking_loop",
+        "weight": 1
+      }
+    ],
+    "volume": 0.5,
+    "pitch": 1.0
+  },
+  "bogre.cauldron_gui_open": {
+    "sounds": [
+      {
+        "name": "inhabitants:gui/cauldron/cauldron_gui_open",
+        "weight": 1
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
+  "bogre.deposit_in_chest": {
+    "sounds": [
+      {
+        "name": "inhabitants:bogre/nautral/deposit_in_chest",
+        "weight": 1
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
   "impaler.attack": {
     "subtitle": "subtitles.inhabitants.impaler.attack",
     "sounds": [

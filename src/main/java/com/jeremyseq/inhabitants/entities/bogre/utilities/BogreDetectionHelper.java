@@ -2,11 +2,11 @@ package com.jeremyseq.inhabitants.entities.bogre.utilities;
 
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
-import com.jeremyseq.inhabitants.entities.bogre.recipe.BogreRecipe;
-import com.jeremyseq.inhabitants.entities.bogre.recipe.BogreRecipeManager;
+import com.jeremyseq.inhabitants.entities.bogre.ai.BogreAi;
+import com.jeremyseq.inhabitants.recipe.CarvingRecipe;
+import com.jeremyseq.inhabitants.recipe.BogreRecipeManager;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -19,6 +19,9 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.Container;
 
 import java.util.*;
 
@@ -120,7 +123,7 @@ public class BogreDetectionHelper {
 
         for (BlockPos pos : carvableBlocks) {
             Block block = bogre.level().getBlockState(pos).getBlock();
-            Optional<BogreRecipe> recipeOpt = BogreRecipeManager.getCarvingRecipe(block);
+            Optional<CarvingRecipe> recipeOpt = BogreRecipeManager.getCarvingRecipe(block);
             if (recipeOpt.isEmpty()) continue;
             
             int required = recipeOpt.get().requiredBlocks();
@@ -129,8 +132,10 @@ public class BogreDetectionHelper {
             }
 
             // check line directions
-            if (checkLine(bogre.level(), pos, block, required, 1, 0, 0, blockSet)) return offsetLine(pos, required, 1, 0, 0);
-            if (checkLine(bogre.level(), pos, block, required, 0, 0, 1, blockSet)) return offsetLine(pos, required, 0, 0, 1);
+            if (checkLine(bogre.level(), pos, block, required, 1, 0, 0, blockSet))
+                return offsetLine(pos, required, 1, 0, 0);
+            if (checkLine(bogre.level(), pos, block, required, 0, 0, 1, blockSet))
+                return offsetLine(pos, required, 0, 0, 1);
         }
         return Collections.emptyList();
     }
@@ -164,4 +169,45 @@ public class BogreDetectionHelper {
         Vec3 add = new Vec3(look.x, 0, look.z).normalize().scale(2.25);
         return new Vec3(bogre.getX(), bogre.getY() + 1.8, bogre.getZ()).add(add);
     }
+
+    public static Optional<BlockPos> findChestWithSpace(BogreEntity bogre, int radius, int maxToSearch) {
+        BlockPos origin = bogre.blockPosition();
+        ItemStack held = bogre.getItemHeld();
+        if (held.isEmpty()) return Optional.empty();
+
+        return BlockPos.betweenClosedStream(origin.offset(-radius, -3, -radius),
+            origin.offset(radius, 3, radius))
+            .map(BlockPos::immutable)
+            .filter(pos -> {
+                
+                BlockEntity be = bogre.level().getBlockEntity(pos);
+                if (be == null) return false;
+                BlockState state = bogre.level().getBlockState(pos);
+                if (!(state.getBlock() instanceof ChestBlock)) return false;
+                
+                if (pos.equals(bogre.getEntityData().get(BogreEntity.TARGET_POS)) && 
+                bogre.getAi().getDeliveryState() == BogreAi.DeliveryState.SEARCHING &&
+                bogre.getCookingTicks() > 0) {
+                    return false;
+                }
+
+                return hasAccessibleEmptyChestSlot(bogre.level(), pos, state);
+            })
+            .sorted(Comparator.comparingDouble(origin::distSqr))
+            .findFirst();
+    }
+
+    public static boolean hasAccessibleEmptyChestSlot(Level level, BlockPos pos, BlockState state) {
+        if (!(state.getBlock() instanceof ChestBlock chestBlock)) return false;
+        Container container = ChestBlock.getContainer(chestBlock, state, level, pos, true);
+        if (container == null) return false;
+
+        for (int i = 0; i < container.getContainerSize(); i++) {
+            if (container.getItem(i).isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

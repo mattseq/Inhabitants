@@ -23,6 +23,7 @@ public class ModSoundEvents {
     public static final RegistryObject<SoundEvent> BOGRE_IDLE = registerSoundEvent("bogre.idle");
     public static final RegistryObject<SoundEvent> BOGRE_ROAR = registerSoundEvent("bogre.roar");
     public static final RegistryObject<SoundEvent> SHOCKWAVE = registerSoundEvent("shockwave");
+    public static final RegistryObject<SoundEvent> CAULDRON_GUI_OPEN = registerSoundEvent("bogre.cauldron_gui_open");
 
     public static final RegistryObject<SoundEvent> IMPALER_ATTACK = registerSoundEvent("impaler.attack");
     public static final RegistryObject<SoundEvent> IMPALER_DEATH = registerSoundEvent("impaler.death");
@@ -35,6 +36,10 @@ public class ModSoundEvents {
     public static final RegistryObject<SoundEvent> BOGRE_SONG = registerSoundEvent("disc.bogre");
     public static final RegistryObject<SoundEvent> BOGRE_HAMMER_KNOCK = registerSoundEvent("bogre.hammer_knock");
     public static final RegistryObject<SoundEvent> BOGRE_CARVING_FINISH = registerSoundEvent("bogre.carving_finish");
+    public static final RegistryObject<SoundEvent> BOGRE_DEPOSIT_IN_CHEST = registerSoundEvent("bogre.deposit_in_chest");
+
+    public static final RegistryObject<SoundEvent> BOGRE_COOKING_START = registerSoundEvent("bogre.cooking_start");
+    public static final RegistryObject<SoundEvent> BOGRE_COOKING_LOOP = registerSoundEvent("bogre.cooking_loop");
 
     public static final RegistryObject<SoundEvent> REVERSE_GROWTH = registerSoundEvent("effects.reverse_growth");
 

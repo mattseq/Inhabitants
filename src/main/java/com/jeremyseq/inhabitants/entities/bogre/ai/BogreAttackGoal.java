@@ -198,7 +198,7 @@ public class BogreAttackGoal extends Goal {
 
         bogre.setSprinting(false);
         
-        this.bogre.triggerAnim("trigger_controller", "attack");
+        BogreAi.playAnimation(bogre, "attack");
         
         BogreSoundHandler.playAttackSound(bogre);
         
@@ -278,7 +278,7 @@ public class BogreAttackGoal extends Goal {
         bogre.setAggressiveState(BogreAi.AggressiveState.ROARING);
         bogre.setRoaring(true);
         bogre.setSprinting(false);
-        bogre.triggerAnim("trigger_controller", "roar");
+        BogreAi.playAnimation(bogre, "roar");
         
         BogreSoundHandler.playRoarSound(bogre);
         
