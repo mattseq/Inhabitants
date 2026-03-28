@@ -262,7 +262,9 @@ public class BogrePathNavigation extends GroundPathNavigation {
         }
     }
     
-    public boolean moveToCarvingTarget(Vec3 boneTarget, float minDistance, float maxDistance) {
+    public boolean moveToCarvingTarget(Vec3 boneTarget, float minDistance, float maxDistance,
+        List<BlockPos> carvableBlocks) {
+
         if (!(this.mob instanceof BogreEntity bogre)) return false;
         
         float targetDist = (minDistance + maxDistance) / 2.0f;
@@ -275,27 +277,63 @@ public class BogrePathNavigation extends GroundPathNavigation {
         }
 
         if (ai.getSkillingMoveSide() == 0) {
-            List<SideChoice> choices = new ArrayList<>();
+            
+            double minX = Double.MAX_VALUE, maxX = -Double.MAX_VALUE;
+            double minZ = Double.MAX_VALUE, maxZ = -Double.MAX_VALUE;
 
-            choices.add(new SideChoice(1,
-            new Vec3(boneTarget.x + targetDist, boneTarget.y, boneTarget.z), 
-            bogre.position().distanceToSqr(boneTarget.x + targetDist, bogre.getY(), boneTarget.z)));
+            for (BlockPos bp : carvableBlocks) {
+                if (bp.getX() < minX) minX = bp.getX();
+                if (bp.getX() > maxX) maxX = bp.getX();
+                if (bp.getZ() < minZ) minZ = bp.getZ();
+                if (bp.getZ() > maxZ) maxZ = bp.getZ();
+            }
 
-            choices.add(new SideChoice(-1,
-            new Vec3(boneTarget.x - targetDist, boneTarget.y, boneTarget.z), 
-            bogre.position().distanceToSqr(boneTarget.x - targetDist, bogre.getY(), boneTarget.z)));
+            double spreadX = maxX - minX;
+            double spreadZ = maxZ - minZ;
 
-            choices.add(new SideChoice(2,
-            new Vec3(boneTarget.x, boneTarget.y, boneTarget.z + targetDist), 
-            bogre.position().distanceToSqr(boneTarget.x, bogre.getY(), boneTarget.z + targetDist)));
+            List<SideChoice> frontSides = new ArrayList<>();
+            List<SideChoice> endSides = new ArrayList<>();
 
-            choices.add(new SideChoice(-2,
-            new Vec3(boneTarget.x, boneTarget.y, boneTarget.z - targetDist), 
-            bogre.position().distanceToSqr(boneTarget.x, bogre.getY(), boneTarget.z - targetDist)));
+            SideChoice posX = new SideChoice(1,
+                new Vec3(boneTarget.x + targetDist, boneTarget.y, boneTarget.z),
+                bogre.position().distanceToSqr(boneTarget.x + targetDist, bogre.getY(), boneTarget.z));
 
-            choices.sort((c1, c2) -> Double.compare(c1.distSq, c2.distSq));
+            SideChoice negX = new SideChoice(-1,
+                new Vec3(boneTarget.x - targetDist, boneTarget.y, boneTarget.z),
+                bogre.position().distanceToSqr(boneTarget.x - targetDist, bogre.getY(), boneTarget.z));
 
-            for (SideChoice choice : choices) {
+            SideChoice posZ = new SideChoice(2,
+                new Vec3(boneTarget.x, boneTarget.y, boneTarget.z + targetDist),
+                bogre.position().distanceToSqr(boneTarget.x, bogre.getY(), boneTarget.z + targetDist));
+            
+            SideChoice negZ = new SideChoice(-2,
+                new Vec3(boneTarget.x, boneTarget.y, boneTarget.z - targetDist),
+                bogre.position().distanceToSqr(boneTarget.x, bogre.getY(), boneTarget.z - targetDist));
+
+            if (spreadX >= spreadZ) {
+                // x -> front is z axis
+                frontSides.add(posZ);
+                frontSides.add(negZ);
+                endSides.add(posX);
+                endSides.add(negX);
+            } else {
+                //  z -> front is x axis
+                frontSides.add(posX);
+                frontSides.add(negX);
+                endSides.add(posZ);
+                endSides.add(negZ);
+            }
+
+            // sort each group by distance, prefer nearest
+            frontSides.sort((c1, c2) -> Double.compare(c1.distSq, c2.distSq));
+            endSides.sort((c1, c2) -> Double.compare(c1.distSq, c2.distSq));
+
+            // try front sides first, then end sides as fallback
+            List<SideChoice> ordered = new ArrayList<>();
+            ordered.addAll(frontSides);
+            ordered.addAll(endSides);
+
+            for (SideChoice choice : ordered) {
                 if (!isPositionBlocked(bogre, choice.pos.x, choice.pos.y, choice.pos.z)) {
                     Path path = this.createPath(BlockPos.containing(choice.pos), 0);
                     if (path != null && path.canReach()) {

@@ -180,7 +180,7 @@ public class BogreAi {
         if (bogre.getAIState() == State.SKILLING) {
             IBogreRecipe recipe = getActiveRecipe();
             if (recipe != null && recipe.getBogreRecipeType() == IBogreRecipe.Type.CARVING) {
-                CarvingSkill.clearCracks(bogre);
+                BogreSkills.CARVING.clearCracks(bogre);
             }
 
             stopAnimation("all");

@@ -16,6 +16,9 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.entity.Entity;
 
 import java.util.*;
 
@@ -23,6 +26,7 @@ public class CarvingSkill extends BogreSkills.Skill {
     public static float dropResultOffset = 3.5f; // Distance from Carving block to drop result (player) (DELIVERING state)
     public static final float MIN_DISTANCE = 2.0f;
     public static final float MAX_DISTANCE = 3.0f;
+    private final Map<UUID, List<BlockPos>> lockedCarvingBlocks = new HashMap<>();
 
     @Override
     public int getAnimationDuration(Animation animation) {
@@ -96,7 +100,8 @@ public class CarvingSkill extends BogreSkills.Skill {
         );
 
         BogrePathNavigation nav = (BogrePathNavigation) bogre.getNavigation();
-        if (nav.moveToCarvingTarget(boneTarget, MIN_DISTANCE, MAX_DISTANCE)) {
+        if (nav.moveToCarvingTarget(boneTarget, MIN_DISTANCE, MAX_DISTANCE, carvableBlocks)) {
+            lockedCarvingBlocks.put(bogre.getUUID(), new ArrayList<>(carvableBlocks));
             bogre.setCraftingState(BogreAi.SkillingState.CARVING);
             setCarveTicks(bogre, 0);
         }
@@ -110,7 +115,9 @@ public class CarvingSkill extends BogreSkills.Skill {
             return;
         }
 
-        List<BlockPos> carvableBlocks = BogreSkillingGoal.findCarvableBlocks(bogre, 5);
+        List<BlockPos> carvableBlocks = lockedCarvingBlocks.getOrDefault(bogre.getUUID(), 
+                BogreSkillingGoal.findCarvableBlocks(bogre, 5));
+        
         if (carvableBlocks.isEmpty()) {
             finishSkill(bogre);
             return;
@@ -142,13 +149,26 @@ public class CarvingSkill extends BogreSkills.Skill {
             bogre.getLookControl().setLookAt(boneTarget.x, boneTarget.y + 0.5, boneTarget.z, 100f, 100f);
         }
 
-        // validate blocks are still present
-        if (BogreSkillingGoal.findCarvableBlocks(bogre, 5).isEmpty()) {
-            finishSkill(bogre);
-            return;
-        }
-
         incrementCarveTicks(bogre);
+    }
+
+    // Called by ModEvents.onBlockBreak
+    public void onBlockBroken(Level level, BlockPos pos) {
+        if (!(level instanceof ServerLevel serverLevel)) return;
+        
+        List<UUID> toFinish = new ArrayList<>();
+        for (Map.Entry<UUID, List<BlockPos>> entry : lockedCarvingBlocks.entrySet()) {
+            if (entry.getValue().contains(pos)) {
+                toFinish.add(entry.getKey());
+            }
+        }
+        
+        for (UUID uuid : toFinish) {
+            Entity entity = serverLevel.getEntity(uuid);
+            if (entity instanceof BogreEntity bogre) {
+                finishSkill(bogre);
+            }
+        }
     }
 
     // Called by animation keyframes
@@ -159,12 +179,15 @@ public class CarvingSkill extends BogreSkills.Skill {
                 IBogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
                 if (activeRecipe != null) {
                     bogre.setItemHeld(activeRecipe.result().copy());
-                    List<BlockPos> blocks = BogreDetectionHelper.findCarvableBlocks(bogre, 5);
+                    List<BlockPos> blocks = lockedCarvingBlocks.getOrDefault(bogre.getUUID(), 
+                            BogreDetectionHelper.findCarvableBlocks(bogre, 5));
                     for (BlockPos pos : blocks) {
                         bogre.level().destroyBlock(pos, false);
                     }
                     bogre.playSound(SoundEvents.BONE_BLOCK_BREAK, 1.0F, 0.8F);
                 }
+
+                clearCracks(bogre);
 
                 bogre.getEntityData().set(BogreEntity.CARVING_ANIM, false);
                 BogreAi.playAnimation(bogre, "grab");
@@ -187,8 +210,9 @@ public class CarvingSkill extends BogreSkills.Skill {
                 
                 int hammerHits = carving.hammer_hits();
                 if (hammerHits < 1) hammerHits = 1;
-
-                List<BlockPos> blocks = BogreDetectionHelper.findCarvableBlocks(bogre, 5);
+ 
+                List<BlockPos> blocks = lockedCarvingBlocks.getOrDefault(bogre.getUUID(), 
+                        BogreDetectionHelper.findCarvableBlocks(bogre, 5));
                 int progress = (int) Math.min(9, ((currentHits - 1) * 10f / (float) hammerHits));
 
                 BlockPos targetPos = bogre.getEntityData().get(BogreEntity.TARGET_POS);
@@ -252,12 +276,16 @@ public class CarvingSkill extends BogreSkills.Skill {
         bogre.incrementAiTicks();
     }
 
-    public static void clearCracks(BogreEntity bogre) {
+    public void clearCracks(BogreEntity bogre) {
         if (!bogre.level().isClientSide) {
-            List<BlockPos> blocks = BogreDetectionHelper.findCarvableBlocks(bogre, 12);
+            List<BlockPos> blocks = lockedCarvingBlocks.remove(bogre.getUUID());
+            if (blocks == null) {
+                blocks = BogreDetectionHelper.findCarvableBlocks(bogre, 12);
+            }
+            
             for (int i = 0; i < 60; i++) {
                 int id = bogre.getId() + i;
-                if (i < blocks.size()) {
+                if (blocks != null && i < blocks.size()) {
                     bogre.level().destroyBlockProgress(id, blocks.get(i), -1);
                 }
 

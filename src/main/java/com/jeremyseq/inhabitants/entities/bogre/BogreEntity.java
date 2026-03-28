@@ -7,12 +7,11 @@ import com.jeremyseq.inhabitants.entities.bogre.ai.*;
 import com.jeremyseq.inhabitants.entities.bogre.render.BogreAnimationHandler;
 import com.jeremyseq.inhabitants.entities.bogre.utilities.*;
 import com.jeremyseq.inhabitants.entities.bogre.render.RoarEffectRenderer;
-import com.jeremyseq.inhabitants.entities.bogre.skill.CarvingSkill;
+import com.jeremyseq.inhabitants.entities.bogre.skill.BogreSkills;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.*;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -33,11 +32,12 @@ import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
-import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
+
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -242,13 +242,13 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     @Override
     public void die(@NotNull DamageSource pCause) {
-        CarvingSkill.clearCracks(this);
+        BogreSkills.CARVING.clearCracks(this);
         super.die(pCause);
     }
 
     @Override
     public void remove(Entity.@NotNull RemovalReason pReason) {
-        CarvingSkill.clearCracks(this);
+        BogreSkills.CARVING.clearCracks(this);
         super.remove(pReason);
     }
 
