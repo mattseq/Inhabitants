@@ -9,6 +9,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,16 +18,24 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.Map;
+
 @Mixin(Player.class)
 public abstract class ReverseGrowthMixin {
 
     private static final float shrinkScale = 0.5f;
     private boolean hadReverseGrowth;
 
+    private boolean hasReverseGrowth() {
+        Map<MobEffect, MobEffectInstance> effects = 
+            ((LivingEntityAccessor) this).getActiveEffects();
+        return effects != null && effects.containsKey(ModEffects.REVERSE_GROWTH.get());
+    }
+
     @Inject(method = "tick", at = @At("HEAD"))
     private void tickReverseGrowth(CallbackInfo ci) {
         Player player = (Player) (Object) this;
-        boolean hasEffect = player.hasEffect(ModEffects.REVERSE_GROWTH.get());
+        boolean hasEffect = hasReverseGrowth();
 
         if (hasEffect != hadReverseGrowth) {
 
@@ -50,8 +60,7 @@ public abstract class ReverseGrowthMixin {
 
     @Inject(method = "getDimensions", at = @At("RETURN"), cancellable = true)
     private void shrinkPlayer(Pose pose, CallbackInfoReturnable<EntityDimensions> callbackInfoReturnable) {
-
-        if (hadReverseGrowth) {
+        if (hasReverseGrowth()) {
 
             EntityDimensions original = callbackInfoReturnable.getReturnValue();
             
@@ -67,8 +76,8 @@ public abstract class ReverseGrowthMixin {
     at = @At("RETURN"), cancellable = true)
     private void reverseGrowthEyeHeight(Pose pose, EntityDimensions dimensions,
         CallbackInfoReturnable<Float> callbackInfoReturnable) {
-
-        if (hadReverseGrowth) {
+        
+        if (hasReverseGrowth()) {
             callbackInfoReturnable.setReturnValue(callbackInfoReturnable.getReturnValue() * shrinkScale);
         }
     }
