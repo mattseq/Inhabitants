@@ -5,6 +5,8 @@ import com.jeremyseq.inhabitants.ModSoundEvents;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
 import com.jeremyseq.inhabitants.networking.ScreenShakePacketS2C;
 import com.jeremyseq.inhabitants.networking.bogre.ShockwaveParticlePacketS2C;
+import com.jeremyseq.inhabitants.debug.DevMode;
+import com.jeremyseq.inhabitants.debug.BogreDebugRenderer;
 
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -103,45 +105,47 @@ public class ShockwaveGoal {
             
             AABB searchBox = new AABB(
                 center.x - outerRadius, center.y - 1.0, center.z - outerRadius,
-                center.x + outerRadius, center.y + 2.0, center.z + outerRadius
+                center.x + outerRadius, center.y + 4.0, center.z + outerRadius
             );
+
+            double innerSq = innerRadius * innerRadius;
+            double outerSq = outerRadius * outerRadius;
             
-            List<LivingEntity> nearbyEntities = level.getEntitiesOfClass(LivingEntity.class, searchBox);
+            List<LivingEntity> nearbyEntities = level.getEntitiesOfClass(LivingEntity.class, searchBox, entity -> {
+                if (hitEntities.contains(entity) || entity == owner) return false;
+
+                // allowing jumping to avoid the shockwave
+                if (!entity.onGround()) return false;
+
+                double distanceSq = entity.distanceToSqr(center.x, entity.getY(), center.z);
+                return distanceSq >= innerSq && distanceSq <= outerSq;
+            });
 
             for (LivingEntity entity : nearbyEntities) {
-                if (hitEntities.contains(entity) || entity == owner) {
-                    continue;
-                }
+                hitEntities.add(entity);
+                
+                double deltaX = entity.getX() - center.x;
+                double deltaZ = entity.getZ() - center.z;
                 
                 double distanceSq = entity.distanceToSqr(center.x, entity.getY(), center.z);
-                double innerSq = innerRadius * innerRadius;
-                double outerSq = outerRadius * outerRadius;
-
-                if (distanceSq >= innerSq && distanceSq <= outerSq) {
-                    hitEntities.add(entity);
+                double distance = Math.sqrt(distanceSq);
+                if (distance > 0.1) {
+                    double strength = Math.max(0, (radius - distance) / radius); // prevents negative knockback
+                    if (strength > 0) {
+                        entity.knockback(strength * 3.0, -deltaX / distance, -deltaZ / distance);
+                    }
                     
-                    double deltaX = entity.getX() - center.x;
-                    double deltaZ = entity.getZ() - center.z;
-                    
-                    double distance = Math.sqrt(distanceSq);
-                    if (distance > 0.1) {
-                        double strength = Math.max(0, (radius - distance) / radius); // prevents negative knockback
-                        if (strength > 0) {
-                            entity.knockback(strength * 3.0, -deltaX / distance, -deltaZ / distance);
-                        }
-                        
-                        // apply damage based on distance from center
+                    // apply damage based on distance from center
 
-                        float falloffDamage = (float) (this.damage * (1.0 - Math.min(distance / radius, 1.0)));
-                        entity.hurt(entity.damageSources().mobAttack(owner != null ? owner : entity), falloffDamage);
+                    float falloffDamage = (float) (this.damage * (1.0 - Math.min(distance / radius, 1.0)));
+                    entity.hurt(entity.damageSources().mobAttack(owner != null ? owner : entity), falloffDamage);
 
-                        // stop blocking for 5 seconds if using a shield
-                        if (entity instanceof ServerPlayer player && player.isBlocking()) {
-                            ItemStack stack = player.getUseItem();
-                            if (stack.canPerformAction(ToolActions.SHIELD_BLOCK)) {
-                                player.stopUsingItem();
-                                player.getCooldowns().addCooldown(stack.getItem(), 100);
-                            }
+                    // stop blocking for 5 seconds if using a shield
+                    if (entity instanceof ServerPlayer player && player.isBlocking()) {
+                        ItemStack stack = player.getUseItem();
+                        if (stack.canPerformAction(ToolActions.SHIELD_BLOCK)) {
+                            player.stopUsingItem();
+                            player.getCooldowns().addCooldown(stack.getItem(), 100);
                         }
                     }
                 }

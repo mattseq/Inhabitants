@@ -6,11 +6,8 @@ import com.jeremyseq.inhabitants.networking.ScreenShakePacketS2C;
 import com.jeremyseq.inhabitants.entities.bogre.render.RoarEffectRenderer;
 import com.jeremyseq.inhabitants.entities.bogre.utilities.*;
 
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.ai.goal.Goal.Flag;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.EnumSet;
@@ -31,20 +28,19 @@ import java.util.UUID;
 public class BogreAttackGoal extends Goal {
 
     private final BogreEntity bogre;
-    private enum Phase { ROARING, CHASING, ATTACKING }
 
     // --- Roaring constants ---
-    private static final int ROAR_TICKS = 45;
+    private static final int ROAR_TICKS = 36;
     // --- Combat constants ---
     public static final float SHOCKWAVE_RADIUS = 9;
     public static final float SHOCKWAVE_DAMAGE = 28f;
 
-    private static final int ATTACK_INTERVAL = 50;
-    private static final int ANIMATION_DURATION = 25;
-    public static final double MIN_ATTACK_DISTANCE = 2.0;
-    public static final double MAX_ATTACK_DISTANCE = 5.0;
+    private static final int ATTACK_INTERVAL = 35;
+    private static final int ANIMATION_DURATION = 14;
+    public static final double MIN_ATTACK_DISTANCE = 3.0;
+    public static final double MAX_ATTACK_DISTANCE = 5.5;
     private int ticksUntilNextAttack = 0;
-    public static final float FORGET_ATTACK_RANGE = 40f; // distance to forget player who attacked Bogre
+    public static final float FORGET_ATTACK_RANGE = 40f; // distance to forget Player who attacked Bogre
 
     private Player roaredPlayer = null;
     private final List<Player> warnedPlayers = new ArrayList<>();
@@ -76,7 +72,9 @@ public class BogreAttackGoal extends Goal {
         }
         
         if (ticksUntilNextAttack > 0) {
-            ticksUntilNextAttack--;
+            // cooldown faster while chasing to ensure immediate attack when arrived
+            int reduction = (bogre.getAggressiveState() == BogreAi.AggressiveState.CHASING) ? 2 : 1;
+            ticksUntilNextAttack = Math.max(0, ticksUntilNextAttack - reduction);
         }
 
         if (bogre.getAggressiveState() == BogreAi.AggressiveState.ATTACKING && bogre.getAiTicks() > 0) {
@@ -113,10 +111,15 @@ public class BogreAttackGoal extends Goal {
         if (bogre.getTarget() == null) return;
         double distance = bogre.distanceTo(bogre.getTarget());
 
-        if (distance >= MIN_ATTACK_DISTANCE &&
-        distance <= MAX_ATTACK_DISTANCE) {
+        if (distance <= MAX_ATTACK_DISTANCE) {
+            if (bogre.getAggressiveState() != BogreAi.AggressiveState.ATTACKING) {
+                enterAttacking();
+            }
             handleAttacking();
         } else {
+            if (bogre.getAggressiveState() != BogreAi.AggressiveState.CHASING) {
+                enterChasing();
+            }
             handleChasing();
         }
     }
@@ -169,21 +172,29 @@ public class BogreAttackGoal extends Goal {
     }
     
     private void handleChasing() {
-        enterChasing();
         bogre.setSprinting(true); // Trigger run animation
-        bogre.getNavigation().moveTo(bogre.getTarget(), 1.35); // Pursue at elevated speed
+        bogre.getNavigation().moveTo(bogre.getTarget(), 1.4); // Pursue at elevated speed
         bogre.getLookControl().setLookAt(bogre.getTarget(), 60.0F, 60.0F);
     }
     
     private void handleAttacking() {
-        enterAttacking();
         bogre.getLookControl().setLookAt(bogre.getTarget(), 60.0F, 60.0F);
         
         if (ticksUntilNextAttack <= 0 && bogre.getAiTicks() == 0) {
             startAttackSequence();
         } else {
-            bogre.setSprinting(false); 
-            bogre.getNavigation().moveTo(bogre.getTarget(), 1.0); 
+            double distance = bogre.distanceTo(bogre.getTarget());
+            if (distance > MIN_ATTACK_DISTANCE + 0.5) {
+                bogre.setSprinting(true); 
+                bogre.getNavigation().moveTo(bogre.getTarget(), 1.4); 
+            } else if (distance < MIN_ATTACK_DISTANCE - 0.5) {
+                bogre.setSprinting(false);
+                bogre.getNavigation().stop();
+                bogre.getLookControl().setLookAt(bogre.getTarget(), 60.0F, 60.0F);
+            } else {
+                bogre.getNavigation().stop();
+                bogre.getLookControl().setLookAt(bogre.getTarget(), 60.0F, 60.0F);
+            }
         }
     }
 

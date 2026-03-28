@@ -173,7 +173,7 @@ public class BogreAnimationHandler {
             String moveAnim = bogre.isSprinting() ? ANIM_RUN : ANIM_WALK;
             controller.setAnimation(RawAnimation.begin().then(moveAnim, Animation.LoopType.LOOP));
         } else {
-            if (bogre.randomChance) {
+            if (bogre.getAIState() != BogreAi.State.AGGRESSIVE && bogre.randomChance) {
                 controller.setAnimation(RawAnimation.begin().then(ANIM_IDLE_RARE, Animation.LoopType.PLAY_ONCE));
                 if (controller.hasAnimationFinished()) {
                     bogre.randomChance = false;

@@ -2,8 +2,6 @@ package com.jeremyseq.inhabitants.debug;
 
 import com.jeremyseq.inhabitants.debug.DevMode;
 import com.jeremyseq.inhabitants.entities.ModEntities;
-import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
-import com.jeremyseq.inhabitants.entities.bogre.ai.BogreAi;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -14,6 +12,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.player.Player;
 
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -35,6 +36,7 @@ public class DebugCommands {
 
         dispatcher.register(registerBogreCommands());
         dispatcher.register(registerCauldronCommands());
+        dispatcher.register(registerDevCommands());
     }
 
     private static LiteralArgumentBuilder<CommandSourceStack> registerBogreCommands() {
@@ -85,6 +87,26 @@ public class DebugCommands {
             }));
     }
 
+    private static LiteralArgumentBuilder<CommandSourceStack> registerDevCommands() {
+        return Commands.literal("dev")
+            .requires(source -> source.hasPermission(4))
+            .then(Commands.literal("tankmode")
+            .then(Commands.argument("enabled", BoolArgumentType.bool())
+            .executes(context -> {
+                applyTankMode(context.getSource(),
+                BoolArgumentType.getBool(context, "enabled"));
+                return 1;
+            })))
+            
+            .then(Commands.literal("fly")
+            .then(Commands.argument("enabled", BoolArgumentType.bool())
+            .executes(context -> {
+                applyFly(context.getSource(),
+                BoolArgumentType.getBool(context, "enabled"));
+                return 1;
+            })));
+    }
+
     private static void spawnCauldron(CommandSourceStack source, Vec3 pos) {
         if (!DevMode.isEnabled() && !source.hasPermission(4)) return;
         
@@ -112,6 +134,35 @@ public class DebugCommands {
         
         DevMode.setShowPathfinding(enabled);
         log("Bogre path debug: " + DevMode.isShowPathfinding(), source);
+    }
+
+    private static void applyTankMode(CommandSourceStack source, boolean enabled) {
+        if (!DevMode.isEnabled() && !source.hasPermission(4)) return;
+        
+        Entity entity = source.getEntity();
+        if (entity instanceof Player player) {
+            if (enabled) {
+                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 72000, 4, false, false));
+                player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 72000, 4, false, false));
+                log("Tank Mode: ON", source);
+            } else {
+                player.removeEffect(MobEffects.DAMAGE_RESISTANCE);
+                player.removeEffect(MobEffects.REGENERATION);
+                log("Tank Mode: OFF", source);
+            }
+        }
+    }
+
+    private static void applyFly(CommandSourceStack source, boolean enabled) {
+        if (!DevMode.isEnabled() && !source.hasPermission(4)) return;
+        
+        Entity entity = source.getEntity();
+        if (entity instanceof Player player) {
+            player.getAbilities().mayfly = enabled;
+            if (!enabled) player.getAbilities().flying = false;
+            player.onUpdateAbilities();
+            log("Flight: " + (enabled ? "ON" : "OFF"), source);
+        }
     }
 
     private static void spawnMob(CommandSourceStack source, EntityType<? extends Mob> entityType) {
