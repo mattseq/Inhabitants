@@ -16,6 +16,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
 
@@ -24,8 +25,9 @@ import java.util.*;
  * - Handles the logic for Bogre skills
  */
 public final class BogreSkillingGoal {
-    public static final float HOSTILE_RANGE = 20.0f;
-    public static final float FORGET_RANGE = 40.0f;
+    public static final float SKILLING_RANGE = 20.0f;
+    public static final float BOGRE_RANGE = 40.0f;
+    public static final float NEARBY_PLAYERS_RANGE = 10.0f;
     public static final int COOKING_START_OFFSET = 10;
 
     private BogreSkillingGoal() {}
@@ -59,7 +61,7 @@ public final class BogreSkillingGoal {
 
         List<BogreCauldronEntity> cauldrons = bogre.level().getEntitiesOfClass(
                 BogreCauldronEntity.class,
-                bogre.getBoundingBox().inflate(FORGET_RANGE),
+                bogre.getBoundingBox().inflate(SKILLING_RANGE),
                 cauldron -> cauldron.isAlive() && !cauldron.isCooking());
 
         for (BogreCauldronEntity cauldron : cauldrons) {
@@ -76,18 +78,22 @@ public final class BogreSkillingGoal {
                 Optional<CookingRecipe> recipe = BogreRecipeManager.getCookingRecipe(items);
 
                 if (recipe.isPresent()) {
-                    if (bogre.cauldronPos == null ||
-                            !bogre.isValidCauldron(bogre.cauldronPos)) {
-                        bogre.cauldronPos = cauldron.blockPosition();
-                    }
+                    if (!isJobClaimed(bogre, cauldron.blockPosition(), -1, true, null) 
+                        && isClosestIdleBogreToPosition(bogre, cauldron.position())) {
+                        
+                        if (bogre.cauldronPos == null ||
+                                !bogre.isValidCauldron(bogre.cauldronPos)) {
+                            bogre.cauldronPos = cauldron.blockPosition();
+                        }
 
-                    if (bogre.cauldronPos.equals(cauldron.blockPosition())) {
-                        ai.enterSkilling();
-                        ai.setActiveRecipe(recipe.get());
-                        captureResultOwner(bogre, null); // for now, we will use nearest player
-                        bogre.setCraftingState(BogreAi.SkillingState.MOVING_TO_TARGET);
-                        bogre.resetCookingTicks();
-                        return;
+                        if (bogre.cauldronPos.equals(cauldron.blockPosition())) {
+                            ai.enterSkilling();
+                            ai.setActiveRecipe(recipe.get());
+                            captureResultOwner(bogre, null); // for now, we will use nearest player
+                            bogre.setCraftingState(BogreAi.SkillingState.MOVING_TO_TARGET);
+                            bogre.resetCookingTicks();
+                            return;
+                        }
                     }
                 }
             }
@@ -97,14 +103,19 @@ public final class BogreSkillingGoal {
         List<BlockPos> carveableBlocks = BogreDetectionHelper.findCarvableBlocks(bogre, (int) BogreAi.ROAR_RANGE);
 
         if (carveableBlocks != null && !carveableBlocks.isEmpty()) {
+            BlockPos carvePos = carveableBlocks.get(0);
             Optional<CarvingRecipe> recipe = BogreRecipeManager.getCarvingRecipe(
-                    bogre.level().getBlockState(carveableBlocks.get(0)).getBlock());
-            if (recipe.isPresent()) {
+                    bogre.level().getBlockState(carvePos).getBlock());
+            
+            if (recipe.isPresent() && !isJobClaimed(bogre, null, -1, false, carveableBlocks) 
+                && isClosestIdleBogreToPosition(bogre, Vec3.atCenterOf(carvePos))) {
+                
                 ai.enterSkilling();
                 ai.setActiveRecipe(recipe.get());
                 captureResultOwner(bogre, null); // for now, we will use nearest player
                 bogre.setCraftingState(BogreAi.SkillingState.MOVING_TO_TARGET);
                 CarvingSkill.setCarveTicks(bogre, 0);
+                bogre.getEntityData().set(BogreEntity.TARGET_POS, carvePos);
                 return;
             }
         }
@@ -117,20 +128,75 @@ public final class BogreSkillingGoal {
         if (transformationItem != null) {
             Optional<TransformationRecipe> recipe = BogreRecipeManager
                     .getTransformationRecipe(transformationItem.getItem().getItem());
-            if (recipe.isPresent()) {
+            
+            if (recipe.isPresent() && !isJobClaimed(bogre, null, transformationItem.getId(), false, null) 
+                && isClosestIdleBogreToPosition(bogre, transformationItem.position())) {
+                
                 ai.enterSkilling();
                 ai.setActiveRecipe(recipe.get());
                 captureResultOwner(bogre, transformationItem.getOwner());
                 bogre.setCraftingState(BogreAi.SkillingState.MOVING_TO_TARGET);
                 TransformationSkill.setTransformationTicks(bogre, 0);
+                bogre.getEntityData().set(BogreEntity.TARGET_ENTITY_ID, transformationItem.getId());
                 return;
             }
         }
     }
 
+    private static boolean isJobClaimed(BogreEntity bogre, BlockPos targetBlock,
+    int targetEntityId, boolean isCauldron, List<BlockPos> carveableBlocks) {
+
+        List<BogreEntity> nearbyBogres = bogre.level().getEntitiesOfClass(
+                BogreEntity.class, bogre.getBoundingBox().inflate(BOGRE_RANGE));
+                
+        for (BogreEntity other : nearbyBogres) {
+            if (other.getUUID().equals(bogre.getUUID())) continue;
+            
+            if (other.getAIState() == BogreAi.State.SKILLING) {
+                if (isCauldron && targetBlock != null && targetBlock.equals(other.cauldronPos)) {
+                    return true;
+                }
+                
+                if (carveableBlocks != null && !carveableBlocks.isEmpty()) {
+                    BlockPos p = other.getEntityData().get(BogreEntity.TARGET_POS);
+                    if (p != null && carveableBlocks.contains(p)) return true;
+                }
+                
+                int currentTargetId = other.getEntityData().get(BogreEntity.TARGET_ENTITY_ID);
+                if (targetEntityId != -1 && targetEntityId == currentTargetId) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean isClosestIdleBogreToPosition(BogreEntity bogre, Vec3 targetPos) {
+        List<BogreEntity> nearbyBogres = bogre.level().getEntitiesOfClass(
+                BogreEntity.class,
+                bogre.getBoundingBox().inflate(SKILLING_RANGE),
+                otherBogre -> otherBogre.isAlive() 
+                && otherBogre.getAIState() == BogreAi.State.NEUTRAL 
+                && !otherBogre.isRoaring()
+        );
+
+        BogreEntity closest = null;
+        double minDistSq = Double.MAX_VALUE;
+
+        for (BogreEntity other : nearbyBogres) {
+            double distSq = other.distanceToSqr(targetPos.x, targetPos.y, targetPos.z);
+            if (distSq < minDistSq) {
+                closest = other;
+                minDistSq = distSq;
+            }
+        }
+
+        return closest != null && closest.getUUID().equals(bogre.getUUID());
+    }
+
     private static void captureResultOwner(BogreEntity bogre, Entity owner) {
         if (owner == null) {
-            owner = bogre.level().getNearestPlayer(bogre, FORGET_RANGE);
+            owner = bogre.level().getNearestPlayer(bogre, NEARBY_PLAYERS_RANGE);
         }
         if (owner != null) {
             bogre.getAi().setResultOwnerUUID(owner.getUUID());
