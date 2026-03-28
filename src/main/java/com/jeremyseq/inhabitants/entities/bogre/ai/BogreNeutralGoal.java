@@ -26,6 +26,11 @@ public class BogreNeutralGoal extends WaterAvoidingRandomStrollGoal {
 
     public static final double MAX_CAULDRON_DIST_SQR = 14 * 14;
 
+    // wander
+    private int nextWanderTick = 0;
+    public static final int MIN_WANDER_PAUSE = 80;
+    public static final int WANDER_PAUSE_RANDOM = 60;
+
 
     public BogreNeutralGoal(BogreEntity bogre) {
         super(bogre, 1.0D);
@@ -41,6 +46,10 @@ public class BogreNeutralGoal extends WaterAvoidingRandomStrollGoal {
 
         if (shouldDance(bogre)) {
             return true;
+        }
+        
+        if (bogre.tickCount < nextWanderTick) {
+            return false;
         }
 
         return super.canUse();
@@ -69,6 +78,10 @@ public class BogreNeutralGoal extends WaterAvoidingRandomStrollGoal {
     public void stop() {
         super.stop();
         bogre.setNeutralState(BogreAi.NeutralState.IDLE);
+        
+        this.nextWanderTick = bogre.tickCount +
+            MIN_WANDER_PAUSE +
+            bogre.getRandom().nextInt(WANDER_PAUSE_RANDOM);
     }
 
     @Override

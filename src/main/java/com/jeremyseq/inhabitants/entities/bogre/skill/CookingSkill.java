@@ -117,6 +117,14 @@ public class CookingSkill extends BogreSkills.Skill {
         if (preciseNav.moveToCauldronPrecise(targetCenter, 0.15f)) {
             bogre.setCraftingState(BogreAi.SkillingState.COOKING);
             bogre.resetCookingTicks();
+            
+            Vec3 target = Vec3.atCenterOf(bogre.cauldronPos);
+            double dx = target.x - bogre.getX();
+            double dz = target.z - bogre.getZ();
+            float yaw = (float)(Math.atan2(dz, dx) * (180.0 / Math.PI)) - 90.0F;
+            bogre.setYRot(yaw);
+            bogre.setYHeadRot(yaw);
+            bogre.yBodyRot = yaw;
         }
     }
 

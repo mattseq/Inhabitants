@@ -107,6 +107,13 @@ public class TransformationSkill extends BogreSkills.Skill {
             bogre.getNavigation().stop();
             bogre.setCraftingState(BogreAi.SkillingState.TRANSFORMATION);
             setTransformationTicks(bogre, 0);
+            
+            dx = itemPos.x - bogre.getX();
+            dz = itemPos.z - bogre.getZ();
+            float yaw = (float)(Math.atan2(dz, dx) * (180.0 / Math.PI)) - 90.0F;
+            bogre.setYRot(yaw);
+            bogre.setYHeadRot(yaw);
+            bogre.yBodyRot = yaw;
         }
     }
 

@@ -26,9 +26,17 @@ public class BogreReturnToCauldronGoal extends Goal {
         if (bogre.getTarget() != null) return false;
         if (bogre.isRoaring()) return false;
 
-        return !this.bogre.canSeeCauldron() || bogre.cauldronPos.distToCenterSqr(bogre.position())
-                > BogreNeutralGoal.MAX_CAULDRON_DIST_SQR;
-
+        boolean outOfRange = !this.bogre.canSeeCauldron() ||
+            bogre.cauldronPos.distToCenterSqr(bogre.position()) > BogreNeutralGoal.MAX_CAULDRON_DIST_SQR;
+        
+        if (outOfRange) {
+            double distSq = bogre.cauldronPos.distToCenterSqr(bogre.position());
+            if (distSq > BogreNeutralGoal.MAX_CAULDRON_DIST_SQR * 2.0 || bogre.getRandom().nextInt(40) == 0) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     @Override

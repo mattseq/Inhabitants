@@ -104,6 +104,13 @@ public class CarvingSkill extends BogreSkills.Skill {
             lockedCarvingBlocks.put(bogre.getUUID(), new ArrayList<>(carvableBlocks));
             bogre.setCraftingState(BogreAi.SkillingState.CARVING);
             setCarveTicks(bogre, 0);
+            
+            double dx = boneTarget.x - bogre.getX();
+            double dz = boneTarget.z - bogre.getZ();
+            float yaw = (float)(Math.atan2(dz, dx) * (180.0 / Math.PI)) - 90.0F;
+            bogre.setYRot(yaw);
+            bogre.setYHeadRot(yaw);
+            bogre.yBodyRot = yaw;
         }
     }
 

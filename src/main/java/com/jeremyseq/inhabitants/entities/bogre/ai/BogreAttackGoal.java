@@ -9,6 +9,8 @@ import com.jeremyseq.inhabitants.entities.bogre.utilities.*;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
 
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -205,7 +207,15 @@ public class BogreAttackGoal extends Goal {
         ticksUntilNextAttack = ATTACK_INTERVAL;
         
         if (bogre.getTarget() != null) {
-            bogre.getLookControl().setLookAt(bogre.getTarget(), 60.0F, 60.0F);
+            LivingEntity target = bogre.getTarget();
+            double dx = target.getX() - bogre.getX();
+            double dz = target.getZ() - bogre.getZ();
+            float yaw = (float)(Mth.atan2(dz, dx) * (180.0 / Math.PI)) - 90.0F;
+            bogre.setYRot(yaw);
+            bogre.setYHeadRot(yaw);
+            bogre.yBodyRot = yaw;
+            
+            bogre.getLookControl().setLookAt(target, 360.0F, 360.0F);
         }
 
         bogre.setSprinting(false);

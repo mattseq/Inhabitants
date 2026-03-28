@@ -173,13 +173,12 @@ public class BogreAnimationHandler {
                 controller.setAnimation(RawAnimation.begin().then(ANIM_IDLE_RARE, Animation.LoopType.PLAY_ONCE));
                 if (controller.hasAnimationFinished()) {
                     bogre.randomChance = false;
-                    controller.forceAnimationReset();
                 }
             } else {
-                controller.setAnimation(RawAnimation.begin().then(ANIM_IDLE, Animation.LoopType.PLAY_ONCE));
-                if (controller.hasAnimationFinished()) {
-                    bogre.randomChance = new Random().nextFloat() < 0.1f;
-                    controller.forceAnimationReset();
+                controller.setAnimation(RawAnimation.begin().then(ANIM_IDLE, Animation.LoopType.LOOP));
+                
+                if (bogre.getRandom().nextFloat() < 0.001f) {
+                    bogre.randomChance = true;
                 }
             }
         }

@@ -2,6 +2,7 @@
 	"format_version": "1.8.0",
 	"animations": {
 		"idle_rare": {
+			"loop": true,
 			"animation_length": 6,
 			"bones": {
 				"rightarm": {
@@ -1971,6 +1972,7 @@
 			}
 		},
 		"idle": {
+			"loop": true,
 			"animation_length": 6,
 			"bones": {
 				"rightarm": {

@@ -105,6 +105,7 @@ public class BogreEntity extends Monster implements GeoEntity {
         
         ((GroundPathNavigation) this.getNavigation()).setAvoidSun(false);
         this.ai.registerGoals();
+        this.moveControl = new BogreMoveControl(this);
     }
 
     public static AttributeSupplier setAttributes() {
