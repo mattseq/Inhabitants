@@ -57,28 +57,56 @@ public class CauldronMenu extends RecipeBookMenu<Container> {
         // slot 0
         this.addSlot(new SlotItemHandler(itemHandler, 0, 44, 19) {
             @Override public boolean mayPlace(@NotNull ItemStack stack) {
-                return BogreRecipeManager.isCookingIngredient(stack.getItem());
+                return stack.getItem().isEdible();
+            }
+            @Override public void set(@NotNull ItemStack stack) {
+                if (!stack.isEmpty() && !BogreRecipeManager.isCookingIngredient(stack.getItem())) {
+                    BogreCauldronEntity cauldron = getCauldronEntity();
+                    if (cauldron != null) cauldron.notifyInvalidIngredient(player);
+                }
+                super.set(stack);
             }
             @Override public int getMaxStackSize() { return 1; }
         });
         // slot 1
         this.addSlot(new SlotItemHandler(itemHandler, 1, 62, 19) {
             @Override public boolean mayPlace(@NotNull ItemStack stack) {
-                return BogreRecipeManager.isCookingIngredient(stack.getItem());
+                return stack.getItem().isEdible();
+            }
+            @Override public void set(@NotNull ItemStack stack) {
+                if (!stack.isEmpty() && !BogreRecipeManager.isCookingIngredient(stack.getItem())) {
+                    BogreCauldronEntity cauldron = getCauldronEntity();
+                    if (cauldron != null) cauldron.notifyInvalidIngredient(player);
+                }
+                super.set(stack);
             }
             @Override public int getMaxStackSize() { return 1; }
         });
         // slot 2
         this.addSlot(new SlotItemHandler(itemHandler, 2, 44, 37) {
             @Override public boolean mayPlace(@NotNull ItemStack stack) {
-                return BogreRecipeManager.isCookingIngredient(stack.getItem());
+                return stack.getItem().isEdible();
+            }
+            @Override public void set(@NotNull ItemStack stack) {
+                if (!stack.isEmpty() && !BogreRecipeManager.isCookingIngredient(stack.getItem())) {
+                    BogreCauldronEntity cauldron = getCauldronEntity();
+                    if (cauldron != null) cauldron.notifyInvalidIngredient(player);
+                }
+                super.set(stack);
             }
             @Override public int getMaxStackSize() { return 1; }
         });
         // slot 3
         this.addSlot(new SlotItemHandler(itemHandler, 3, 62, 37) {
             @Override public boolean mayPlace(@NotNull ItemStack stack) {
-                return BogreRecipeManager.isCookingIngredient(stack.getItem());
+                return stack.getItem().isEdible();
+            }
+            @Override public void set(@NotNull ItemStack stack) {
+                if (!stack.isEmpty() && !BogreRecipeManager.isCookingIngredient(stack.getItem())) {
+                    BogreCauldronEntity cauldron = getCauldronEntity();
+                    if (cauldron != null) cauldron.notifyInvalidIngredient(player);
+                }
+                super.set(stack);
             }
             @Override public int getMaxStackSize() { return 1; }
         });
@@ -147,7 +175,7 @@ public class CauldronMenu extends RecipeBookMenu<Container> {
             boolean moved = false;
             if (slotItem.getItem() == Items.BOWL) {
                 moved = this.moveItemStackTo(slotItem, BOWL_SLOT, BOWL_SLOT + 1, false);
-            } else if (BogreRecipeManager.isCookingIngredient(slotItem.getItem())) {
+            } else if (slotItem.getItem().isEdible()) {
                 moved = this.moveItemStackTo(slotItem, 0, INGREDIENT_SLOTS, false);
             }
             

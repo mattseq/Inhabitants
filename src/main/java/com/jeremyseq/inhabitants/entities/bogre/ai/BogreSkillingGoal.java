@@ -172,26 +172,14 @@ public final class BogreSkillingGoal {
     }
 
     private static boolean isClosestIdleBogreToPosition(BogreEntity bogre, Vec3 targetPos) {
-        List<BogreEntity> nearbyBogres = bogre.level().getEntitiesOfClass(
-                BogreEntity.class,
-                bogre.getBoundingBox().inflate(SKILLING_RANGE),
-                otherBogre -> otherBogre.isAlive() 
-                && otherBogre.getAIState() == BogreAi.State.NEUTRAL 
-                && !otherBogre.isRoaring()
+        Optional<BogreEntity> closest = BogreDetectionHelper.findClosestBogre(
+                bogre.level(),
+                targetPos,
+                SKILLING_RANGE,
+                other -> other.getAIState() == BogreAi.State.NEUTRAL && !other.isRoaring()
         );
 
-        BogreEntity closest = null;
-        double minDistSq = Double.MAX_VALUE;
-
-        for (BogreEntity other : nearbyBogres) {
-            double distSq = other.distanceToSqr(targetPos.x, targetPos.y, targetPos.z);
-            if (distSq < minDistSq) {
-                closest = other;
-                minDistSq = distSq;
-            }
-        }
-
-        return closest != null && closest.getUUID().equals(bogre.getUUID());
+        return closest.isPresent() && closest.get().getUUID().equals(bogre.getUUID());
     }
 
     private static void captureResultOwner(BogreEntity bogre, Entity owner) {

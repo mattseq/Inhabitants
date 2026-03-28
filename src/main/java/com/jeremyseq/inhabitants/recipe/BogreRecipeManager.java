@@ -218,6 +218,8 @@ public class BogreRecipeManager extends SimpleJsonResourceReloadListener {
         for (CookingRecipe recipe : cookingRecipes) {
             if (recipe.ingredients().size() != items.size()) continue;
 
+            if (isFishSnotChowderRecipe(recipe) && containsCookedItem(items)) continue;
+
             if (recipe.hasAnyTags()) {
                 if (matchesTagRecipe(recipe, items)) return Optional.of(recipe);
             } else {
@@ -225,6 +227,18 @@ public class BogreRecipeManager extends SimpleJsonResourceReloadListener {
             }
         }
         return Optional.empty();
+    }
+
+    private static boolean isFishSnotChowderRecipe(CookingRecipe recipe) {
+        return recipe.result().is(ModItems.FISH_SNOT_CHOWDER.get());
+    }
+
+    private static boolean containsCookedItem(List<Item> items) {
+        for (Item item : items) {
+            ResourceLocation rl = ForgeRegistries.ITEMS.getKey(item);
+            if (rl != null && rl.getPath().contains("cooked")) return true;
+        }
+        return false;
     }
 
     private static boolean matchesExactRecipe(CookingRecipe recipe, List<Item> items) {

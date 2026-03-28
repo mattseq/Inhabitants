@@ -24,6 +24,7 @@ import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.Container;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 public class BogreDetectionHelper {
     private static final int JUKEBOX_RANGE = 15;
@@ -210,4 +211,24 @@ public class BogreDetectionHelper {
         return false;
     }
 
+    public static Optional<BogreEntity> findClosestBogre(Level level, Vec3 pos, double range, Predicate<BogreEntity> filter) {
+        List<BogreEntity> nearbyBogres = level.getEntitiesOfClass(
+                BogreEntity.class,
+                new AABB(pos, pos).inflate(range),
+                bogre -> bogre.isAlive() && filter.test(bogre)
+        );
+
+        BogreEntity closest = null;
+        double minDistSq = Double.MAX_VALUE;
+
+        for (BogreEntity bogre : nearbyBogres) {
+            double distSq = bogre.distanceToSqr(pos);
+            if (distSq < minDistSq) {
+                closest = bogre;
+                minDistSq = distSq;
+            }
+        }
+        
+        return Optional.ofNullable(closest);
+    }
 }

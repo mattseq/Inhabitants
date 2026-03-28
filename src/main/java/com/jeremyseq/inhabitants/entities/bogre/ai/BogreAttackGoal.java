@@ -110,6 +110,7 @@ public class BogreAttackGoal extends Goal {
     }
     
     private void runPhaseLogic() {
+        if (bogre.getTarget() == null) return;
         double distance = bogre.distanceTo(bogre.getTarget());
 
         if (distance >= MIN_ATTACK_DISTANCE &&

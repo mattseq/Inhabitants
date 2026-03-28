@@ -9,6 +9,7 @@ import com.jeremyseq.inhabitants.entities.bogre.ai.BogreAi;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.ModSoundEvents;
+import com.jeremyseq.inhabitants.entities.bogre.utilities.BogreDetectionHelper;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -347,25 +348,46 @@ public class BogreCauldronEntity extends Entity implements GeoEntity, MenuProvid
         this.setCooking(false);
         this.getEntityData().set(COOKING_PROGRESS, 0);
         
-        List<BogreEntity> nearbyBogres = this.level().getEntitiesOfClass(BogreEntity.class, 
-            this.getBoundingBox().inflate(10),
-            bogre -> bogre.isAlive() && bogre.getAIState() == BogreAi.State.SKILLING
+        triggerBogreAnger(player);
+    }
+
+    public void notifyInvalidIngredient(Player player) {
+        if (this.level().isClientSide) return;
+        
+        // when invalid ingredient is added, stop cooking and reset progress
+        this.setCooking(false);
+        this.getEntityData().set(COOKING_PROGRESS, 0);
+
+        triggerBogreAnger(player);
+    }
+
+    private void triggerBogreAnger(Player player) {
+        Optional<BogreEntity> closest = BogreDetectionHelper.findClosestBogre(
+                this.level(),
+                this.position(),
+                10,
+                bogre -> {
+                    boolean isSkillingAtThisCauldron = bogre.getAIState() == BogreAi.State.SKILLING && 
+                            bogre.cauldronPos != null && bogre.cauldronPos.distSqr(this.blockPosition()) < 4;
+                    return isSkillingAtThisCauldron || bogre.getAIState() == BogreAi.State.NEUTRAL;
+                }
         );
 
-        for (BogreEntity bogre : nearbyBogres) {
-            if (bogre.cauldronPos != null && bogre.cauldronPos.distSqr(this.blockPosition()) < 4) {
+        if (closest.isPresent()) {
+            BogreEntity bogre = closest.get();
+            if (bogre.getAIState() == BogreAi.State.SKILLING) {
                 bogre.getAi().interruptSkilling();
+            }
 
-                if (!player.isCreative() && !player.isSpectator()) {
-                    var attackGoal = bogre.getAttackGoal();
-                    if (attackGoal != null) {
-                        attackGoal.getAttackedByPlayers().add(player.getUUID());
-                        bogre.setTarget(player);
-                        attackGoal.enterRoaring(player);
-                    } else {
-                        bogre.setTarget(player);
-                        bogre.setAIState(BogreAi.State.AGGRESSIVE);
-                    }
+            if (!player.isCreative() && !player.isSpectator()) {
+                var attackGoal = bogre.getAttackGoal();
+                if (attackGoal != null) {
+                    attackGoal.getAttackedByPlayers().add(player.getUUID());
+                    bogre.setTarget(player);
+                    attackGoal.enterRoaring(player);
+                } else {
+                    bogre.setTarget(player);
+                    bogre.setAIState(BogreAi.State.AGGRESSIVE);
                 }
             }
         }

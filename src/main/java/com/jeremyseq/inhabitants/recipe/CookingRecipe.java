@@ -1,5 +1,7 @@
 package com.jeremyseq.inhabitants.recipe;
 
+import com.jeremyseq.inhabitants.items.ModItems;
+
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.tags.TagKey;
@@ -7,6 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Items;
+import net.minecraft.resources.ResourceLocation;
 
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -52,8 +55,13 @@ public record CookingRecipe(
                         if (reg.isPresent()) {
                             var tagSet = reg.get().getTag(tag);
                             if (tagSet.isPresent() && tagSet.get().size() > 0) {
-                                List<Item> items = tagSet.get().stream().map(Holder::value).toList();
-                                return items.get((int) ((time / 20) % items.size()));
+                                List<Item> items = tagSet.get().stream().map(Holder::value)
+                                    .filter(item -> !isForbiddenCookedIngredient(item))
+                                    .toList();
+                                
+                                if (!items.isEmpty()) {
+                                    return items.get((int) ((time / 20) % items.size()));
+                                }
                             }
                         }
                     }
@@ -65,8 +73,15 @@ public record CookingRecipe(
 
                     if (!tagValue.isEmpty()) {
                         List<Item> tagItems = new ArrayList<>();
-                        tagValue.forEach(tagItems::add);
-                        return tagItems.get((int) ((time / 20) % tagItems.size()));
+                        tagValue.forEach(item -> {
+                            if (!isForbiddenCookedIngredient(item)) {
+                                tagItems.add(item);
+                            }
+                        });
+                        
+                        if (!tagItems.isEmpty()) {
+                            return tagItems.get((int) ((time / 20) % tagItems.size()));
+                        }
                     }
                 } catch (Exception ignored) {}
 
@@ -84,5 +99,11 @@ public record CookingRecipe(
         }
 
         return slot < ingredients.size() ? ingredients.get(slot) : Items.AIR;
+    }
+    
+    private boolean isForbiddenCookedIngredient(Item item) {
+        if (!this.result.is(ModItems.FISH_SNOT_CHOWDER.get())) return false;
+        ResourceLocation rl = ForgeRegistries.ITEMS.getKey(item);
+        return rl != null && rl.getPath().contains("cooked");
     }
 }
