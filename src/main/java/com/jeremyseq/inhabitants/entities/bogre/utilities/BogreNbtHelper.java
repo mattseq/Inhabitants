@@ -3,15 +3,12 @@ package com.jeremyseq.inhabitants.entities.bogre.utilities;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.NbtUtils;
 
 import java.util.UUID;
 
 public class BogreNbtHelper {
     public static final String CAULDRON_POS_KEY = "CauldronPos";
-    public static final String TRANSFORMATION_PROGRESS_KEY = "bogre_disc_progress";
     public static final String RESULT_OWNER_UUID_KEY = "OwnerUUID";
 
     public static void save(BogreEntity bogre, CompoundTag tag) {

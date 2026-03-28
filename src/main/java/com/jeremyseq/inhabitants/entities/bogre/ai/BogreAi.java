@@ -39,7 +39,7 @@ public class BogreAi {
 
     public enum SkillingState {
         NONE, COOKING, CARVING, TRANSFORMATION,
-        DELIVERING, MOVING_TO_TARGET, PLACING_ITEM
+        DELIVERING, MOVING_TO_TARGET
     }
 
     public enum DeliveryState {
@@ -118,8 +118,7 @@ public class BogreAi {
         if (bogre.getAIState() == State.SKILLING) {
             // Only apply stuck failsafe during movement phases
             if (bogre.getCraftingState() != SkillingState.MOVING_TO_TARGET && 
-                bogre.getCraftingState() != SkillingState.DELIVERING &&
-                bogre.getCraftingState() != SkillingState.PLACING_ITEM) {
+                bogre.getCraftingState() != SkillingState.DELIVERING) {
                 this.resetStuckTicks();
                 return;
             }
@@ -172,7 +171,6 @@ public class BogreAi {
             return skill == SkillingState.COOKING ||
                     skill == SkillingState.CARVING ||
                     skill == SkillingState.TRANSFORMATION ||
-                    skill == SkillingState.PLACING_ITEM ||
                     skill == SkillingState.DELIVERING;
         }
         return false;

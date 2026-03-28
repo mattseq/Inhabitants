@@ -1,7 +1,6 @@
 package com.jeremyseq.inhabitants.entities.bogre.skill;
 
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
-import com.jeremyseq.inhabitants.recipe.BogreRecipeManager;
 import com.jeremyseq.inhabitants.recipe.TransformationRecipe;
 import com.jeremyseq.inhabitants.recipe.IBogreRecipe;
 import com.jeremyseq.inhabitants.entities.bogre.ai.*;
@@ -109,11 +108,6 @@ public class TransformationSkill extends BogreSkills.Skill {
             bogre.setCraftingState(BogreAi.SkillingState.TRANSFORMATION);
             setTransformationTicks(bogre, 0);
         }
-    }
-
-    @Override
-    public void handlePlacingItem(BogreEntity bogre) {
-        // not used yet
     }
 
     @Override

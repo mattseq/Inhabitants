@@ -1,10 +1,10 @@
 package com.jeremyseq.inhabitants.entities.bogre.render;
 
+import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.ai.BogreAi;
 import com.jeremyseq.inhabitants.entities.bogre.ai.BogreNeutralGoal;
 import com.jeremyseq.inhabitants.entities.bogre.skill.BogreSkills;
-import com.jeremyseq.inhabitants.particles.ModParticles;
 import com.jeremyseq.inhabitants.networking.bogre.BogreSkillKeyframePacketC2S;
 import com.jeremyseq.inhabitants.ModSoundEvents;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
@@ -14,16 +14,12 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
 import net.minecraftforge.registries.ForgeRegistries;
 
 import software.bernie.geckolib.cache.object.GeoBone;
-import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.Animation;
 import software.bernie.geckolib.core.animation.AnimationController;
@@ -284,73 +280,56 @@ public class BogreAnimationHandler {
     }
 
     private static void soundKeyframeHandler(SoundKeyframeEvent<BogreEntity> event) {
-        BogreEntity bogre = event.getAnimatable();
-        String soundName = event.getKeyframeData().getSound().trim();
+        playSound(event.getAnimatable(), event.getKeyframeData().getSound().trim());
+    }
 
+    private static void playSound(BogreEntity bogre, String soundName) {
+        Player player = ClientUtils.getClientPlayer();
+        if (player == null) return;
+
+        // transformation/carving hammer sound
         if (soundName.equals(KEYFRAME_HAMMER_SOUND)) {
-            handleHammerSound(bogre, soundName);
+            String customSound = bogre.getEntityData().get(BogreEntity.HAMMER_SOUND);
+            boolean soundPlayed = false;
+            float pitch = 0.8F;
+
+            if (bogre.getAIState() == BogreAi.State.SKILLING) {
+                int expectedHits = Math.max(1, bogre.getEntityData().get(BogreEntity.HAMMER_HITS));
+                int currentHit = bogre.clientSkillHits + 1;
+                float progress = (float) currentHit / (float) expectedHits;
+                pitch = 0.8F + (progress * 0.8F);
+            } else {
+                pitch = 0.8F + new Random().nextFloat() * 0.4F;
+            }
+
+            if (!customSound.isEmpty()) {
+                SoundEvent soundEvent = ForgeRegistries.SOUND_EVENTS.getValue(ResourceLocation.parse(customSound));
+                if (soundEvent != null) {
+                    player.playSound(soundEvent, 1f, pitch);
+                    soundPlayed = true;
+                }
+            }
+
+            if (bogre.getAIState() == BogreAi.State.SKILLING) {
+                ModNetworking.sendToServer(new BogreSkillKeyframePacketC2S(bogre.getId(), soundName));
+                BogreAi.SkillingState state = bogre.getCraftingState();
+                if (state == BogreAi.SkillingState.CARVING) {
+                    BogreSkills.CARVING.keyframeTriggered(bogre, soundName);
+                } else if (state == BogreAi.SkillingState.TRANSFORMATION) {
+                    BogreSkills.TRANSFORMATION.keyframeTriggered(bogre, soundName);
+                }
+            } else if (!soundPlayed) {
+                player.playSound(SoundEvents.ANVIL_LAND, .5f, pitch);
+            }
         } else if (soundName.equals(KEYFRAME_ROAR)) {
-            handleRoarSound(bogre);
+            // roar sound
+            bogre.playSound(ModSoundEvents.BOGRE_ROAR.get(), 1f, 1f);
         } else if (soundName.contains(KEYFRAME_COOKING_START_SOUND)) {
-            handleCookingSounds(bogre, soundName);
-        } else if (soundName.contains(KEYFRAME_COOKING_LOOP_SOUND)) {
-            handleCookingSounds(bogre, soundName);
-        }
-    }
-
-    private static void handleHammerSound(BogreEntity bogre, String soundName) {
-        Player player = ClientUtils.getClientPlayer();
-        if (player == null) return;
-
-        String customSound = bogre.getEntityData().get(BogreEntity.HAMMER_SOUND);
-        boolean soundPlayed = false;
-        
-        float pitch = 0.8F;
-        if (bogre.getAIState() == BogreAi.State.SKILLING) {
-            int expectedHits = Math.max(1, bogre.getEntityData().get(BogreEntity.HAMMER_HITS));
-            
-            int currentHit = bogre.clientSkillHits + 1;
-            
-            float progress = (float) currentHit / (float) expectedHits;
-            pitch = 0.8F + (progress * 0.8F);
-        } else {
-            pitch = 0.8F + new Random().nextFloat() * 0.4F;
-        }
-        
-        if (!customSound.isEmpty()) {
-            SoundEvent soundEvent = ForgeRegistries.SOUND_EVENTS.getValue(ResourceLocation.parse(customSound));
-            if (soundEvent != null) {
-                player.playSound(soundEvent, 1f, pitch);
-                soundPlayed = true;
-            }
-        }
-        
-        if (bogre.getAIState() == BogreAi.State.SKILLING) {
-            ModNetworking.sendToServer(new BogreSkillKeyframePacketC2S(bogre.getId(), soundName));
-            BogreAi.SkillingState state = bogre.getCraftingState();
-            if (state == BogreAi.SkillingState.CARVING) {
-                BogreSkills.CARVING.keyframeTriggered(bogre, soundName);
-            } else if (state == BogreAi.SkillingState.TRANSFORMATION) {
-                BogreSkills.TRANSFORMATION.keyframeTriggered(bogre, soundName);
-            }
-        } else if (!soundPlayed) {
-            player.playSound(SoundEvents.ANVIL_LAND, .5f, pitch);
-        }
-    }
-
-    private static void handleRoarSound(BogreEntity bogre) {
-        bogre.playSound(ModSoundEvents.BOGRE_ROAR.get(), 1f, 1f);
-    }
-
-    private static void handleCookingSounds(BogreEntity bogre, String soundName) {
-        Player player = ClientUtils.getClientPlayer();
-        if (player == null) return;
-
-        if (soundName.contains(KEYFRAME_COOKING_START_SOUND)) {
+            // cooking start sound
             player.playSound(ModSoundEvents.BOGRE_COOKING_START.get(), 1.0f, 1.0f);
         } else if (soundName.contains(KEYFRAME_COOKING_LOOP_SOUND)) {
+            // cooking loop sound
             player.playSound(ModSoundEvents.BOGRE_COOKING_LOOP.get(), 1.2f, 1.0f);
         }
     }
-    // TODO: make playSound(bogre, soundName) for all sound keyframes instead of having multiple functions
 }

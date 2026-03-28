@@ -1,7 +1,6 @@
 package com.jeremyseq.inhabitants.entities.bogre.skill;
 
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
-import com.jeremyseq.inhabitants.recipe.BogreRecipeManager;
 import com.jeremyseq.inhabitants.recipe.CarvingRecipe;
 import com.jeremyseq.inhabitants.recipe.IBogreRecipe;
 import com.jeremyseq.inhabitants.entities.bogre.ai.BogrePathNavigation;
@@ -103,23 +102,6 @@ public class CarvingSkill extends BogreSkills.Skill {
         }
     }
 
-    private boolean isPositionBlocked(BogreEntity bogre, double x, double y, double z) {
-        BlockPos pos = BlockPos.containing(x, y, z);
-        
-        return isSolid(bogre, pos) || isSolid(bogre, pos.above());
-    }
-
-    private boolean isSolid(BogreEntity bogre, BlockPos pos) {
-        BlockState state = bogre.level().getBlockState(pos);
-        if (state.isAir()) return false;
-        return !state.getCollisionShape(bogre.level(), pos).isEmpty();
-    }
-
-    @Override
-    public void handlePlacingItem(BogreEntity bogre) {
-        // not used for carving
-    }
-
     @Override
     public void handleSkilling(BogreEntity bogre) {
         IBogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
@@ -153,7 +135,7 @@ public class CarvingSkill extends BogreSkills.Skill {
         }
 
         BlockPos targetPos = bogre.getEntityData().get(BogreEntity.TARGET_POS);
-        if (targetPos != null && !targetPos.equals(BlockPos.ZERO)) {
+        if (isTargetBlock(targetPos)) {
             Vec3 hitTarget = Vec3.atCenterOf(targetPos);
             bogre.getLookControl().setLookAt(hitTarget.x, hitTarget.y + 0.5, hitTarget.z, 100f, 100f);
         } else {
@@ -210,14 +192,14 @@ public class CarvingSkill extends BogreSkills.Skill {
                 int progress = (int) Math.min(9, ((currentHits - 1) * 10f / (float) hammerHits));
 
                 BlockPos targetPos = bogre.getEntityData().get(BogreEntity.TARGET_POS);
-                if (targetPos != null && !targetPos.equals(BlockPos.ZERO) && bogre.level().getBlockState(targetPos).isAir()) {
+                if (isTargetBlock(targetPos) && bogre.level().getBlockState(targetPos).isAir()) {
                     if (!blocks.isEmpty()) {
                         targetPos = blocks.get(bogre.getRandom().nextInt(blocks.size()));
                         bogre.getEntityData().set(BogreEntity.TARGET_POS, targetPos);
                     }
                 }
 
-                if (targetPos != null && !targetPos.equals(BlockPos.ZERO)) {
+                if (isTargetBlock(targetPos)) {
                     HammerEffectsRenderer.spawnCarvingParticles(bogre.level(), targetPos, bogre.level().getBlockState(targetPos));
                     for (int i = 0; i < blocks.size(); i++) {
                         bogre.level().destroyBlockProgress(bogre.getId() + i, blocks.get(i), progress);
@@ -251,7 +233,7 @@ public class CarvingSkill extends BogreSkills.Skill {
 
                 List<BlockPos> blocks = BogreDetectionHelper.findCarvableBlocks(bogre, 5);
                 BlockPos targetPos = bogre.getEntityData().get(BogreEntity.TARGET_POS);
-                if (targetPos != null && !targetPos.equals(BlockPos.ZERO)) {
+                if (isTargetBlock(targetPos)) {
                     HammerEffectsRenderer.spawnCarvingParticles(bogre.level(), targetPos, bogre.level().getBlockState(targetPos));
                 }
             }
@@ -282,5 +264,9 @@ public class CarvingSkill extends BogreSkills.Skill {
                 bogre.level().destroyBlockProgress(id, bogre.blockPosition(), -1);
             }
         }
+    }
+
+    private boolean isTargetBlock(BlockPos targetPos) {
+        return targetPos != null && !targetPos.equals(BlockPos.ZERO);
     }
 }

@@ -438,7 +438,7 @@
 					]
 				},
 				{
-					"name": "fish",
+					"name": "item",
 					"parent": "leftarm",
 					"pivot": [13.5, 9, -4.5],
 					"rotation": [0, 90, 0]

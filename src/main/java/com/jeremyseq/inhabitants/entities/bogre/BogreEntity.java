@@ -33,6 +33,7 @@ import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
+import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
@@ -147,7 +148,7 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     // --- Combat & Attack Interaction ---
     @Override
-    public boolean doHurtTarget(Entity target) {
+    public boolean doHurtTarget(@NotNull Entity target) {
         this.triggerShockwave();
         return true;
     }
@@ -158,16 +159,8 @@ public class BogreEntity extends Monster implements GeoEntity {
         BogreUtil.triggerShockwave(this, BogreAttackGoal.SHOCKWAVE_DAMAGE, BogreAttackGoal.SHOCKWAVE_RADIUS);
     }
 
-    public void triggerShockwave(Vec3 spawnPos) {
-        if (this.level().isClientSide) return;
-        if (this.isRoaring()) return;
-        ShockwaveGoal.addShockwave((ServerLevel) this.level(), spawnPos,
-        BogreAttackGoal.SHOCKWAVE_DAMAGE,
-        BogreAttackGoal.SHOCKWAVE_RADIUS, 40, this);
-    }
-
     @Override
-    public boolean hurt(DamageSource damageSource, float amount) {
+    public boolean hurt(@NotNull DamageSource damageSource, float amount) {
         boolean result = super.hurt(damageSource, amount);
         if (result && !level().isClientSide) {
             this.triggerAnim("hurt", "hurt");
@@ -248,13 +241,13 @@ public class BogreEntity extends Monster implements GeoEntity {
     }
 
     @Override
-    public void die(DamageSource pCause) {
+    public void die(@NotNull DamageSource pCause) {
         CarvingSkill.clearCracks(this);
         super.die(pCause);
     }
 
     @Override
-    public void remove(Entity.RemovalReason pReason) {
+    public void remove(Entity.@NotNull RemovalReason pReason) {
         CarvingSkill.clearCracks(this);
         super.remove(pReason);
     }
@@ -358,22 +351,8 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     // --- Navigation & Movement Helpers ---
     @Override
-    protected PathNavigation createNavigation(Level pLevel) {
+    protected @NotNull PathNavigation createNavigation(@NotNull Level pLevel) {
         return new BogrePathNavigation(this, pLevel);
-    }
-
-    public boolean moveTo(BlockPos pos, double speed, boolean checkCauldronDistance) {
-        if (checkCauldronDistance && this.cauldronPos != null
-                && this.cauldronPos.distToCenterSqr(pos.getX(), pos.getY(), pos.getZ()) >
-                BogreNeutralGoal.MAX_CAULDRON_DIST_SQR) {
-            return false;
-        }
-        this.getNavigation().moveTo(this.getNavigation().createPath(pos, 0), speed);
-        return true;
-    }
-
-    public boolean moveTo(BlockPos pos, double speed) {
-        return moveTo(pos, speed, true);
     }
 
     // --- Sound & Anim Helpers ---
@@ -401,10 +380,10 @@ public class BogreEntity extends Monster implements GeoEntity {
     @Override
     protected SoundEvent getAmbientSound() { return BogreSoundHandler.getAmbientSound(); }
     @Override
-    protected SoundEvent getHurtSound(DamageSource pDamageSource) { return BogreSoundHandler.getHurtSound(pDamageSource); }
+    protected @NotNull SoundEvent getHurtSound(@NotNull DamageSource pDamageSource) { return BogreSoundHandler.getHurtSound(pDamageSource); }
     @Override
-    protected SoundEvent getDeathSound() { return BogreSoundHandler.getDeathSound(); }
-    protected void playStepSound(BlockPos pPos, BlockState pState) { BogreSoundHandler.playStepSound(this, pPos, pState); }
+    protected @NotNull SoundEvent getDeathSound() { return BogreSoundHandler.getDeathSound(); }
+    protected void playStepSound(@NotNull BlockPos pPos, @NotNull BlockState pState) { BogreSoundHandler.playStepSound(this, pPos, pState); }
 
     @Override
     public float getStepHeight() { return 1.5f; }
@@ -418,20 +397,20 @@ public class BogreEntity extends Monster implements GeoEntity {
     public boolean isPersistenceRequired() { return true; }
 
     @Override
-    protected void dropCustomDeathLoot(DamageSource source, int looting, boolean recentlyHit) {
+    protected void dropCustomDeathLoot(@NotNull DamageSource source, int looting, boolean recentlyHit) {
         super.dropCustomDeathLoot(source, looting, recentlyHit);
         this.spawnAtLocation(new ItemStack(ModItems.GIANT_BONE.get()));
     }
 
     // --- NBT & Save Data ---
     @Override
-    public void addAdditionalSaveData(CompoundTag tag) {
+    public void addAdditionalSaveData(@NotNull CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         BogreNbtHelper.save(this, tag);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag tag) {
+    public void readAdditionalSaveData(@NotNull CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         BogreNbtHelper.load(this, tag);
     }
@@ -447,7 +426,6 @@ public class BogreEntity extends Monster implements GeoEntity {
 
     // --- Refactoring Redirection (Fields moved to AI/Goal classes) ---
     public void setPathSet(boolean pathSet) { this.getAi().setPathSet(pathSet); }
-    public boolean isPathSet() { return this.getAi().isPathSet(); }
     public void resetStuckTicks() { this.getAi().resetStuckTicks(); }
     public void setLastPos(Vec3 pos) { this.getAi().setLastPos(pos); }
     public Vec3 getLastPos() { return this.getAi().getLastPos(); }

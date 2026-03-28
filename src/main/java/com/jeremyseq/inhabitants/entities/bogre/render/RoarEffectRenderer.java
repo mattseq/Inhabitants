@@ -4,13 +4,15 @@ import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.particles.ModParticles;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.entity.Entity;
+
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraft.world.entity.Entity;
 
 import java.util.*;
 
@@ -82,13 +84,7 @@ public class RoarEffectRenderer {
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase == TickEvent.Phase.END && !activeRoars.isEmpty()) {
             Iterator<ActiveRoarEffect> iterator = activeRoars.iterator();
-            while (iterator.hasNext()) {
-                ActiveRoarEffect roar = iterator.next();
-                roar.tick();
-                if (roar.isFinished()) {
-                    iterator.remove();
-                }
-            }
+            onTick(iterator);
         }
     }
 
@@ -96,12 +92,17 @@ public class RoarEffectRenderer {
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END && !clientActiveRoars.isEmpty()) {
             Iterator<ActiveRoarEffect> iterator = clientActiveRoars.iterator();
-            while (iterator.hasNext()) {
-                ActiveRoarEffect roar = iterator.next();
-                roar.tick();
-                if (roar.isFinished()) {
-                    iterator.remove();
-                }
+            onTick(iterator);
+        }
+    }
+
+    private static void onTick(Iterator<ActiveRoarEffect> iterator)
+    {
+        while (iterator.hasNext()) {
+            ActiveRoarEffect roar = iterator.next();
+            roar.tick();
+            if (roar.isFinished()) {
+                iterator.remove();
             }
         }
     }
@@ -153,37 +154,28 @@ public class RoarEffectRenderer {
             }
 
             if (this.ticksAlive % 3 == 0) {
-                if (level instanceof ServerLevel serverLevel) {
-                    serverLevel.sendParticles(
-                        ModParticles.ROAR_EFFECT.get(),
-                        sourcePos.x, sourcePos.y, sourcePos.z,
-                        0,
-                        lookDirection.x * speedMultiplier, lookDirection.y * speedMultiplier,
-                        lookDirection.z * speedMultiplier,
-                        1.0D);
-                } else if (level.isClientSide) {
-                    level.addParticle(ModParticles.ROAR_EFFECT.get(),
-                        sourcePos.x, sourcePos.y, sourcePos.z,
-                        lookDirection.x * speedMultiplier, lookDirection.y * speedMultiplier,
-                        lookDirection.z * speedMultiplier);
-                }
+                sendParticles(ModParticles.ROAR_EFFECT.get());
             }
 
             if (this.ticksAlive % 6 == 0) {
-                if (level instanceof ServerLevel serverLevel) {
-                    serverLevel.sendParticles(
-                        ModParticles.SONIC_WAVE.get(),
-                        sourcePos.x, sourcePos.y, sourcePos.z,
-                        0,
-                        lookDirection.x * speedMultiplier, lookDirection.y * speedMultiplier,
-                        lookDirection.z * speedMultiplier,
-                        1.0D);
-                } else if (level.isClientSide) {
-                    level.addParticle(ModParticles.SONIC_WAVE.get(),
-                        sourcePos.x, sourcePos.y, sourcePos.z,
-                        lookDirection.x * speedMultiplier, lookDirection.y * speedMultiplier,
-                        lookDirection.z * speedMultiplier);
-                }
+                sendParticles(ModParticles.SONIC_WAVE.get());
+            }
+        }
+
+        private void sendParticles(ParticleOptions particleOptions) {
+            if (level instanceof ServerLevel serverLevel) {
+                serverLevel.sendParticles(
+                    particleOptions,
+                    sourcePos.x, sourcePos.y, sourcePos.z,
+                    0,
+                    lookDirection.x * speedMultiplier, lookDirection.y * speedMultiplier,
+                    lookDirection.z * speedMultiplier,
+                    1.0D);
+            } else if (level.isClientSide) {
+                level.addParticle(particleOptions,
+                    sourcePos.x, sourcePos.y, sourcePos.z,
+                    lookDirection.x * speedMultiplier, lookDirection.y * speedMultiplier,
+                    lookDirection.z * speedMultiplier);
             }
         }
 

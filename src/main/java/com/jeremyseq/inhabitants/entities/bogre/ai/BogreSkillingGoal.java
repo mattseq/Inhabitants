@@ -48,11 +48,6 @@ public final class BogreSkillingGoal {
             bogre.setCraftingState(BogreAi.SkillingState.MOVING_TO_TARGET);
         }
 
-        if (bogre.getCraftingState() == BogreAi.SkillingState.PLACING_ITEM) {
-            BogreSkills.forType(activeRecipe.getBogreRecipeType()).handlePlacingItem(bogre);
-            return;
-        }
-
         BogreSkills.forType(activeRecipe.getBogreRecipeType()).aiStep(bogre);
     }
 

@@ -14,13 +14,13 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.Container;
 
 import java.util.*;
@@ -32,14 +32,14 @@ public class BogreDetectionHelper {
     public static boolean isJukeboxPlayingNearby(BogreEntity bogre) {
         BlockPos origin = bogre.blockPosition();
         return BlockPos.betweenClosedStream(
-                origin.offset(-JUKEBOX_RANGE, -2, -JUKEBOX_RANGE),
-                origin.offset(JUKEBOX_RANGE, 2, JUKEBOX_RANGE)).anyMatch(pos -> {
-                    BlockState state = bogre.level().getBlockState(pos);
-                    BlockEntity blockEntity = bogre.level().getBlockEntity(pos);
-                    return state.is(Blocks.JUKEBOX)
-                            && blockEntity instanceof JukeboxBlockEntity jukeboxblockentity
-                            && jukeboxblockentity.isRecordPlaying();
-                });
+            origin.offset(-JUKEBOX_RANGE, -2, -JUKEBOX_RANGE),
+            origin.offset(JUKEBOX_RANGE, 2, JUKEBOX_RANGE)).anyMatch(pos -> {
+                BlockState state = bogre.level().getBlockState(pos);
+                BlockEntity blockEntity = bogre.level().getBlockEntity(pos);
+                return state.is(Blocks.JUKEBOX)
+                    && blockEntity instanceof JukeboxBlockEntity jukeboxblockentity
+                    && jukeboxblockentity.isRecordPlaying();
+            });
     }
 
     public static boolean isValidCauldron(Level level, BlockPos pos) {
@@ -48,8 +48,8 @@ public class BogreDetectionHelper {
         double centerZ = pos.getZ() + 0.5;
 
         List<BogreCauldronEntity> entities = level.getEntitiesOfClass(
-                BogreCauldronEntity.class,
-                new AABB(centerX - 0.5, centerY - 1, centerZ - 0.5, centerX + 0.5, centerY + 2, centerZ + 0.5));
+            BogreCauldronEntity.class,
+            new AABB(centerX - 0.5, centerY - 1, centerZ - 0.5, centerX + 0.5, centerY + 2, centerZ + 0.5));
 
         for (BogreCauldronEntity entity : entities) {
             if (entity.blockPosition().equals(pos)) {
@@ -65,11 +65,11 @@ public class BogreDetectionHelper {
         Vec3 target = Vec3.atCenterOf(bogre.cauldronPos);
 
         HitResult hit = bogre.level().clip(new ClipContext(
-                eyePos,
-                target,
-                ClipContext.Block.COLLIDER,
-                ClipContext.Fluid.NONE,
-                bogre));
+            eyePos,
+            target,
+            ClipContext.Block.COLLIDER,
+            ClipContext.Fluid.NONE,
+            bogre));
 
         if (hit.getType() == HitResult.Type.MISS) {
             return true;
@@ -84,10 +84,10 @@ public class BogreDetectionHelper {
 
     public static Optional<BlockPos> findNearestCauldron(BogreEntity bogre, int radius) {
         return BlockPos.betweenClosedStream(bogre.blockPosition().offset(-radius, -2, -radius),
-                        bogre.blockPosition().offset(radius, 2, radius))
-                .map(BlockPos::immutable)
-                .filter(bogre::isValidCauldron)
-                .findFirst();
+            bogre.blockPosition().offset(radius, 2, radius))
+            .map(BlockPos::immutable)
+            .filter(bogre::isValidCauldron)
+            .findFirst();
     }
 
 
@@ -95,9 +95,9 @@ public class BogreDetectionHelper {
         BlockPos origin = bogre.blockPosition();
         AABB searchBox = new AABB(origin).inflate(range);
         List<ItemEntity> items = bogre.level().getEntitiesOfClass(
-                ItemEntity.class,
-                searchBox,
-                item -> item.isAlive() && BogreRecipeManager.isTransformationIngredient(item.getItem().getItem())
+            ItemEntity.class,
+            searchBox,
+            item -> item.isAlive() && BogreRecipeManager.isTransformationIngredient(item.getItem().getItem())
         );
         if (items.isEmpty()) return null;
         return items.get(0);
@@ -108,11 +108,11 @@ public class BogreDetectionHelper {
         List<BlockPos> carvableBlocks = new ArrayList<>();
 
         BlockPos.betweenClosedStream(origin.offset(-radius, -3, -radius), origin.offset(radius, 3, radius))
-                .forEach(pos -> {
-                    if (BogreRecipeManager.isCarvable(bogre.level().getBlockState(pos).getBlock())) {
-                        carvableBlocks.add(pos.immutable());
-                    }
-                });
+            .forEach(pos -> {
+                if (BogreRecipeManager.isCarvable(bogre.level().getBlockState(pos).getBlock())) {
+                    carvableBlocks.add(pos.immutable());
+                }
+            });
 
         // Use stable coordinate sorting to ensure the "middle" block doesn't jump as Bogre moves
         carvableBlocks.sort((p1, p2) -> {
@@ -163,12 +163,6 @@ public class BogreDetectionHelper {
             line.add(start.offset(i * stepX, i * stepY, i * stepZ).immutable());
         }
         return line;
-    }
-
-    public static Vec3 getMouthPosition(BogreEntity bogre) {
-        Vec3 look = bogre.getLookAngle();
-        Vec3 add = new Vec3(look.x, 0, look.z).normalize().scale(2.25);
-        return new Vec3(bogre.getX(), bogre.getY() + 1.8, bogre.getZ()).add(add);
     }
 
     public static Optional<BlockPos> findChestWithSpace(BogreEntity bogre, int radius, int maxToSearch) {

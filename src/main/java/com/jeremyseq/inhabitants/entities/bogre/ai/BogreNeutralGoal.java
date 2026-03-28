@@ -4,7 +4,6 @@ import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.ai.BogreAi;
 import com.jeremyseq.inhabitants.entities.bogre.utilities.*;
 
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;

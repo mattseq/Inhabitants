@@ -5,8 +5,6 @@ import com.jeremyseq.inhabitants.ModSoundEvents;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
 import com.jeremyseq.inhabitants.networking.ScreenShakePacketS2C;
 import com.jeremyseq.inhabitants.networking.bogre.ShockwaveParticlePacketS2C;
-import com.jeremyseq.inhabitants.debug.DevMode;
-import com.jeremyseq.inhabitants.debug.BogreDebugRenderer;
 
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;

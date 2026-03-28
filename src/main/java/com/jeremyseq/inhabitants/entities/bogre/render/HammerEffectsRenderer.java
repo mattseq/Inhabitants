@@ -1,7 +1,5 @@
 package com.jeremyseq.inhabitants.entities.bogre.render;
 
-import com.jeremyseq.inhabitants.particles.ModParticles;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;

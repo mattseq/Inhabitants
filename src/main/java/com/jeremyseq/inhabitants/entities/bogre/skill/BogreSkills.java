@@ -37,7 +37,6 @@ public final class BogreSkills {
         public abstract void aiStep(BogreEntity bogre);
 
         public abstract void handleMovement(BogreEntity bogre);
-        public abstract void handlePlacingItem(BogreEntity bogre);
         public abstract void handleSkilling(BogreEntity bogre);
         
         public abstract boolean canPerform(BogreEntity bogre);
@@ -48,7 +47,6 @@ public final class BogreSkills {
         
 
         protected void finishSkill(BogreEntity bogre) {
-            // Future TODO: make sure dropping the item in case Bogre has it held
             bogre.setAIState(BogreAi.State.NEUTRAL);
             bogre.setCraftingState(BogreAi.SkillingState.NONE);
             bogre.getAi().setActiveRecipe(null);

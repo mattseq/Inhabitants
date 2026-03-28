@@ -4,22 +4,14 @@ import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.debug.BogreDebugRenderer;
 import com.jeremyseq.inhabitants.debug.DevMode;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
-import com.jeremyseq.inhabitants.entities.bogre.ai.BogreAi;
 
-import net.minecraft.client.gui.Font;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.entity.Entity;
 
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.cache.object.GeoBone;
@@ -27,18 +19,14 @@ import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
 import software.bernie.geckolib.renderer.layer.BlockAndItemGeoLayer;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
-import org.joml.Matrix4f;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class BogreRenderer extends GeoEntityRenderer<BogreEntity> {
     private static final float scale = 1.25f;
-
-    private int lastSpitTick = -1;
 
     public BogreRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new BogreModel());
@@ -49,8 +37,8 @@ public class BogreRenderer extends GeoEntityRenderer<BogreEntity> {
     }
 
     @Override
-    public void render(BogreEntity entity, float entityYaw, float partialTick, PoseStack poseStack,
-    MultiBufferSource bufferSource, int packedLight) {
+    public void render(@NotNull BogreEntity entity, float entityYaw, float partialTick, @NotNull PoseStack poseStack,
+                       @NotNull MultiBufferSource bufferSource, int packedLight) {
         super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
 
         this.getGeoModel().getBone("mouthPoint").ifPresent(bone -> {
@@ -73,7 +61,9 @@ public class BogreRenderer extends GeoEntityRenderer<BogreEntity> {
     }
 
     @Override
-    public void postRender(PoseStack poseStack, BogreEntity animatable, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+    public void postRender(PoseStack poseStack, BogreEntity animatable, BakedGeoModel model,
+    MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick,
+    int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
     }
 
     @Override
@@ -93,7 +83,7 @@ public class BogreRenderer extends GeoEntityRenderer<BogreEntity> {
 
         @Override
         protected @Nullable ItemStack getStackForBone(GeoBone bone, BogreEntity animatable) {
-            if ("fish".equals(bone.getName()) && !animatable.getItemHeld().isEmpty()) {
+            if ("item".equals(bone.getName()) && !animatable.getItemHeld().isEmpty()) {
                 return animatable.getItemHeld();
             }
 

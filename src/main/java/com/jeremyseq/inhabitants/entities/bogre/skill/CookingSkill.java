@@ -7,7 +7,6 @@ import com.jeremyseq.inhabitants.entities.bogre.ai.BogreAi;
 import com.jeremyseq.inhabitants.entities.bogre.ai.BogreSkillingGoal;
 import com.jeremyseq.inhabitants.entities.bogre.ai.BogrePathNavigation;
 import com.jeremyseq.inhabitants.entities.bogre.utilities.BogreDetectionHelper;
-import com.jeremyseq.inhabitants.ModSoundEvents;
 
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.Direction;
@@ -15,9 +14,6 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.BlockPos;
-import net.minecraft.sounds.SoundSource;
-
-import java.util.List;
 
 public class CookingSkill extends BogreSkills.Skill {
     private final float howFarFromCauldron = 2.5f; // Distance from cauldron to start cooking (MOVING_TO_TARGET state)
@@ -83,12 +79,8 @@ public class CookingSkill extends BogreSkills.Skill {
 
         BogreAi.SkillingState state = bogre.getCraftingState();
 
-        if (state == BogreAi.SkillingState.PLACING_ITEM || state == BogreAi.SkillingState.COOKING) {
-            if (state == BogreAi.SkillingState.PLACING_ITEM) {
-                handlePlacingItem(bogre);
-            } else {
-                handleSkilling(bogre);
-            }
+        if (state == BogreAi.SkillingState.COOKING) {
+            handleSkilling(bogre);
             return;
         }
         
@@ -126,11 +118,6 @@ public class CookingSkill extends BogreSkills.Skill {
             bogre.setCraftingState(BogreAi.SkillingState.COOKING);
             bogre.resetCookingTicks();
         }
-    }
-
-    @Override
-    public void handlePlacingItem(BogreEntity bogre) {
-        // no longer used
     }
 
     private void handleStuck(BogreEntity bogre, Vec3 targetCenter) {
