@@ -69,7 +69,12 @@ public class BogreCauldronEntity extends Entity implements GeoEntity, MenuProvid
     SynchedEntityData.defineId(BogreCauldronEntity.class, EntityDataSerializers.BOOLEAN);
 
     // 5 slots: 4 for ingredients, 1 for the bowl/output
-    private final ItemStackHandler itemHandler = new ItemStackHandler(5);
+    private final ItemStackHandler itemHandler = new ItemStackHandler(5) {
+        @Override
+        public int getSlotLimit(int slot) {
+            return 1;
+        }
+    };
     private final LazyOptional<IItemHandler> optionalItemHandler =
         LazyOptional.of(() -> itemHandler);
 

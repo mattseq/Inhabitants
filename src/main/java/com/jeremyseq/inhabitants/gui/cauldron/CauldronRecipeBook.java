@@ -365,7 +365,7 @@ public class CauldronRecipeBook extends AbstractWidget {
             for (int i = 0; i < inv.getContainerSize() && needed > 0; i++) {
                 if (usedItems[i]) continue;
                 ItemStack stack = inv.getItem(i);
-                if (!stack.isEmpty() && stack.is(tag)) {
+                if (!stack.isEmpty() && stack.is(tag) && !recipe.isForbiddenCookedIngredient(stack.getItem())) {
                     int consume = Math.min(needed, stack.getCount());
                     needed -= consume;
                     usedItems[i] = true;

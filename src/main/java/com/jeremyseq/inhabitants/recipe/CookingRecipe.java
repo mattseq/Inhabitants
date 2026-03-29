@@ -101,7 +101,7 @@ public record CookingRecipe(
         return slot < ingredients.size() ? ingredients.get(slot) : Items.AIR;
     }
     
-    private boolean isForbiddenCookedIngredient(Item item) {
+    public boolean isForbiddenCookedIngredient(Item item) {
         if (!this.result.is(ModItems.FISH_SNOT_CHOWDER.get())) return false;
         ResourceLocation rl = ForgeRegistries.ITEMS.getKey(item);
         return rl != null && rl.getPath().contains("cooked");

@@ -49,7 +49,7 @@ public class BogreRecipePacketC2S {
 
             for (int i = 0; i < recipe.ingredients().size(); i++) {
                 if (recipe.hasTagIngredient(i)) {
-                    findAndMoveTagItem(player, menu, recipe.getTagForSlot(i), i, usedSlots);
+                    findAndMoveTagItem(player, menu, recipe.getTagForSlot(i), i, usedSlots, recipe);
                 } else {
                     Item needed = recipe.ingredients().get(i);
                     if (needed != Items.AIR) {
@@ -83,13 +83,13 @@ public class BogreRecipePacketC2S {
     }
 
     private static void findAndMoveTagItem(ServerPlayer player, CauldronMenu menu,
-        TagKey<Item> tag, int slotIndex, boolean[] usedSlots) {
+        TagKey<Item> tag, int slotIndex, boolean[] usedSlots, CookingRecipe recipe) {
 
         for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
             if (usedSlots[i]) continue;
 
             ItemStack stack = player.getInventory().getItem(i);
-            if (!stack.isEmpty() && stack.is(tag)) {
+            if (!stack.isEmpty() && stack.is(tag) && !recipe.isForbiddenCookedIngredient(stack.getItem())) {
                 ItemStack moved = player.getInventory().removeItem(i, 1);
                 menu.getSlot(slotIndex).set(moved);
 
