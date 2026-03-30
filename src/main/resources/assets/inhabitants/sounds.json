@@ -416,5 +416,15 @@
     ],
     "volume": 0.8,
     "pitch": 1.0
+  },
+  "concussion.buzz": {
+    "sounds": [
+      {
+        "name": "inhabitants:effects/concussion_buzz",
+        "stream": true
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
   }
 }

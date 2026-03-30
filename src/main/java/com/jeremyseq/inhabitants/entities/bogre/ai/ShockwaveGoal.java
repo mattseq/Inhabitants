@@ -1,7 +1,7 @@
 package com.jeremyseq.inhabitants.entities.bogre.ai;
 
 import com.jeremyseq.inhabitants.Inhabitants;
-import com.jeremyseq.inhabitants.ModSoundEvents;
+import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
 import com.jeremyseq.inhabitants.networking.ScreenShakePacketS2C;
 import com.jeremyseq.inhabitants.networking.bogre.ShockwaveParticlePacketS2C;

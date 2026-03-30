@@ -16,6 +16,7 @@ import com.jeremyseq.inhabitants.particles.ModParticles;
 import com.jeremyseq.inhabitants.potions.ModPotions;
 import com.jeremyseq.inhabitants.recipe.BogreRecipeManager;
 import com.jeremyseq.inhabitants.gui.cauldron.CauldronScreen;
+import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;

@@ -1,5 +1,6 @@
-package com.jeremyseq.inhabitants;
+package com.jeremyseq.inhabitants.audio;
 
+import com.jeremyseq.inhabitants.Inhabitants;
 import net.minecraft.util.Mth;
 
 import org.lwjgl.openal.ALC10;

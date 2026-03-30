@@ -1,6 +1,6 @@
 package com.jeremyseq.inhabitants.entities.bogre.utilities;
 
-import com.jeremyseq.inhabitants.ModSoundEvents;
+import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 
 import net.minecraft.core.BlockPos;

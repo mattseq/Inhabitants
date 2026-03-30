@@ -1,5 +1,6 @@
-package com.jeremyseq.inhabitants;
+package com.jeremyseq.inhabitants.audio;
 
+import com.jeremyseq.inhabitants.Inhabitants;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -44,6 +45,7 @@ public class ModSoundEvents {
     public static final RegistryObject<SoundEvent> REVERSE_GROWTH = registerSoundEvent("effects.reverse_growth");
     public static final RegistryObject<SoundEvent> IMMATERIAL_ENTER_WALL = registerSoundEvent("immaterial.enter_wall");
     public static final RegistryObject<SoundEvent> IMMATERIAL_EXIT_WALL = registerSoundEvent("immaterial.exit_wall");
+    public static final RegistryObject<SoundEvent> CONCUSSION_BUZZ = registerSoundEvent("concussion.buzz");
 
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, name)));

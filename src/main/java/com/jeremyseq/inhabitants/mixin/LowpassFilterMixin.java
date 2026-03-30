@@ -1,7 +1,7 @@
 package com.jeremyseq.inhabitants.mixin;
 
 import com.jeremyseq.inhabitants.events.ModClientEvents;
-import com.jeremyseq.inhabitants.InhabitantsAudio;
+import com.jeremyseq.inhabitants.audio.InhabitantsAudio;
 
 import com.mojang.blaze3d.audio.Channel;
 import com.mojang.blaze3d.audio.Library;

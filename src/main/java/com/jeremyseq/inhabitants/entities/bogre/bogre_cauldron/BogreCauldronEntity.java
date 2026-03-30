@@ -8,7 +8,7 @@ import com.jeremyseq.inhabitants.recipe.CookingRecipe;
 import com.jeremyseq.inhabitants.entities.bogre.ai.BogreAi;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.Inhabitants;
-import com.jeremyseq.inhabitants.ModSoundEvents;
+import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 import com.jeremyseq.inhabitants.entities.bogre.utilities.BogreDetectionHelper;
 
 import net.minecraft.core.BlockPos;

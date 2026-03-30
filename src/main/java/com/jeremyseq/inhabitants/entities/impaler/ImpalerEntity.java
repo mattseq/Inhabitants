@@ -1,6 +1,6 @@
 package com.jeremyseq.inhabitants.entities.impaler;
 
-import com.jeremyseq.inhabitants.ModSoundEvents;
+import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 import com.jeremyseq.inhabitants.entities.EntityUtil;
 import com.jeremyseq.inhabitants.particles.ImpalerSpikeRaiseParticle;
 import com.jeremyseq.inhabitants.entities.goals.BreakTorchGoal;

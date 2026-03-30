@@ -1,6 +1,6 @@
 package com.jeremyseq.inhabitants.mixin;
 
-import com.jeremyseq.inhabitants.ModSoundEvents;
+import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 import com.jeremyseq.inhabitants.particles.ModParticles;
 import com.jeremyseq.inhabitants.effects.ModEffects;
 

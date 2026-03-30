@@ -1,6 +1,6 @@
 package com.jeremyseq.inhabitants.entities.bogre.ai;
 
-import com.jeremyseq.inhabitants.ModSoundEvents;
+import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.skill.CarvingSkill;
 import com.jeremyseq.inhabitants.entities.bogre.skill.CookingSkill;

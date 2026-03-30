@@ -10,7 +10,8 @@
     "ReverseGrowthMixin$Physics",
     "GiantBoneSpecialAttackMixin",
     "LivingEntityAccessor",
-    "ImmaterialMixin$Physics"
+    "ImmaterialMixin$Physics",
+    "ConcussionMixins$Movement"
   ],
   "client": [
     "SubtitleOverlayMixin",
@@ -18,7 +19,9 @@
     "ImmaterialMixin$Visuals",
     "ImmaterialMixin$BlockRendering",
     "LowpassFilterMixin$AudioChannel",
-    "LowpassFilterMixin$AudioLibrary"
+    "LowpassFilterMixin$AudioLibrary",
+    "ConcussionMixins$ClientInput",
+    "EntityRendererMixin"
   ],
   "minVersion": "0.8"
 }

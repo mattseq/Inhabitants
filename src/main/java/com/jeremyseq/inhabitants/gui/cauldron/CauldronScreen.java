@@ -1,6 +1,6 @@
 package com.jeremyseq.inhabitants.gui.cauldron;
 
-import com.jeremyseq.inhabitants.ModSoundEvents;
+import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 import com.jeremyseq.inhabitants.gui.components.GuiLayout;
 import com.jeremyseq.inhabitants.gui.components.ModGuiTextures;
 import com.jeremyseq.inhabitants.recipe.CookingRecipe;

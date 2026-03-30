@@ -1,12 +1,11 @@
 package com.jeremyseq.inhabitants.entities.bogre.render;
 
-import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.ai.BogreAi;
 import com.jeremyseq.inhabitants.entities.bogre.ai.BogreNeutralGoal;
 import com.jeremyseq.inhabitants.entities.bogre.skill.BogreSkills;
 import com.jeremyseq.inhabitants.networking.bogre.BogreSkillKeyframePacketC2S;
-import com.jeremyseq.inhabitants.ModSoundEvents;
+import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
 
 import net.minecraft.client.Minecraft;
