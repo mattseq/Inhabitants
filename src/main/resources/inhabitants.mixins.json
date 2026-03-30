@@ -7,13 +7,13 @@
     "CrossbowItemMixin",
     "NearestAttackableTargetGoalMixin",
     "StickyLegsMixin",
-    "ReverseGrowthMixin",
+    "ReverseGrowthMixin$Physics",
     "GiantBoneSpecialAttackMixin",
     "LivingEntityAccessor"
   ],
   "client": [
     "SubtitleOverlayMixin",
-    "ReverseGrowthClientMixin"
+    "ReverseGrowthMixin$Client"
   ],
   "minVersion": "0.8"
 }
