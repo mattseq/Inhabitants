@@ -38,6 +38,20 @@ public class ModNetworking {
                 BogreSkillKeyframePacketC2S::decode,
                 BogreSkillKeyframePacketC2S::handle
         );
+        CHANNEL.registerMessage(
+                packetId++,
+                BogreRecipePacketC2S.class,
+                BogreRecipePacketC2S::encode,
+                BogreRecipePacketC2S::decode,
+                BogreRecipePacketC2S::handle
+        );
+        CHANNEL.registerMessage(
+                packetId++,
+                AscendPacketC2S.class,
+                AscendPacketC2S::encode,
+                AscendPacketC2S::decode,
+                AscendPacketC2S::handle
+        );
 
         // Server → Client
         CHANNEL.registerMessage(
@@ -60,13 +74,6 @@ public class ModNetworking {
                 TinnitusPacketS2C::encode,
                 TinnitusPacketS2C::decode,
                 TinnitusPacketS2C::handle
-        );
-        CHANNEL.registerMessage(
-                packetId++,
-                BogreRecipePacketC2S.class,
-                BogreRecipePacketC2S::encode,
-                BogreRecipePacketC2S::decode,
-                BogreRecipePacketC2S::handle
         );
         CHANNEL.registerMessage(
                 packetId++,

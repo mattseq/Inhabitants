@@ -396,5 +396,25 @@
     ],
     "volume": 1.0,
     "pitch": 1.0
+  },
+  "immaterial.enter_wall": {
+    "subtitle": "subtitles.inhabitants.immaterial.enter_wall",
+    "sounds": [
+      {
+        "name": "inhabitants:effects/immaterial_enter_wall"
+      }
+    ],
+    "volume": 0.8,
+    "pitch": 1.0
+  },
+  "immaterial.exit_wall": {
+    "subtitle": "subtitles.inhabitants.immaterial.exit_wall",
+    "sounds": [
+      {
+        "name": "inhabitants:effects/immaterial_exit_wall"
+      }
+    ],
+    "volume": 0.8,
+    "pitch": 1.0
   }
 }

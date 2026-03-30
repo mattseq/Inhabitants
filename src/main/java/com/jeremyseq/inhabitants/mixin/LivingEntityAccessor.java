@@ -13,4 +13,7 @@ import java.util.Map;
 public interface LivingEntityAccessor {
     @Accessor("activeEffects")
     Map<MobEffect, MobEffectInstance> inhabitants$getActiveEffects();
+
+    @Accessor("jumping")
+    boolean inhabitants$isJumping();
 }

@@ -9,11 +9,16 @@
     "StickyLegsMixin",
     "ReverseGrowthMixin$Physics",
     "GiantBoneSpecialAttackMixin",
-    "LivingEntityAccessor"
+    "LivingEntityAccessor",
+    "ImmaterialMixin$Physics"
   ],
   "client": [
     "SubtitleOverlayMixin",
-    "ReverseGrowthMixin$Client"
+    "ReverseGrowthMixin$Client",
+    "ImmaterialMixin$Visuals",
+    "ImmaterialMixin$BlockRendering",
+    "LowpassFilterMixin$AudioChannel",
+    "LowpassFilterMixin$AudioLibrary"
   ],
   "minVersion": "0.8"
 }
