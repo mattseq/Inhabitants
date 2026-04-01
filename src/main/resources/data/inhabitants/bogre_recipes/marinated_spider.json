@@ -6,5 +6,6 @@
     "minecraft:slime_ball"
   ],
   "result": "inhabitants:marinated_spider",
+  "container": "minecraft:bowl",
   "time_ticks": 30
 }

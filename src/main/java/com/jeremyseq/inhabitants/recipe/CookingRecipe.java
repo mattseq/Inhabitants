@@ -18,6 +18,7 @@ import java.util.*;
 public record CookingRecipe(
     List<Item> ingredients,
     List<TagKey<Item>> tagIngredients,
+    Item container, // bowl, skeleton skull, etc.
     ItemStack result,
     int time_ticks
 ) implements IBogreRecipe {

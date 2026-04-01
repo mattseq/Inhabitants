@@ -39,6 +39,7 @@ public class BogreRecipePacketS2C {
                 }
             }
             
+            buf.writeUtf(ForgeRegistries.ITEMS.getKey(recipe.container()).toString());
             buf.writeItem(recipe.result());
             buf.writeInt(recipe.time_ticks());
         }
@@ -64,10 +65,16 @@ public class BogreRecipePacketS2C {
                 }
             }
             
+            Item container = ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(buf.readUtf()));
             ItemStack result = buf.readItem();
             int timeTicks = buf.readInt();
 
-            recipes.add(new CookingRecipe(ingredients, tagIngredients, result, timeTicks));
+            recipes.add(new CookingRecipe(
+                ingredients, 
+                tagIngredients, 
+                container != null ? container : Items.BOWL, 
+                result, 
+                timeTicks));
         }
 
         return new BogreRecipePacketS2C(recipes);

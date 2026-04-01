@@ -190,7 +190,7 @@ public class CookingSkill extends BogreSkills.Skill {
             bogreCauldron_final.setCooking(false);
 
         } else if (bogre.getCookingTicks() >= getDuration(bogre) - BogreSkillingGoal.COOKING_START_OFFSET) {
-            //grab the item from the bowl slot 4
+            //grab the item from the container slot 4
             ItemStack result = bogreCauldron_final.getItemHandler().extractItem(4, 64, false);
             
             if (!result.isEmpty()) {

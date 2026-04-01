@@ -59,7 +59,7 @@ public class BogreRecipePacketC2S {
             }
 
             if (!menu.getSlot(4).hasItem()) {
-                findAndMoveItem(player, menu, Items.BOWL, 4, usedSlots);
+                findAndMoveItem(player, menu, recipe.container(), 4, usedSlots);
             }
         });
         context.setPacketHandled(true);

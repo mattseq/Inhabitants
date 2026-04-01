@@ -32,8 +32,8 @@ import java.util.*;
 public class CauldronMenu extends RecipeBookMenu<Container> {
 
     private static final int INGREDIENT_SLOTS = 4; // 4 ingredients slots 0, 1, 2, 3
-    private static final int BOWL_SLOT = 4;
-    private static final int CAULDRON_SLOTS = 5; // 4 ingredients + 1 bowl/output
+    private static final int CONTAINER_SLOT = 4;
+    private static final int CAULDRON_SLOTS = 5; // 4 ingredients + 1 container/output
 
     private final Level level;
     public final Player player;
@@ -53,7 +53,7 @@ public class CauldronMenu extends RecipeBookMenu<Container> {
         this.blockPosition = blockPosition;
 
         // ingredient slots (0, 1, 2, 3), max 1 item each
-        // bowl slot 4, max 1 item
+        // container slot 4, max 1 item
         // slot 0
         this.addSlot(new SlotItemHandler(itemHandler, 0, 44, 19) {
             @Override public boolean mayPlace(@NotNull ItemStack stack) {
@@ -111,9 +111,9 @@ public class CauldronMenu extends RecipeBookMenu<Container> {
             @Override public int getMaxStackSize() { return 1; }
         });
         // slot 4 (bowl/output)
-        this.addSlot(new SlotItemHandler(itemHandler, BOWL_SLOT, 98, 28) {
+        this.addSlot(new SlotItemHandler(itemHandler, CONTAINER_SLOT, 98, 28) {
             @Override public boolean mayPlace(@NotNull ItemStack stack) {
-                return stack.getItem() == Items.BOWL;
+                return BogreRecipeManager.isContainer(stack.getItem());
             }
             @Override public int getMaxStackSize() { return 1; }
         });
@@ -140,7 +140,7 @@ public class CauldronMenu extends RecipeBookMenu<Container> {
     @Override
     public void clicked(int slotId, int button, @NotNull ClickType clickType, @NotNull Player player) {
         // triggers Bogre to get angry if player try to remove ingredints while cooking
-        if (slotId >= 0 && slotId < BOWL_SLOT + 1) { // 0-4 (ingredients + bowl)
+        if (slotId >= 0 && slotId < CONTAINER_SLOT + 1) { // 0-4 (ingredients + bowl)
             BogreCauldronEntity cauldron = getCauldronEntity();
             if (cauldron != null && cauldron.isCooking()) {
                 boolean isRemoval = clickType == ClickType.PICKUP
@@ -173,8 +173,8 @@ public class CauldronMenu extends RecipeBookMenu<Container> {
         } else {
             // player to cauldron
             boolean moved = false;
-            if (slotItem.getItem() == Items.BOWL) {
-                moved = this.moveItemStackTo(slotItem, BOWL_SLOT, BOWL_SLOT + 1, false);
+            if (BogreRecipeManager.isContainer(slotItem.getItem())) {
+                moved = this.moveItemStackTo(slotItem, CONTAINER_SLOT, CONTAINER_SLOT + 1, false);
             } else if (slotItem.getItem().isEdible()) {
                 moved = this.moveItemStackTo(slotItem, 0, INGREDIENT_SLOTS, false);
             }
@@ -262,7 +262,7 @@ public class CauldronMenu extends RecipeBookMenu<Container> {
         return entities.isEmpty() ? null : entities.get(0);
     }
 
-    @Override public int getResultSlotIndex() { return BOWL_SLOT; }
+    @Override public int getResultSlotIndex() { return CONTAINER_SLOT; }
     @Override public int getGridWidth() { return 2; }
     @Override public int getGridHeight() { return 2; }
     @Override public int getSize() { return CAULDRON_SLOTS; }

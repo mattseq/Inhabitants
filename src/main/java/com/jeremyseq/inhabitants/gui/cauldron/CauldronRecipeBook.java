@@ -244,11 +244,11 @@ public class CauldronRecipeBook extends AbstractWidget {
         int arrowWidth = 12;
 
         int slotsWidth = (2 * slotSize) + spacing +
-        arrowWidth + slotSize + 2 * spacing;
+            (spacing * 4) + (arrowWidth * 2) + (slotSize * 2);
         
         GuiLayout tooltipLayout = GuiLayout.screen(this.minecraft)
             .width(Math.max(titleWidth, slotsWidth) + 8)
-            .height(9 + 4 + (2 * slotSize + spacing) + 8)
+            .height(9 + 4 + (2 * slotSize + spacing) + 4)
             .offset(mouseX + 12, mouseY - 12)
             .clampToScreen(this.minecraft);
         
@@ -290,25 +290,40 @@ public class CauldronRecipeBook extends AbstractWidget {
         }
         
         currentX += (2 * slotSize) + spacing + spacing;
-        int centerOffset = (slotSize + spacing) / 2;
+        int gridHeight = (2 * slotSize) + spacing;
+        int centerY = slotsY + gridHeight / 2;
         
-        // arrow
+        // first arrow
         guiGraphics.drawString(minecraft.font,
             Component.literal("→")
             .withStyle(ChatFormatting.GRAY),
-            currentX + 1, slotsY + centerOffset + 5,
+            currentX + 1, centerY - 4,
             -1, true);
 
         currentX += arrowWidth + spacing;
         
-        // result slot
-        RenderSystem.enableBlend();
-
-        guiGraphics.blit(ModGuiTextures.SLOT, currentX, slotsY + centerOffset, 0, 0,
+        // container slot
+        guiGraphics.blit(ModGuiTextures.SLOT, currentX, centerY - 9, 0, 0,
             slotSize, slotSize, slotSize, slotSize);
+        guiGraphics.renderItem(new ItemStack(recipe.container()), currentX + 1, centerY - 8);
 
-        guiGraphics.renderItem(recipe.result(), currentX + 1, slotsY + centerOffset + 1);
-        guiGraphics.renderItemDecorations(minecraft.font, recipe.result(), currentX + 1, slotsY + centerOffset + 1);
+        currentX += slotSize + spacing + spacing;
+
+        // second arrow, container → output
+        guiGraphics.drawString(minecraft.font,
+            Component.literal("→")
+            .withStyle(ChatFormatting.GRAY),
+            currentX + 1, centerY - 4,
+            -1, true);
+
+        currentX += arrowWidth + spacing;
+
+        // output slot
+        RenderSystem.enableBlend();
+        guiGraphics.blit(ModGuiTextures.SLOT, currentX, centerY - 9, 0, 0,
+            slotSize, slotSize, slotSize, slotSize);
+        guiGraphics.renderItem(recipe.result(), currentX + 1, centerY - 8);
+        guiGraphics.renderItemDecorations(minecraft.font, recipe.result(), currentX + 1, centerY - 8);
         
         guiGraphics.pose().popPose();
     }
@@ -336,7 +351,7 @@ public class CauldronRecipeBook extends AbstractWidget {
             }
         }
 
-        exactNeeded.merge(Items.BOWL, 1, Integer::sum);
+        exactNeeded.merge(recipe.container(), 1, Integer::sum);
         
         boolean[] usedItems = new boolean[inv.getContainerSize()];
         

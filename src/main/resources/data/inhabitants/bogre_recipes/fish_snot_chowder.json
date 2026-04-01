@@ -6,5 +6,6 @@
     "#inhabitants:cauldron_fish"
   ],
   "result": "inhabitants:fish_snot_chowder",
+  "container": "minecraft:bowl",
   "time_ticks": 100
 }

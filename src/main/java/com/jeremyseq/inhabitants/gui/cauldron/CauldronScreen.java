@@ -160,18 +160,34 @@ public class CauldronScreen extends AbstractContainerScreen<CauldronMenu> {
         // ingredient slots 0-3
         for (int i = 0; i < 4; i++) {
             Slot slot = menu.getSlot(i);
-            boolean isGhost = !slot.hasItem() && ghostRecipe != null && i < ghostRecipe.ingredients().size();
-            GuiLayout slotLayout = bgLayout.createChild().width(18).height(18).offset(slot.x - 1, slot.y - 1);
+
+            boolean isGhost = !slot.hasItem() &&
+                ghostRecipe != null && i < ghostRecipe.ingredients().size();
+
+            GuiLayout slotLayout = bgLayout.createChild()
+                .width(18).height(18).offset(slot.x - 1, slot.y - 1);
+            
             RenderUtil.blit(guiGraphics,
                 isGhost ? ModGuiTextures.GHOST_SLOT : ModGuiTextures.SLOT, slotLayout);
         }
 
-        // bowl slot 4
-        Slot bowlSlot = menu.getSlot(4);
-        boolean bowlIsGhost = !bowlSlot.hasItem() && ghostRecipe != null;
-        GuiLayout bowlLayout = bgLayout.createChild().width(18).height(18).offset(bowlSlot.x - 1, bowlSlot.y - 1);
-        RenderUtil.blit(guiGraphics, bowlIsGhost ?
-            ModGuiTextures.GHOST_SLOT : ModGuiTextures.BOWL_SLOT, bowlLayout);
+        // container slot 4
+        Slot containerSlot = menu.getSlot(4);
+        boolean containerIsGhost = !containerSlot.hasItem() && ghostRecipe != null;
+        
+        GuiLayout containerLayout = bgLayout.createChild()
+            .width(18).height(18).offset(containerSlot.x - 1, containerSlot.y - 1);
+        
+        ResourceLocation containerTex;
+        if (containerIsGhost) {
+            containerTex = ModGuiTextures.GHOST_SLOT;
+        } else if (containerSlot.hasItem()) {
+            containerTex = ModGuiTextures.SLOT;
+        } else {
+            containerTex = ModGuiTextures.BOWL_SLOT;
+        }
+
+        RenderUtil.blit(guiGraphics, containerTex, containerLayout);
 
     }
 
@@ -193,11 +209,11 @@ public class CauldronScreen extends AbstractContainerScreen<CauldronMenu> {
             }
         }
 
-        // ghost bowl
-        Slot bowlSlot = menu.getSlot(4);
-        if (!bowlSlot.hasItem()) {
-            RenderUtil.renderGhostItem(guiGraphics, new ItemStack(Items.BOWL),
-                this.leftPos + bowlSlot.x, this.topPos + bowlSlot.y);
+        // ghost container item
+        Slot containerSlot = menu.getSlot(4);
+        if (!containerSlot.hasItem()) {
+            RenderUtil.renderGhostItem(guiGraphics, new ItemStack(ghostRecipe.container()),
+                this.leftPos + containerSlot.x, this.topPos + containerSlot.y);
         }
     }
 
@@ -217,10 +233,10 @@ public class CauldronScreen extends AbstractContainerScreen<CauldronMenu> {
             }
         }
 
-        // ghost bowl
-        Slot bowlSlot = menu.getSlot(4);
-        if (!bowlSlot.hasItem() && this.isHovering(bowlSlot.x, bowlSlot.y, 16, 16, mouseX, mouseY)) {
-            guiGraphics.renderTooltip(this.font, new ItemStack(Items.BOWL), mouseX, mouseY);
+        // ghost container tooltip
+        Slot containerSlot = menu.getSlot(4);
+        if (!containerSlot.hasItem() && this.isHovering(containerSlot.x, containerSlot.y, 16, 16, mouseX, mouseY)) {
+            guiGraphics.renderTooltip(this.font, new ItemStack(ghostRecipe.container()), mouseX, mouseY);
         }
     }
 
@@ -253,7 +269,7 @@ public class CauldronScreen extends AbstractContainerScreen<CauldronMenu> {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         // clicking a ghost slot clears the ghost recipe
         if (CauldronRecipeBook.activeGhostRecipe != null) {
-            for (int i = 0; i < 5; i++) { // 0-4 (ingredients + bowl)
+            for (int i = 0; i < 5; i++) { // 0-4 (ingredients + container)
                 Slot slot = menu.getSlot(i);
                 if (!slot.hasItem() && isHovering(slot.x, slot.y, 16, 16, mouseX, mouseY)) {
                     CauldronRecipeBook.activeGhostRecipe = null;

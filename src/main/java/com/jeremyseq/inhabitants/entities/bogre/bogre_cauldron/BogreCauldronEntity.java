@@ -68,7 +68,7 @@ public class BogreCauldronEntity extends Entity implements GeoEntity, MenuProvid
     public static final EntityDataAccessor<Boolean> HAS_HEAT_SOURCE =
     SynchedEntityData.defineId(BogreCauldronEntity.class, EntityDataSerializers.BOOLEAN);
 
-    // 5 slots: 4 for ingredients, 1 for the bowl/output
+    // 5 slots: 4 for ingredients, 1 for the container (bowl)/output
     private final ItemStackHandler itemHandler = new ItemStackHandler(5) {
         @Override
         public int getSlotLimit(int slot) {
@@ -316,8 +316,9 @@ public class BogreCauldronEntity extends Entity implements GeoEntity, MenuProvid
         Optional<CookingRecipe> recipeOpt = BogreRecipeManager.getCookingRecipe(items);
         if (recipeOpt.isEmpty()) return false;
 
-        ItemStack bowlSlot = itemHandler.getStackInSlot(4);
-        return !bowlSlot.isEmpty() && bowlSlot.is(Items.BOWL);
+        ItemStack containerSlot = itemHandler.getStackInSlot(4);
+
+        return hasContainerItem(containerSlot);
     }
 
     public int getItemCount() {
@@ -341,10 +342,11 @@ public class BogreCauldronEntity extends Entity implements GeoEntity, MenuProvid
             if (!stack.isEmpty()) items.add(stack.getItem());
         }
         
-        boolean hasRecipe = BogreRecipeManager.getCookingRecipe(items).isPresent();
-        ItemStack bowl = itemHandler.getStackInSlot(4);
+        Optional<CookingRecipe> recipeOpt = BogreRecipeManager.getCookingRecipe(items);
+        if (recipeOpt.isEmpty()) return false;
 
-        return hasRecipe && !bowl.isEmpty() && bowl.is(Items.BOWL) && hasHeatSource();
+        ItemStack container = itemHandler.getStackInSlot(4);
+        return hasContainerItem(container) && hasHeatSource();
     }
 
     public void notifyTheft(Player player) {
@@ -416,10 +418,10 @@ public class BogreCauldronEntity extends Entity implements GeoEntity, MenuProvid
             for (int i = 0; i < 4; i++) {
                 itemHandler.getStackInSlot(i).shrink(1);
             }
-            // consume bowl 4
+            // consume container 4
             itemHandler.getStackInSlot(4).shrink(1);
 
-            // put result in bowl slot 4, replaces the consumed bowl
+            // put result in container slot 4, replaces the consumed container
             itemHandler.setStackInSlot(4, result);
             
             level().playSound(null, blockPosition(), SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT,
@@ -507,5 +509,9 @@ public class BogreCauldronEntity extends Entity implements GeoEntity, MenuProvid
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;
+    }
+
+    private boolean hasContainerItem(ItemStack container) {
+        return !container.isEmpty() && container.is(recipeOpt.get().container());
     }
 }

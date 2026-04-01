@@ -126,8 +126,17 @@ public class BogreRecipeManager extends SimpleJsonResourceReloadListener {
                             }
                         }
                     }
+                    
+                    Item container = Items.BOWL;
+                    
+                    if (json.has("container")) {
+                        container = ForgeRegistries.ITEMS.getValue(
+                            ResourceLocation.tryParse(GsonHelper.getAsString(json, "container")));
+                    }
+                    if (container == null) container = Items.BOWL;
+
                     int time_ticks = GsonHelper.getAsInt(json, "time_ticks", GsonHelper.getAsInt(json, "timeTicks", 160));
-                    cookingList.add(new CookingRecipe(ingredients, tagIngredients, result, time_ticks));
+                    cookingList.add(new CookingRecipe(ingredients, tagIngredients, container, result, time_ticks));
                 }
                 case "transformation" -> {
                     Item ingredient = ForgeRegistries.ITEMS.getValue(
@@ -304,6 +313,13 @@ public class BogreRecipeManager extends SimpleJsonResourceReloadListener {
         return false;
     }
 
+    public static boolean isContainer(Item item) {
+        for (CookingRecipe recipe : cookingRecipes) {
+            if (recipe.container() == item) return true;
+        }
+        return item == Items.BOWL; // always allow bowl as fallback
+    }
+
     public static boolean isTransformationIngredient(Item item) {
         return transformationRecipes.containsKey(item);
     }
@@ -318,7 +334,7 @@ public class BogreRecipeManager extends SimpleJsonResourceReloadListener {
         RegistryObject<Item> resultItem, int time) {
             
         List<TagKey<Item>> tagList = new ArrayList<>(Collections.nCopies(ingredients.size(), null));
-        list.add(new CookingRecipe(ingredients, tagList, new ItemStack(resultItem.get(), 1), time));
+        list.add(new CookingRecipe(ingredients, tagList, Items.BOWL, new ItemStack(resultItem.get(), 1), time));
     }
 
     // --- Cooking Fallback Recipes ---
@@ -329,6 +345,7 @@ public class BogreRecipeManager extends SimpleJsonResourceReloadListener {
         list.add(new CookingRecipe(
             List.of(Items.COD, Items.SALMON, Items.TROPICAL_FISH),
             List.of(fishTag, fishTag, fishTag),
+            Items.BOWL,
             new ItemStack(ModItems.FISH_SNOT_CHOWDER.get(), 1),
             100));
     }

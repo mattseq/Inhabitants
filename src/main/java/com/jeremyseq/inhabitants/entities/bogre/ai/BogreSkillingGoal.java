@@ -61,7 +61,7 @@ public final class BogreSkillingGoal {
 
         for (BogreCauldronEntity cauldron : cauldrons) {
             if (cauldron.getItemCount() > 0 && cauldron.hasHeatSource() && 
-                cauldron.getItemHandler().getStackInSlot(4).is(Items.BOWL)) {
+                !cauldron.getItemHandler().getStackInSlot(4).isEmpty()) {
                 
                 List<Item> items = new ArrayList<>();
                 for (int i = 0; i < 4; i++) {
@@ -72,7 +72,9 @@ public final class BogreSkillingGoal {
 
                 Optional<CookingRecipe> recipe = BogreRecipeManager.getCookingRecipe(items);
 
-                if (recipe.isPresent()) {
+                if (recipe.isPresent() &&
+                    cauldron.getItemHandler().getStackInSlot(4).is(recipe.get().container())) {
+                    
                     if (!isJobClaimed(bogre, cauldron.blockPosition(), -1, true, null) 
                         && isClosestIdleBogreToPosition(bogre, cauldron.position())) {
                         
