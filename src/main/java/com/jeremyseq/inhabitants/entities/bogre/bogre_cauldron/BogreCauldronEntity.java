@@ -318,7 +318,7 @@ public class BogreCauldronEntity extends Entity implements GeoEntity, MenuProvid
 
         ItemStack containerSlot = itemHandler.getStackInSlot(4);
 
-        return hasContainerItem(containerSlot);
+        return hasContainerItem(containerSlot, recipeOpt);
     }
 
     public int getItemCount() {
@@ -346,7 +346,7 @@ public class BogreCauldronEntity extends Entity implements GeoEntity, MenuProvid
         if (recipeOpt.isEmpty()) return false;
 
         ItemStack container = itemHandler.getStackInSlot(4);
-        return hasContainerItem(container) && hasHeatSource();
+        return hasContainerItem(container, recipeOpt) && hasHeatSource();
     }
 
     public void notifyTheft(Player player) {
@@ -511,7 +511,9 @@ public class BogreCauldronEntity extends Entity implements GeoEntity, MenuProvid
         return cache;
     }
 
-    private boolean hasContainerItem(ItemStack container) {
-        return !container.isEmpty() && container.is(recipeOpt.get().container());
+    private boolean hasContainerItem(ItemStack container, Optional<CookingRecipe> recipeOpt) {
+        return recipeOpt.isPresent() &&
+            !container.isEmpty() &&
+            container.is(recipeOpt.get().container());
     }
 }
