@@ -5,12 +5,21 @@ import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.items.food.*;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.Level;
+
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-import net.minecraft.world.item.*;
+
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class ModItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Inhabitants.MODID);
@@ -46,6 +55,15 @@ public class ModItems {
 
     public static final RegistryObject<Item> MUSIC_DISC_BOGRE = ITEMS.register("music_disc_bogre",
             () -> new RecordItem(6, ModSoundEvents.BOGRE_SONG, new Item.Properties().stacksTo(1).rarity(Rarity.RARE), 2100));
+
+    public static final RegistryObject<Item> TOTEM_OF_OFFERING = ITEMS.register("totem_of_offering",
+            () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)) {
+                @Override
+                public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+                    super.appendHoverText(stack, level, tooltip, flag);
+                    tooltip.add(Component.translatable("item.inhabitants.totem_of_offering.desc").withStyle(ChatFormatting.GRAY));
+                }
+            });
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

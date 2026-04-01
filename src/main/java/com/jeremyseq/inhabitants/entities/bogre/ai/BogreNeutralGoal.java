@@ -40,7 +40,9 @@ public class BogreNeutralGoal extends WaterAvoidingRandomStrollGoal {
 
     @Override
     public boolean canUse() {
-        if (bogre.getAIState() != BogreAi.State.NEUTRAL || bogre.isRoaring()) {
+        if (bogre.getAIState() != BogreAi.State.NEUTRAL ||
+            bogre.isRoaring() || 
+            bogre.getNeutralState() == BogreAi.NeutralState.APPROACHING_OFFERING) {
             return false;
         }
 
@@ -57,7 +59,9 @@ public class BogreNeutralGoal extends WaterAvoidingRandomStrollGoal {
 
     @Override
     public boolean canContinueToUse() {
-        if (bogre.getAIState() != BogreAi.State.NEUTRAL || bogre.isRoaring()) {
+        if (bogre.getAIState() != BogreAi.State.NEUTRAL ||
+            bogre.isRoaring() || 
+            bogre.getNeutralState() == BogreAi.NeutralState.APPROACHING_OFFERING) {
             return false;
         }
 
@@ -77,7 +81,9 @@ public class BogreNeutralGoal extends WaterAvoidingRandomStrollGoal {
     @Override
     public void stop() {
         super.stop();
-        bogre.setNeutralState(BogreAi.NeutralState.IDLE);
+        if (bogre.getNeutralState() == BogreAi.NeutralState.WANDERING) {
+            bogre.setNeutralState(BogreAi.NeutralState.IDLE);
+        }
         
         this.nextWanderTick = bogre.tickCount +
             MIN_WANDER_PAUSE +

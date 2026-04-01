@@ -4,6 +4,8 @@ import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.utilities.*;
 import com.jeremyseq.inhabitants.entities.bogre.skill.*;
 import com.jeremyseq.inhabitants.recipe.*;
+import com.jeremyseq.inhabitants.items.ModItems;
+import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.core.BlockPos;
@@ -11,6 +13,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.sounds.SoundEvents;
 
 import java.util.*;
 
@@ -30,7 +35,7 @@ public class BogreAi {
 
     // --- AI Sub-States ---
     public enum NeutralState {
-        IDLE, WANDERING, DANCING
+        IDLE, WANDERING, DANCING, APPROACHING_OFFERING
     }
 
     public enum AggressiveState {
@@ -52,6 +57,7 @@ public class BogreAi {
     // --- AI Constants ---
     public static final float FORGET_RANGE = 20f;
     public static final float ROAR_RANGE = 12f;
+    public static final float TOTEM_OF_OFFERING_RANGE = 5.0f;
 
     private IBogreRecipe activeRecipe = null;
     private ItemStack storedSkillResult = ItemStack.EMPTY;
@@ -62,6 +68,9 @@ public class BogreAi {
     private boolean pathSet = false;
     private int skillingMoveSide = 0; // 1: +X, -1: -X, 2: +Z, -2: -Z (0: NONE)
     private int deliveryFailures = 0;
+
+    private int tamingTicks = 0;
+    private ItemEntity targetTamingItem = null;
 
     public BogreAi(BogreEntity bogre) {
         this.bogre = bogre;
@@ -74,6 +83,8 @@ public class BogreAi {
     }
 
     public void aiStep() {
+        handleTaming();
+        
         if (bogre.getAIState() == State.NEUTRAL && !bogre.isRoaring()) {
             BogreSkillingGoal.handleSkills(bogre);
             if (bogre.getAIState() == State.SKILLING) return;
@@ -153,6 +164,113 @@ public class BogreAi {
 
     public void handleHandItem() {
         // Handle hand item logic
+    }
+
+    private void handleTaming() {
+        if (bogre.isTamed()) return;
+        if (bogre.getAIState() == State.AGGRESSIVE) return;
+
+        if (tamingTicks > 0) {
+            tamingTicks--;
+            
+            if (tamingTicks == 3) {
+                bogre.playSound(SoundEvents.ITEM_PICKUP, 1.0F, 1.0F);
+            }
+
+            if (targetTamingItem != null && targetTamingItem.isAlive()) {
+                bogre.getLookControl().setLookAt(
+                    targetTamingItem.getX(), 
+                    targetTamingItem.getEyeY(), 
+                    targetTamingItem.getZ(), 
+                    30.0F, 
+                    30.0F
+                );
+            }
+
+            if (tamingTicks == 0) {
+                completeTaming();
+            }
+            return;
+        }
+
+        NeutralState nState = bogre.getNeutralState();
+        List<ItemEntity> items = bogre.level().getEntitiesOfClass(
+            ItemEntity.class, 
+            bogre.getBoundingBox().inflate(TOTEM_OF_OFFERING_RANGE),
+            item -> item.isAlive() &&
+            item.getItem().is(ModItems.TOTEM_OF_OFFERING.get())
+        );
+
+        if (items.isEmpty()) {
+            if (nState == NeutralState.APPROACHING_OFFERING) {
+                bogre.setNeutralState(NeutralState.IDLE);
+                bogre.getNavigation().stop();
+            }
+            return;
+        }
+        
+        items.sort(Comparator.comparingDouble(bogre::distanceToSqr));
+        ItemEntity itemEntity = items.get(0);
+        double distSq = bogre.distanceToSqr(itemEntity);
+        
+        if (distSq > 1.6 * 1.6) {
+            if (nState != NeutralState.APPROACHING_OFFERING) {
+                bogre.getNavigation().stop();
+                bogre.setNeutralState(NeutralState.APPROACHING_OFFERING);
+            }
+            bogre.getNavigation().moveTo(itemEntity, 1.4);
+            bogre.getLookControl().setLookAt(itemEntity, 30.0F, 30.0F);
+        } else if (itemEntity.onGround()) {
+            startTamingSequence(itemEntity);
+        }
+    }
+
+    private void startTamingSequence(ItemEntity item) {
+        this.tamingTicks = 5;
+        this.targetTamingItem = item;
+        bogre.triggerAnim("trigger_controller", "grab");
+        bogre.getNavigation().stop();
+        bogre.getLookControl().setLookAt(
+            item.getX(), 
+            item.getEyeY(), 
+            item.getZ(), 
+            30.0F, 
+            30.0F
+        );
+    }
+
+    private void completeTaming() {
+        if (targetTamingItem == null || !targetTamingItem.isAlive()) {
+            bogre.setNeutralState(NeutralState.IDLE);
+            return;
+        }
+
+        bogre.setTamed(true);
+        Entity owner = targetTamingItem.getOwner();
+
+        if (owner != null) {
+            bogre.setTamedOwnerUUID(owner.getUUID());
+        } else {
+            Player nearest = bogre.level().getNearestPlayer(bogre, 10.0D);
+            if (nearest != null) {
+                bogre.setTamedOwnerUUID(nearest.getUUID());
+            }
+        }
+        
+        targetTamingItem.getItem().shrink(1);
+
+        if (targetTamingItem.getItem().isEmpty()) {
+            targetTamingItem.discard();
+        }
+        
+        bogre.tamingEffects();
+        bogre.playSound(SoundEvents.EXPERIENCE_ORB_PICKUP, 1.0F, 1.0F);
+        bogre.playSound(ModSoundEvents.BOGRE_IDLE.get(), 1.0F, 0.8F + bogre.getRandom().nextFloat() * 0.3F);
+        
+        bogre.setNeutralState(NeutralState.IDLE);
+        bogre.getNavigation().stop();
+
+        this.targetTamingItem = null;
     }
 
     public void enterSkilling() {
