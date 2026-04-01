@@ -46,5 +46,8 @@ public class GhostRenderUtils {
         @Override public VertexConsumer normal(float x, float y, float z) { return delegate.normal(x, y, z); }
         @Override public VertexConsumer vertex(Matrix4f matrix, float x, float y, float z) { return delegate.vertex(matrix, x, y, z); }
         @Override public VertexConsumer normal(Matrix3f matrix, float x, float y, float z) { return delegate.normal(matrix, x, y, z); }
+        @Override public VertexConsumer color(float r, float g, float b, float a) { return delegate.color(r, g, b, a * alpha); }
+        @Override public VertexConsumer uv2(int light) { return delegate.uv2(light); }
+        @Override public VertexConsumer overlayCoords(int overlay) { return delegate.overlayCoords(overlay); }
     }
 }

@@ -39,9 +39,12 @@ public class ImmaterialMixin {
             CollisionContext pContext,
             CallbackInfoReturnable<VoxelShape> cir) {
 
-            if (pContext instanceof EntityCollisionContext ctx &&
-                    ctx.getEntity() instanceof Player player) {
-                if (player.hasEffect(ModEffects.IMMATERIAL.get())) {
+            if (pContext instanceof EntityCollisionContext ctx && 
+                ctx.getEntity() != null &&
+                ctx.getEntity() instanceof Player player) {
+                    
+                if (ModEffects.IMMATERIAL.isPresent() && 
+                    player.hasEffect(ModEffects.IMMATERIAL.get())) {
                     VoxelShape shape = cir.getReturnValue();
                     if (shape != null && !shape.isEmpty()) {
                         double shapeMinY = shape.min(Direction.Axis.Y) + pPos.getY();
@@ -53,6 +56,22 @@ public class ImmaterialMixin {
                         // if Player is strictly below the block, preserve ceiling collision
                         if (player.getBoundingBox().maxY <= shapeMinY + 0.001)
                             return;
+                        
+                        BlockPos wallFootPos = new BlockPos(
+                            pPos.getX(), 
+                            (int)Math.floor(player.getY()), 
+                            pPos.getZ());
+                        BlockPos wallEyePos = new BlockPos(
+                            pPos.getX(), 
+                            (int)Math.floor(player.getEyeY()), 
+                            pPos.getZ());
+                        
+                        if (pLevel.getBlockState(wallFootPos).getCollisionShape(
+                            pLevel, wallFootPos, CollisionContext.empty()).isEmpty() ||
+                            pLevel.getBlockState(wallEyePos).getCollisionShape(
+                                pLevel, wallEyePos, CollisionContext.empty()).isEmpty()) {
+                            return;
+                        }
 
                         cir.setReturnValue(Shapes.empty());
                     }
@@ -74,6 +93,7 @@ public class ImmaterialMixin {
 
             if (!cir.getReturnValue()) {
                 if (pCamera.getEntity() instanceof LivingEntity living &&
+                        ModEffects.IMMATERIAL.isPresent() &&
                         living.hasEffect(ModEffects.IMMATERIAL.get())) {
                     BlockPos eyePos = BlockPos.containing(pCamera.getPosition());
 
@@ -104,7 +124,9 @@ public class ImmaterialMixin {
 
             Minecraft mc = Minecraft.getInstance();
 
-            if (mc.player != null && mc.player.hasEffect(ModEffects.IMMATERIAL.get())) {
+            if (mc.player != null && 
+                ModEffects.IMMATERIAL.isPresent() &&
+                mc.player.hasEffect(ModEffects.IMMATERIAL.get())) {
                 if (pPos.getY() < mc.player.getY()) {
                     double distSq = mc.player.distanceToSqr(
                         pPos.getX() + 0.5,

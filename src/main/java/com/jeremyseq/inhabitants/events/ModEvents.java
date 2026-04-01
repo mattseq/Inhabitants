@@ -27,7 +27,8 @@ public class ModEvents {
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.phase == TickEvent.Phase.START) {
             // immaterial sneak
-            if (event.player.hasEffect(ModEffects.IMMATERIAL.get()) &&
+            if (ModEffects.IMMATERIAL.isPresent() && 
+                event.player.hasEffect(ModEffects.IMMATERIAL.get()) &&
                 !event.player.level().isClientSide) {
                 HandleImmaterialSneak(event.player);
             }
@@ -65,6 +66,7 @@ public class ModEvents {
     @SubscribeEvent
     public static void onLivingAttack(LivingAttackEvent event) {
         if (event.getEntity() != null &&
+            ModEffects.IMMATERIAL.isPresent() &&
             event.getEntity().hasEffect(ModEffects.IMMATERIAL.get())) {
             
             if (event.getSource().is(DamageTypes.IN_WALL)) {

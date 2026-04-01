@@ -13,6 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.Mth;
+import net.minecraft.network.chat.Component;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -87,12 +88,7 @@ public abstract class EntityRendererMixin<T extends Entity> {
                 float fade = 1.0F - ((float)i / history.size());
                 float alpha = alphaBase * fade;
                 
-                VertexConsumer ghostConsumer = pBuffer.getBuffer(ghostType);
-
-                GhostRenderUtils.GhostVertexConsumer wrappedConsumer = new
-                    GhostRenderUtils.GhostVertexConsumer(ghostConsumer, alpha);
-
-                MultiBufferSource ghostSource = type -> wrappedConsumer;
+                MultiBufferSource ghostSource = new GhostRenderUtils.GhostBufferSource(pBuffer, alpha);
 
                 EntityRenderer<T> renderer = (EntityRenderer<T>) (Object) this;
 
@@ -104,6 +100,19 @@ public abstract class EntityRendererMixin<T extends Entity> {
             }
             
             inhabitants$isGhostRendering = false;
+        }
+    }
+
+    @Inject(
+        method = "renderNameTag", 
+        at = @At("HEAD"), 
+        cancellable = true
+    )
+    private void inhabitants$skipGhostNameTag(T pEntity, Component pDisplayName,
+        PoseStack pMatrixStack, MultiBufferSource pBuffer, int pPackedLight,
+        CallbackInfo ci) {
+        if (inhabitants$isGhostRendering) {
+            ci.cancel();
         }
     }
 }
