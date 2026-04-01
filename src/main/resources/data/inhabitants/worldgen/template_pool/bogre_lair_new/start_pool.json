@@ -1,12 +1,12 @@
 {
-  "name": "inhabitants:bogre_lair/start_pool",
+  "name": "inhabitants:bogre_lair_new/start_pool",
   "fallback": "minecraft:empty",
   "elements": [
     {
       "weight": 1,
       "element": {
-        "location": "inhabitants:bogre_lair",
-        "processors": "minecraft:empty",
+        "location": "inhabitants:bogre_lair_new",
+        "processors": "inhabitants:no_hollow_base",
         "projection": "rigid",
         "element_type": "minecraft:single_pool_element"
       }
