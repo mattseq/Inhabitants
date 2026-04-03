@@ -67,7 +67,7 @@ public class ModEntities {
     public static final RegistryObject<EntityType<JavelinEntity>> JAVELIN =
             REGISTRY.register("javelin",
                     () -> EntityType.Builder.<JavelinEntity>of(JavelinEntity::new, MobCategory.MISC)
-                            .sized(0.5f, 0.5f)
+                            .sized(0.75f, 0.75f)
                             .clientTrackingRange(4)
                             .updateInterval(20)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "javelin").toString()));

@@ -3,6 +3,7 @@ package com.jeremyseq.inhabitants.entities.javelin;
 import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.items.ModItems;
+import com.jeremyseq.inhabitants.debug.DevMode;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -23,6 +24,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.phys.Vec3;
 
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -47,8 +51,10 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
     private BlockPos stuckBlockPos = null;
 
     private float charge = 0.0f;
-    private float baseDamage = 3.0f;
+    private float baseDamage = 4.0f;
     private int baseKnockback = 2;
+    private float extraDamage = 3.0f;
+    private int extraKnockback = 2;
 
     public JavelinEntity(EntityType<? extends JavelinEntity> type, Level level) {
         super(type, level);
@@ -183,7 +189,7 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
         if (target instanceof LivingEntity living) {
             if (!this.level().isClientSide) {
                 float velocity = (float)this.getDeltaMovement().length();
-                int damage = Mth.ceil(baseDamage + this.getCharge());
+                int damage = Mth.ceil(baseDamage + (this.getCharge() * extraDamage));
                 
                 DamageSource damageSource = this.damageSources()
                     .arrow(this, this.getOwner() == null ? this : this.getOwner());
@@ -192,10 +198,28 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
                     owner.setLastHurtMob(living);
                 }
                 
-                int knockback = baseKnockback + Mth.floor(this.getCharge() * 2.0f);
+                int knockback = baseKnockback + Mth.floor(this.getCharge() * extraKnockback);
                 this.setKnockback(knockback);
 
+                if(DevMode.isEnabled()) {
+                    if (this.getOwner() instanceof Player player) {
+                        player.displayClientMessage(Component.literal("Damage: " + damage + " | Knockback: " + knockback)
+                            .withStyle(ChatFormatting.GOLD), true);
+                    }
+                }
+
                 if (living.hurt(damageSource, (float)damage)) {
+                    if (knockback > 0) {
+                        Vec3 knockbackVec = this.getDeltaMovement()
+                            .multiply(1.0D, 0.0D, 1.0D)
+                            .normalize()
+                            .scale((double)knockback * 0.5D);
+                        
+                        if (knockbackVec.lengthSqr() > 0.0D) {
+                            living.push(knockbackVec.x, 0.1D, knockbackVec.z);
+                        }
+                    }
+
                     this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
                             ModSoundEvents.JAVELIN_ON_ENTITY_HIT.get(), SoundSource.NEUTRAL, 1.0f, 1.0f);
                     

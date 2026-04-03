@@ -99,7 +99,7 @@ public class JavelinItem extends Item implements GeoItem {
                         pStack.shrink(1);
                     }
 
-                    player.getCooldowns().addCooldown(this, 20);
+                    player.getCooldowns().addCooldown(this, 8);
                 }
 
                 player.awardStat(Stats.ITEM_USED.get(this));
