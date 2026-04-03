@@ -3,15 +3,15 @@
     "subtitle": "subtitles.inhabitants.warped_clam.closing",
     "sounds": [
       {
-        "name": "inhabitants:warped_clam/clam_closing_1",
+        "name": "inhabitants:entity/warped_clam/clam_closing_1",
         "weight": 1
       },
       {
-        "name": "inhabitants:warped_clam/clam_closing_2",
+        "name": "inhabitants:entity/warped_clam/clam_closing_2",
         "weight": 1
       },
       {
-        "name": "inhabitants:warped_clam/clam_closing_3",
+        "name": "inhabitants:entity/warped_clam/clam_closing_3",
         "weight": 1
       }
     ],
@@ -22,15 +22,15 @@
     "subtitle": "subtitles.inhabitants.warped_clam.opening",
     "sounds": [
       {
-        "name": "inhabitants:warped_clam/clam_opening_1",
+        "name": "inhabitants:entity/warped_clam/clam_opening_1",
         "weight": 1
       },
       {
-        "name": "inhabitants:warped_clam/clam_opening_2",
+        "name": "inhabitants:entity/warped_clam/clam_opening_2",
         "weight": 1
       },
       {
-        "name": "inhabitants:warped_clam/clam_opening_3",
+        "name": "inhabitants:entity/warped_clam/clam_opening_3",
         "weight": 1
       }
     ],
@@ -41,15 +41,15 @@
     "subtitle": "subtitles.inhabitants.warped_clam.closed_damage",
     "sounds": [
       {
-        "name": "inhabitants:warped_clam/clam_closed_damage_1",
+        "name": "inhabitants:entity/warped_clam/clam_closed_damage_1",
         "weight": 1
       },
       {
-        "name": "inhabitants:warped_clam/clam_closed_damage_2",
+        "name": "inhabitants:entity/warped_clam/clam_closed_damage_2",
         "weight": 1
       },
       {
-        "name": "inhabitants:warped_clam/clam_closed_damage_3",
+        "name": "inhabitants:entity/warped_clam/clam_closed_damage_3",
         "weight": 1
       }
     ],
@@ -60,15 +60,15 @@
     "subtitle": "subtitles.inhabitants.warped_clam.opened_damage",
     "sounds": [
       {
-        "name": "inhabitants:warped_clam/clam_opened_damage_1",
+        "name": "inhabitants:entity/warped_clam/clam_opened_damage_1",
         "weight": 1
       },
       {
-        "name": "inhabitants:warped_clam/clam_opened_damage_2",
+        "name": "inhabitants:entity/warped_clam/clam_opened_damage_2",
         "weight": 1
       },
       {
-        "name": "inhabitants:warped_clam/clam_opened_damage_3",
+        "name": "inhabitants:entity/warped_clam/clam_opened_damage_3",
         "weight": 1
       }
     ],
@@ -79,19 +79,19 @@
     "subtitle": "subtitles.inhabitants.bogre.attack",
     "sounds": [
       {
-        "name": "inhabitants:bogre/aggressive/bogre_attack_0",
+        "name": "inhabitants:entity/bogre/aggressive/bogre_attack_0",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/aggressive/bogre_attack_1",
+        "name": "inhabitants:entity/bogre/aggressive/bogre_attack_1",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/aggressive/bogre_attack_2",
+        "name": "inhabitants:entity/bogre/aggressive/bogre_attack_2",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/aggressive/bogre_attack_3",
+        "name": "inhabitants:entity/bogre/aggressive/bogre_attack_3",
         "weight": 1
       }
     ],
@@ -102,11 +102,11 @@
     "subtitle": "subtitles.inhabitants.bogre.death",
     "sounds": [
       {
-        "name": "inhabitants:bogre/neutral/bogre_death_0",
+        "name": "inhabitants:entity/bogre/neutral/bogre_death_0",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/neutral/bogre_death_1",
+        "name": "inhabitants:entity/bogre/neutral/bogre_death_1",
         "weight": 1
       }
     ],
@@ -117,19 +117,19 @@
     "subtitle": "subtitles.inhabitants.bogre.hurt",
     "sounds": [
       {
-        "name": "inhabitants:bogre/neutral/bogre_hurt_0",
+        "name": "inhabitants:entity/bogre/neutral/bogre_hurt_0",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/neutral/bogre_hurt_1",
+        "name": "inhabitants:entity/bogre/neutral/bogre_hurt_1",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/neutral/bogre_hurt_2",
+        "name": "inhabitants:entity/bogre/neutral/bogre_hurt_2",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/neutral/bogre_hurt_3",
+        "name": "inhabitants:entity/bogre/neutral/bogre_hurt_3",
         "weight": 1
       }
     ],
@@ -140,23 +140,23 @@
     "subtitle": "subtitles.inhabitants.bogre.idle",
     "sounds": [
       {
-        "name": "inhabitants:bogre/neutral/bogre_idle_0",
+        "name": "inhabitants:entity/bogre/neutral/bogre_idle_0",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/neutral/bogre_idle_1",
+        "name": "inhabitants:entity/bogre/neutral/bogre_idle_1",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/neutral/bogre_idle_2",
+        "name": "inhabitants:entity/bogre/neutral/bogre_idle_2",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/neutral/bogre_idle_3",
+        "name": "inhabitants:entity/bogre/neutral/bogre_idle_3",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/neutral/bogre_idle_4",
+        "name": "inhabitants:entity/bogre/neutral/bogre_idle_4",
         "weight": 1
       }
     ],
@@ -167,11 +167,11 @@
     "subtitle": "subtitles.inhabitants.bogre.roar",
     "sounds": [
       {
-        "name": "inhabitants:bogre/aggressive/bogre_roar_0",
+        "name": "inhabitants:entity/bogre/aggressive/bogre_roar_0",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/aggressive/bogre_roar_1",
+        "name": "inhabitants:entity/bogre/aggressive/bogre_roar_1",
         "weight": 1
       }
     ],
@@ -182,7 +182,7 @@
     "subtitle": "subtitles.inhabitants.bogre.cooking",
     "sounds": [
       {
-        "name": "inhabitants:bogre/skilling/bogre_cooking_start",
+        "name": "inhabitants:entity/bogre/skilling/bogre_cooking_start",
         "weight": 1
       }
     ],
@@ -193,7 +193,7 @@
     "subtitle": "subtitles.inhabitants.bogre.cooking",
     "sounds": [
       {
-        "name": "inhabitants:bogre/skilling/bogre_cooking_loop",
+        "name": "inhabitants:entity/bogre/skilling/bogre_cooking_loop",
         "weight": 1
       }
     ],
@@ -213,7 +213,7 @@
   "bogre.deposit_in_chest": {
     "sounds": [
       {
-        "name": "inhabitants:bogre/nautral/deposit_in_chest",
+        "name": "inhabitants:entity/bogre/nautral/deposit_in_chest",
         "weight": 1
       }
     ],
@@ -224,15 +224,15 @@
     "subtitle": "subtitles.inhabitants.impaler.attack",
     "sounds": [
       {
-        "name": "inhabitants:impaler/impaler_attack_0",
+        "name": "inhabitants:entity/impaler/impaler_attack_0",
         "weight": 1
       },
       {
-        "name": "inhabitants:impaler/impaler_attack_1",
+        "name": "inhabitants:entity/impaler/impaler_attack_1",
         "weight": 1
       },
       {
-        "name": "inhabitants:impaler/impaler_attack_2",
+        "name": "inhabitants:entity/impaler/impaler_attack_2",
         "weight": 1
       }
     ],
@@ -243,7 +243,7 @@
     "subtitle": "subtitles.inhabitants.impaler.death",
     "sounds": [
       {
-        "name": "inhabitants:impaler/impaler_death_0",
+        "name": "inhabitants:entity/impaler/impaler_death_0",
         "weight": 1
       }
     ],
@@ -254,15 +254,15 @@
     "subtitle": "subtitles.inhabitants.impaler.hurt",
     "sounds": [
       {
-        "name": "inhabitants:impaler/impaler_hurt_0",
+        "name": "inhabitants:entity/impaler/impaler_hurt_0",
         "weight": 1
       },
       {
-        "name": "inhabitants:impaler/impaler_hurt_1",
+        "name": "inhabitants:entity/impaler/impaler_hurt_1",
         "weight": 1
       },
       {
-        "name": "inhabitants:impaler/impaler_hurt_2",
+        "name": "inhabitants:entity/impaler/impaler_hurt_2",
         "weight": 1
       }
     ],
@@ -273,19 +273,19 @@
     "subtitle": "subtitles.inhabitants.impaler.idle",
     "sounds": [
       {
-        "name": "inhabitants:impaler/impaler_idle_0",
+        "name": "inhabitants:entity/impaler/impaler_idle_0",
         "weight": 1
       },
       {
-        "name": "inhabitants:impaler/impaler_idle_1",
+        "name": "inhabitants:entity/impaler/impaler_idle_1",
         "weight": 1
       },
       {
-        "name": "inhabitants:impaler/impaler_idle_2",
+        "name": "inhabitants:entity/impaler/impaler_idle_2",
         "weight": 1
       },
       {
-        "name": "inhabitants:impaler/impaler_idle_3",
+        "name": "inhabitants:entity/impaler/impaler_idle_3",
         "weight": 1
       }
     ],
@@ -296,15 +296,15 @@
     "subtitle": "subtitles.inhabitants.impaler.scream",
     "sounds": [
       {
-        "name": "inhabitants:impaler/impaler_scream_0",
+        "name": "inhabitants:entity/impaler/impaler_scream_0",
         "weight": 1
       },
       {
-        "name": "inhabitants:impaler/impaler_scream_1",
+        "name": "inhabitants:entity/impaler/impaler_scream_1",
         "weight": 1
       },
       {
-        "name": "inhabitants:impaler/impaler_scream_2",
+        "name": "inhabitants:entity/impaler/impaler_scream_2",
         "weight": 1
       }
     ],
@@ -315,19 +315,19 @@
     "subtitle": "subtitles.inhabitants.impaler.spikes",
     "sounds": [
       {
-        "name": "inhabitants:impaler/impaler_spikes_0",
+        "name": "inhabitants:entity/impaler/impaler_spikes_0",
         "weight": 1
       },
       {
-        "name": "inhabitants:impaler/impaler_spikes_1",
+        "name": "inhabitants:entity/impaler/impaler_spikes_1",
         "weight": 1
       },
       {
-        "name": "inhabitants:impaler/impaler_spikes_2",
+        "name": "inhabitants:entity/impaler/impaler_spikes_2",
         "weight": 1
       },
       {
-        "name": "inhabitants:impaler/impaler_spikes_3",
+        "name": "inhabitants:entity/impaler/impaler_spikes_3",
         "weight": 1
       }
     ],
@@ -338,7 +338,7 @@
     "subtitle": "subtitles.inhabitants.impaler.concussion",
     "sounds": [
       {
-        "name": "inhabitants:impaler/impaler_concussion",
+        "name": "inhabitants:entity/impaler/impaler_concussion",
         "weight": 1
       }
     ],
@@ -349,7 +349,7 @@
     "subtitle": "subtitles.inhabitants.shockwave",
     "sounds": [
       {
-        "name": "inhabitants:bogre/aggressive/bogre_shockwave_feedback",
+        "name": "inhabitants:entity/bogre/aggressive/bogre_shockwave_feedback",
         "weight": 1
       }
     ],
@@ -359,7 +359,7 @@
   "disc.bogre": {
     "sounds": [
       {
-        "name": "inhabitants:disc/bogre",
+        "name": "inhabitants:item/music_disc/bogre",
         "stream": true
       }
     ]
@@ -377,11 +377,11 @@
   "bogre.hammer_knock": {
     "sounds": [
       {
-        "name": "inhabitants:bogre/skilling/hammer_knock1",
+        "name": "inhabitants:entity/bogre/skilling/hammer_knock1",
         "weight": 1
       },
       {
-        "name": "inhabitants:bogre/skilling/hammer_knock2",
+        "name": "inhabitants:entity/bogre/skilling/hammer_knock2",
         "weight": 1
       }
     ],
@@ -391,7 +391,7 @@
   "bogre.carving_finish": {
     "sounds": [
       {
-        "name": "inhabitants:bogre/skilling/carving_finish_sound"
+        "name": "inhabitants:entity/bogre/skilling/carving_finish_sound"
       }
     ],
     "volume": 1.0,
