@@ -32,12 +32,10 @@ public class BogreDetectionHelper {
     public static boolean isJukeboxPlayingNearby(BogreEntity bogre) {
         BlockPos origin = bogre.blockPosition();
         return BlockPos.betweenClosedStream(
-            origin.offset(-JUKEBOX_RANGE, -2, -JUKEBOX_RANGE),
-            origin.offset(JUKEBOX_RANGE, 2, JUKEBOX_RANGE)).anyMatch(pos -> {
-                BlockState state = bogre.level().getBlockState(pos);
+            origin.offset(-JUKEBOX_RANGE, -5, -JUKEBOX_RANGE),
+            origin.offset(JUKEBOX_RANGE, 5, JUKEBOX_RANGE)).anyMatch(pos -> {
                 BlockEntity blockEntity = bogre.level().getBlockEntity(pos);
-                return state.is(Blocks.JUKEBOX)
-                    && blockEntity instanceof JukeboxBlockEntity jukeboxblockentity
+                return blockEntity instanceof JukeboxBlockEntity jukeboxblockentity
                     && jukeboxblockentity.isRecordPlaying();
             });
     }

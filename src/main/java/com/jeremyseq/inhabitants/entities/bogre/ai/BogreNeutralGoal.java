@@ -65,8 +65,8 @@ public class BogreNeutralGoal extends WaterAvoidingRandomStrollGoal {
             return false;
         }
 
-        if (bogre.getNeutralState() == BogreAi.NeutralState.DANCING || shouldDance(bogre)) {
-            return true;
+        if (bogre.getNeutralState() == BogreAi.NeutralState.DANCING) {
+            return shouldDance(bogre);
         }
 
         return super.canContinueToUse();
@@ -81,7 +81,8 @@ public class BogreNeutralGoal extends WaterAvoidingRandomStrollGoal {
     @Override
     public void stop() {
         super.stop();
-        if (bogre.getNeutralState() == BogreAi.NeutralState.WANDERING) {
+        if (bogre.getNeutralState() == BogreAi.NeutralState.WANDERING || 
+            bogre.getNeutralState() == BogreAi.NeutralState.DANCING) {
             bogre.setNeutralState(BogreAi.NeutralState.IDLE);
         }
         
