@@ -7,6 +7,7 @@ import com.jeremyseq.inhabitants.effects.ModEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.damagesource.DamageTypes;
 
 import net.minecraftforge.event.TickEvent;
@@ -42,11 +43,17 @@ public class ModEvents {
         if (isSneaking && !wasSneaking) {
             // Only descend if we are actually phasing inside a solid block
             if (isInsideBlock(player)) {
-                player.teleportTo(
-                    player.getX(),
-                    player.getY() - 1.0,
-                    player.getZ()
-                );
+                BlockPos targetPos = BlockPos.containing(
+                    player.getX(), 
+                    player.getY() - 1.0, 
+                    player.getZ());
+                if (!player.level().getBlockState(targetPos).is(Blocks.BEDROCK)) {
+                    player.teleportTo(
+                        player.getX(),
+                        player.getY() - 1.0,
+                        player.getZ()
+                    );
+                }
             }
         }
 

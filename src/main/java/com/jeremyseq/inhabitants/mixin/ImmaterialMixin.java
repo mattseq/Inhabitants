@@ -16,6 +16,7 @@ import net.minecraft.client.Camera;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.client.Minecraft;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -44,7 +45,8 @@ public class ImmaterialMixin {
                 ctx.getEntity() instanceof Player player) {
                     
                 if (ModEffects.IMMATERIAL.isPresent() && 
-                    player.hasEffect(ModEffects.IMMATERIAL.get())) {
+                    player.hasEffect(ModEffects.IMMATERIAL.get()) &&
+                    !pState.is(Blocks.BEDROCK)) {
                     VoxelShape shape = cir.getReturnValue();
                     if (shape != null && !shape.isEmpty()) {
                         double shapeMinY = shape.min(Direction.Axis.Y) + pPos.getY();
