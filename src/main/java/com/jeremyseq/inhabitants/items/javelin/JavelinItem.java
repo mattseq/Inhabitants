@@ -2,6 +2,7 @@ package com.jeremyseq.inhabitants.items.javelin;
 
 import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 import com.jeremyseq.inhabitants.entities.javelin.JavelinEntity;
+
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
@@ -14,6 +15,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.util.Mth;
 
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 
@@ -75,13 +77,13 @@ public class JavelinItem extends Item implements GeoItem {
             int i = this.getUseDuration(pStack) - pTimeLeft;
             if (i >= 10) {
                 if (!pLevel.isClientSide) {
-                    float f = (float)i / 60.0f;
-                    if (f > 1.0f) f = 1.0f;
+                    float charge = Mth.clamp((float)i / 60.0f, 0.0f, 1.0f);
 
-                    float velocity = 0.5f + f * 3.0f;
-                    float inaccuracy = (1.0f - f) * 2.5f + 0.01f;
+                    float velocity = 0.75f + charge * 4.5f;
+                    float inaccuracy = (1.0f - charge) * 2.5f + 0.01f;
 
                     JavelinEntity javelin = new JavelinEntity(pLevel, player, pStack);
+                    javelin.setCharge(charge);
                     
                     javelin.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0f, velocity, inaccuracy);
                     
@@ -102,6 +104,8 @@ public class JavelinItem extends Item implements GeoItem {
 
                 player.awardStat(Stats.ITEM_USED.get(this));
             }
+            
+            pLivingEntity.swing(pLivingEntity.getUsedItemHand());
         }
     }
 

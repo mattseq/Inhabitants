@@ -86,39 +86,57 @@ public class JavelinItemRenderer extends GeoItemRenderer<JavelinItem> {
         if (!isReRender) {
             if (this.renderPerspective == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND || 
                 this.renderPerspective == ItemDisplayContext.THIRD_PERSON_LEFT_HAND) {
-
-                float xOffset = 0.0f;
-                boolean isAiming = false;
-
-                if (Minecraft.getInstance().level != null) {
-                    for (Player player : Minecraft.getInstance().level.players()) {
-                        if (player.isUsingItem() &&
-                            ItemStack.isSameItemSameTags(player.getUseItem(), this.currentItemStack)) {
-                            isAiming = true;
-                            break;
-                        }
-                    }
-                }
                 
-                poseStack.translate(xOffset, 0.15f, 0.05f);
-
-                if (isAiming) {
-                    poseStack.mulPose(Axis.XP.rotationDegrees(180));
-                }
+                thirdPersonAiming(poseStack, partialTick);
             } else if (this.renderPerspective != null &&
                 this.renderPerspective.firstPerson()) {
                 
-                float yOffset = -0.2f;
-
-                if (Minecraft.getInstance().player != null &&
-                    Minecraft.getInstance().player.isUsingItem() && 
-                    ItemStack.isSameItemSameTags(
-                        Minecraft.getInstance().player.getUseItem(), this.currentItemStack)) {
-                    yOffset = -0.5f;
-                }
-                
-                poseStack.translate(0, yOffset, 0);
+                firstPersonAiming(poseStack, partialTick);
             }
         }
+    }
+
+    private void thirdPersonAiming(PoseStack poseStack, float partialTick) {
+        float xOffset = 0.0f;
+        float chargeProgress = 0f;
+        Player aimingPlayer = null;
+
+        if (Minecraft.getInstance().level != null) {
+            for (Player player : Minecraft.getInstance().level.players()) {
+                if (isPlayerUsingThisJavelin(player)) {
+                    aimingPlayer = player;
+                    chargeProgress = getChargeProgress(player, partialTick);
+                    break;
+                }
+            }
+        }
+        
+        poseStack.translate(xOffset, -0.05f, 0.05f);
+        
+        if (aimingPlayer != null && chargeProgress > 0) {
+            poseStack.mulPose(Axis.XP.rotationDegrees(180));
+            poseStack.translate(0, -0.1f * chargeProgress, 0);
+        }
+    }
+
+    private void firstPersonAiming(PoseStack poseStack, float partialTick) {
+        Player localPlayer = Minecraft.getInstance().player;
+        float chargeProgress = getChargeProgress(localPlayer, partialTick);
+
+        float xBase = 0.15f + (0.12f * Math.min(1.0f, chargeProgress * 4.0f));
+        float yBase = -0.2f - (chargeProgress * 0.7f);
+        float zBase = -0.25f * chargeProgress;
+
+        poseStack.translate(xBase, yBase, zBase);
+    }
+
+    private float getChargeProgress(Player player, float partialTick) {
+        if (!isPlayerUsingThisJavelin(player)) return 0f;
+        return Math.min(1.0f, (player.getTicksUsingItem() + partialTick) / 60.0f);
+    }
+
+    private boolean isPlayerUsingThisJavelin(Player player) {
+        return player != null && player.isUsingItem() && 
+               ItemStack.isSameItemSameTags(player.getUseItem(), this.currentItemStack);
     }
 }

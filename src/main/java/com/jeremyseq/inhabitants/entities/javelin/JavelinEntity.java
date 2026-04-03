@@ -46,10 +46,14 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
     private int lastBounceIndex = 0;
     private BlockPos stuckBlockPos = null;
 
+    private float charge = 0.0f;
+    private float baseDamage = 3.0f;
+    private int baseKnockback = 2;
+
     public JavelinEntity(EntityType<? extends JavelinEntity> type, Level level) {
         super(type, level);
-        this.setBaseDamage(3.0d);
-        this.setKnockback(2);
+        this.setBaseDamage(baseDamage);
+        this.setKnockback(baseKnockback);
         this.pickup = Pickup.DISALLOWED;
     }
 
@@ -62,7 +66,15 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
 
     @Override
     public void playerTouch(@NotNull Player pPlayer) {
-        // disabled pickup
+        if (!this.level().isClientSide &&
+            (this.inGround || this.isNoGravity()) && this.shakeTime <= 0) {
+            if (pPlayer.isCrouching()) {
+                if (pPlayer.getInventory().add(this.getPickupItem())) {
+                    pPlayer.take(this, 1);
+                    this.discard();
+                }
+            }
+        }
     }
 
     @Override
@@ -171,7 +183,7 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
         if (target instanceof LivingEntity living) {
             if (!this.level().isClientSide) {
                 float velocity = (float)this.getDeltaMovement().length();
-                int damage = Mth.ceil(Mth.clamp((double)velocity * this.getBaseDamage(), 0.0d, Integer.MAX_VALUE));
+                int damage = Mth.ceil(baseDamage + this.getCharge());
                 
                 DamageSource damageSource = this.damageSources()
                     .arrow(this, this.getOwner() == null ? this : this.getOwner());
@@ -179,6 +191,9 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
                 if (this.getOwner() instanceof LivingEntity owner) {
                     owner.setLastHurtMob(living);
                 }
+                
+                int knockback = baseKnockback + Mth.floor(this.getCharge() * 2.0f);
+                this.setKnockback(knockback);
 
                 if (living.hurt(damageSource, (float)damage)) {
                     this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
@@ -239,6 +254,7 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
         }
         pCompound.putFloat("XRotStored", this.getXRot());
         pCompound.putFloat("YRotStored", this.getYRot());
+        pCompound.putFloat("Charge", this.getCharge());
     }
 
     @Override
@@ -253,10 +269,21 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
             this.setXRot(pCompound.getFloat("XRotStored"));
             this.setYRot(pCompound.getFloat("YRotStored"));
         }
+        if (pCompound.contains("Charge")) {
+            this.setCharge(pCompound.getFloat("Charge"));
+        }
     }
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;
+    }
+
+    public void setCharge(float charge) {
+        this.charge = Mth.clamp(charge, 0.0f, 1.0f);
+    }
+
+    public float getCharge() {
+        return this.charge;
     }
 }

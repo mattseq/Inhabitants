@@ -18,7 +18,7 @@
 				{
 					"name": "front",
 					"parent": "group",
-					"pivot": [-0.5, 0, 0.5],
+					"pivot": [0, 0, 0],
 					"cubes": [
 						{
 							"origin": [-0.02, 20, -2.5],

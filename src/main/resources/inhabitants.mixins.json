@@ -21,7 +21,9 @@
     "LowpassFilterMixin$AudioChannel",
     "LowpassFilterMixin$AudioLibrary",
     "ConcussionMixins$ClientInput",
-    "EntityRendererMixin"
+    "EntityRendererMixin",
+    "ItemInHandRendererMixin",
+    "HumanoidModelMixin"
   ],
   "minVersion": "0.8"
 }
