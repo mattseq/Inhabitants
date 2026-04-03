@@ -6,6 +6,7 @@ import com.jeremyseq.inhabitants.particles.ImpalerSpikeRaiseParticle;
 import com.jeremyseq.inhabitants.entities.goals.BreakTorchGoal;
 import com.jeremyseq.inhabitants.entities.goals.SprintAtTargetGoal;
 import com.jeremyseq.inhabitants.items.ModItems;
+
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -31,8 +32,10 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -49,14 +52,16 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     public static final int THORN_DAMAGE = 3;
     public static final int SCREAM_COOLDOWN = 300;
     public int screamCooldown = 0;
-    public static final EntityDataAccessor<Boolean> SPIKED = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.BOOLEAN);
-    public static final EntityDataAccessor<Boolean> SCREAM_TRIGGER = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.BOOLEAN);
+    
+    public static final EntityDataAccessor<Boolean> SPIKED =
+        SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Integer> SCREAM_START_TICK =
+        SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.INT);
 
     public static final EntityDataAccessor<Integer> TEXTURE = SynchedEntityData.defineId(ImpalerEntity.class, EntityDataSerializers.INT);
 
     private static final int SPIKE_ANIM_DURATION = 30;
     private int spiked_client_timer = -1; // used for spike particle timing, counts up
-    private int scream_client_timer = -1; // used for scream particle timing
 
     private int attackAnimTimer = 0;
 
@@ -127,11 +132,16 @@ public class ImpalerEntity extends Monster implements GeoEntity {
         }
 
         if (this.level().isClientSide) {
-            if (scream_client_timer == 6 || scream_client_timer == 1) {
-                EntityUtil.screamParticles((ClientLevel) this.level(), new Vec3(getX(), getY() + 0.5, getZ()), this.getLookAngle());
-            }
-            if (scream_client_timer > -1) {
-                scream_client_timer--;
+            int startTick = this.entityData.get(SCREAM_START_TICK);
+            if (startTick != -1) {
+                int elapsed = (int) (this.level().getGameTime() - startTick);
+                if (elapsed >= 0 && elapsed <= 10) {
+                    if (elapsed == 0 || elapsed == 5) {
+                        EntityUtil.screamParticles((ClientLevel) this.level(),
+                            new Vec3(getX(), getY() + 0.5, getZ()),
+                            this.getLookAngle());
+                    }
+                }
             }
         }
     }
@@ -186,11 +196,6 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     @Override
     public void onSyncedDataUpdated(@NotNull EntityDataAccessor<?> pKey) {
         super.onSyncedDataUpdated(pKey);
-        if (this.level().isClientSide && pKey == SCREAM_TRIGGER) {
-            if (this.entityData.get(SCREAM_TRIGGER)) {
-                this.scream_client_timer = 6;
-            }
-        }
         if (pKey == SPIKED) {
             if (this.entityData.get(SPIKED)) {
                 spiked_client_timer = 0;
@@ -284,7 +289,7 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     protected void defineSynchedData() {
         super.defineSynchedData();
         entityData.define(SPIKED, false);
-        entityData.define(SCREAM_TRIGGER, true);
+        entityData.define(SCREAM_START_TICK, -1);
         entityData.define(TEXTURE, getBiomeTextureType());
     }
 
