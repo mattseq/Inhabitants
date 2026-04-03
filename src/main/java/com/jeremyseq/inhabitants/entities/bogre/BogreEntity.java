@@ -78,8 +78,6 @@ public class BogreEntity extends Monster implements GeoEntity {
     public static final EntityDataAccessor<Boolean> IS_TRANSFORMING_DISC = defineAccessor(EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Integer> AI_TICKS = defineAccessor(EntityDataSerializers.INT);
     public static final EntityDataAccessor<Integer> DELIVERY_STATE = defineAccessor(EntityDataSerializers.INT);
-    public static final EntityDataAccessor<Boolean> IS_TAMED = defineAccessor(EntityDataSerializers.BOOLEAN);
-    public static final EntityDataAccessor<Optional<UUID>> OWNER_UUID = defineAccessor(EntityDataSerializers.OPTIONAL_UUID);
 
     // --- State & Position Info ---
     public BlockPos cauldronPos = null;
@@ -148,8 +146,6 @@ public class BogreEntity extends Monster implements GeoEntity {
         entityData.define(IS_TRANSFORMING_DISC, false);
         entityData.define(AI_TICKS, 0);
         entityData.define(DELIVERY_STATE, 0);
-        entityData.define(IS_TAMED, false);
-        entityData.define(OWNER_UUID, Optional.empty());
     }
 
     // --- Combat & Attack Interaction ---
@@ -323,45 +319,11 @@ public class BogreEntity extends Monster implements GeoEntity {
         setItemHeld(ItemStack.EMPTY, false);
     }
 
-    public boolean isTamed() {
-        return entityData.get(IS_TAMED);
-    }
 
-    public void setTamed(boolean tamed) {
-        entityData.set(IS_TAMED, tamed);
-    }
-
-    public Optional<UUID> getTamedOwnerUUID() {
-        return entityData.get(OWNER_UUID);
-    }
-
-    public void setTamedOwnerUUID(UUID uuid) {
-        entityData.set(OWNER_UUID, Optional.ofNullable(uuid));
-    }
-
-    public void tamingEffects() {
-        if (this.level().isClientSide) {
-            for (int i = 0; i < 7; ++i) {
-                double d0 = this.random.nextGaussian() * 0.02D;
-                double d1 = this.random.nextGaussian() * 0.02D;
-                double d2 = this.random.nextGaussian() * 0.02D;
-
-                this.level().addParticle(ParticleTypes.HEART,
-                this.getRandomX(1.0D), this.getRandomY() + 1.5D, this.getRandomZ(1.0D),
-                d0, d1, d2);
-            }
-        } else {
-            this.level().broadcastEntityEvent(this, (byte) 7);
-        }
-    }
 
     @Override
     public void handleEntityEvent(byte id) {
-        if (id == 7) {
-            this.tamingEffects();
-        } else {
-            super.handleEntityEvent(id);
-        }
+        super.handleEntityEvent(id);
     }
 
     // --- Cooking & Cauldron ---

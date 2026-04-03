@@ -41,8 +41,7 @@ public class BogreNeutralGoal extends WaterAvoidingRandomStrollGoal {
     @Override
     public boolean canUse() {
         if (bogre.getAIState() != BogreAi.State.NEUTRAL ||
-            bogre.isRoaring() || 
-            bogre.getNeutralState() == BogreAi.NeutralState.APPROACHING_OFFERING) {
+            bogre.isRoaring()) {
             return false;
         }
 
@@ -60,8 +59,7 @@ public class BogreNeutralGoal extends WaterAvoidingRandomStrollGoal {
     @Override
     public boolean canContinueToUse() {
         if (bogre.getAIState() != BogreAi.State.NEUTRAL ||
-            bogre.isRoaring() || 
-            bogre.getNeutralState() == BogreAi.NeutralState.APPROACHING_OFFERING) {
+            bogre.isRoaring()) {
             return false;
         }
 

@@ -57,15 +57,6 @@ public class ModItems {
     public static final RegistryObject<Item> MUSIC_DISC_BOGRE = ITEMS.register("music_disc_bogre",
             () -> new RecordItem(6, ModSoundEvents.BOGRE_SONG, new Item.Properties().stacksTo(1).rarity(Rarity.RARE), 2100));
 
-    public static final RegistryObject<Item> TOTEM_OF_OFFERING = ITEMS.register("totem_of_offering",
-            () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)) {
-                @Override
-                public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
-                    super.appendHoverText(stack, level, tooltip, flag);
-                    tooltip.add(Component.translatable("item.inhabitants.totem_of_offering.desc").withStyle(ChatFormatting.GRAY));
-                }
-            });
-
     public static final RegistryObject<Item> JAVELIN = ITEMS.register("javelin",
             () -> new JavelinItem(new Item.Properties().stacksTo(16)));
 
