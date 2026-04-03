@@ -1,4 +1,4 @@
-# Inhabitants
+# Inhabitants Changelogs
 
 ## v1.1.0 Update
 

@@ -98,7 +98,7 @@ public class BogreRecipeManager extends SimpleJsonResourceReloadListener {
                 ResourceLocation.tryParse(GsonHelper.getAsString(json, "result")));
 
             int count = GsonHelper.getAsInt(json, "count", 1);
-            if (resultItem == null) return;
+            if (resultItem == null || resultItem == Items.AIR) return;
             ItemStack result = new ItemStack(resultItem, count);
 
             switch (typeStr) {
