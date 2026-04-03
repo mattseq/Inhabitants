@@ -36,6 +36,7 @@ into 3 states `start`, `loop`, `end`
 - New visual feedbacks for Concussion effect
 - Audio: new Lowpass filter, currently used in **Immaterial** & **Concussion** effects
 - JEI Compatibility for Cooking, Carving & Transformation recipes
+- New textures for Impaler
 
 ### Bugs & Fix's
 **Impaler**
