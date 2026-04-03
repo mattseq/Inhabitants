@@ -221,6 +221,14 @@ public class BogreRecipeManager extends SimpleJsonResourceReloadListener {
         cookingRecipes = List.copyOf(recipes);
     }
 
+    public static Map<Item, TransformationRecipe> getTransformationRecipes() {
+        return transformationRecipes;
+    }
+
+    public static Map<Block, CarvingRecipe> getCarvingRecipes() {
+        return carvingRecipes;
+    }
+
     public static Optional<CookingRecipe> getCookingRecipe(List<Item> items) {
         if (items.isEmpty()) return Optional.empty();
         

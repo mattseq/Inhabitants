@@ -20,6 +20,7 @@
   "item.inhabitants.music_disc_bogre": "Music Disc",
   "item.inhabitants.music_disc_bogre.desc": "BoboTweaks - Hermit",
   "item.inhabitants.javelin": "Javelin",
+  "item.inhabitants.swamp_lair_map": "Swamp Lair Map",
 
   "tooltip.inhabitants.special_effect": "Special Ability",
   "tooltip.inhabitants.giant_bone": "25% chance to perform a Shockwave on critical hit.",
@@ -64,5 +65,8 @@
   "painting.inhabitants.endermans_last_day.author": "Cucuber",
 
   "gui.inhabitants.missing_heat_source": "Needs Heat Source (e.g. Campfire)",
-  "item.inhabitants.swamp_lair_map": "Swamp Lair Map"
+
+  "gui.inhabitants.jei.cooking": "Bogre Cooking (Cauldron)",
+  "gui.inhabitants.jei.transformation": "Bogre Transformation",
+  "gui.inhabitants.jei.carving": "Bogre Carving"
 }
