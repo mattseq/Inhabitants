@@ -426,5 +426,41 @@
     ],
     "volume": 1.0,
     "pitch": 1.0
+  },
+  "item.javelin_aiming": {
+    "sounds": [
+      "inhabitants:item/javelin/aiming"
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
+  "item.javelin_bounce": {
+    "sounds": [
+      "inhabitants:item/javelin/bounce"
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
+  "item.javelin_launch": {
+    "sounds": [
+      "inhabitants:item/javelin/launching_01",
+      "inhabitants:item/javelin/launching_02"
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
+  "item.javelin_on_block_hit": {
+    "sounds": [
+      "inhabitants:item/javelin/on_block_hit"
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
+  "item.javelin_on_entity_hit": {
+    "sounds": [
+      "inhabitants:item/javelin/on_entity_hit"
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
   }
 }

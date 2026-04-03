@@ -46,6 +46,12 @@ public class ModSoundEvents {
     public static final RegistryObject<SoundEvent> IMMATERIAL_ENTER_WALL = registerSoundEvent("immaterial.enter_wall");
     public static final RegistryObject<SoundEvent> IMMATERIAL_EXIT_WALL = registerSoundEvent("immaterial.exit_wall");
     public static final RegistryObject<SoundEvent> CONCUSSION_BUZZ = registerSoundEvent("concussion.buzz");
+    
+    public static final RegistryObject<SoundEvent> JAVELIN_AIMING = registerSoundEvent("item.javelin_aiming");
+    public static final RegistryObject<SoundEvent> JAVELIN_BOUNCE = registerSoundEvent("item.javelin_bounce");
+    public static final RegistryObject<SoundEvent> JAVELIN_LAUNCHING = registerSoundEvent("item.javelin_launch");
+    public static final RegistryObject<SoundEvent> JAVELIN_ON_BLOCK_HIT = registerSoundEvent("item.javelin_on_block_hit");
+    public static final RegistryObject<SoundEvent> JAVELIN_ON_ENTITY_HIT = registerSoundEvent("item.javelin_on_entity_hit");
 
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, name)));

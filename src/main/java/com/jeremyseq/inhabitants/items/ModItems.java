@@ -4,6 +4,7 @@ import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.items.food.*;
+import com.jeremyseq.inhabitants.items.javelin.JavelinItem;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -64,6 +65,9 @@ public class ModItems {
                     tooltip.add(Component.translatable("item.inhabitants.totem_of_offering.desc").withStyle(ChatFormatting.GRAY));
                 }
             });
+
+    public static final RegistryObject<Item> JAVELIN = ITEMS.register("javelin",
+            () -> new JavelinItem(new Item.Properties().stacksTo(16)));
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

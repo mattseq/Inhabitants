@@ -25,6 +25,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -38,6 +39,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.client.event.ModelEvent;
 
 import org.slf4j.Logger;
 
@@ -121,6 +123,18 @@ public class Inhabitants
                 }
                 return 0.0F;
             });
+
+            ItemProperties.register(ModItems.JAVELIN.get(),
+                ResourceLocation.fromNamespaceAndPath(MODID, "aiming"), (stack, level, entity, seed) -> {
+                    return entity != null &&
+                    entity.isUsingItem() &&
+                    entity.getUseItem() == stack ? 1.0F : 0.0F;
+                });
+        }
+
+        @SubscribeEvent
+        public static void onRegisterAdditional(ModelEvent.RegisterAdditional event) {
+            event.register(new ModelResourceLocation(Inhabitants.MODID, "javelin_gui", "inventory"));
         }
     }
 
