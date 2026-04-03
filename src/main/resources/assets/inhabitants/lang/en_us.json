@@ -63,5 +63,6 @@
   "painting.inhabitants.endermans_last_day.title": "Enderman's Last Day",
   "painting.inhabitants.endermans_last_day.author": "Cucuber",
 
-  "gui.inhabitants.missing_heat_source": "Needs Heat Source (e.g. Campfire)"
+  "gui.inhabitants.missing_heat_source": "Needs Heat Source (e.g. Campfire)",
+  "item.inhabitants.swamp_lair_map": "Swamp Lair Map"
 }

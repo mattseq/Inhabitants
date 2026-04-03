@@ -9,6 +9,22 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.TagKey;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.npc.VillagerTrades;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.MapItem;
+import net.minecraft.world.item.trading.MerchantOffer;
+import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.saveddata.maps.MapDecoration;
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -16,8 +32,10 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.village.VillagerTradesEvent;
 
 import java.util.*;
+import javax.annotation.Nullable;
 
 @Mod.EventBusSubscriber(modid = Inhabitants.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ModEvents {
@@ -78,6 +96,89 @@ public class ModEvents {
             
             if (event.getSource().is(DamageTypes.IN_WALL)) {
                 event.setCanceled(true);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onVillagerTrades(VillagerTradesEvent event) {
+        if (event.getType() == VillagerProfession.CARTOGRAPHER) {
+
+            TagKey<Structure> swampLairTag = TagKey.create(Registries.STRUCTURE,
+                ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "swamp_lair"));
+
+            int randomLevel = new Random().nextInt(4) + 2;
+            boolean chance = new Random().nextFloat() < 0.90f;
+
+            if(!chance) return;
+
+            List<VillagerTrades.ItemListing> trades = event.getTrades().get(randomLevel);
+
+            if (trades != null) {
+                trades.add(new SwampLairMapTrade(
+                    13, // em cost
+                    swampLairTag,
+                    "item.inhabitants.swamp_lair_map",
+                    MapDecoration.Type.RED_X,
+                    12, // max uses
+                    10 // xp
+                ));
+            }
+        }
+    }
+
+    private static class SwampLairMapTrade implements VillagerTrades.ItemListing {
+        private final int emeraldCost;
+        private final TagKey<Structure> destination;
+        private final String displayName;
+        private final MapDecoration.Type destinationType;
+        private final int maxUses;
+        private final int villagerXp;
+
+        public SwampLairMapTrade(
+            int emeraldCost, 
+            TagKey<Structure> destination, 
+            String displayName, 
+            MapDecoration.Type destinationType, 
+            int maxUses, 
+            int villagerXp
+        ) {
+            this.emeraldCost = emeraldCost;
+            this.destination = destination;
+            this.displayName = displayName;
+            this.destinationType = destinationType;
+            this.maxUses = maxUses;
+            this.villagerXp = villagerXp;
+        }
+
+        @Nullable
+        @Override
+        public MerchantOffer getOffer(Entity entity, RandomSource random) {
+            if (!(entity.level() instanceof ServerLevel serverlevel)) {
+                return null;
+            } else {
+                BlockPos blockpos = serverlevel.findNearestMapStructure(
+                    this.destination, entity.blockPosition(), 100, true);
+                
+                if (blockpos != null) {
+                    ItemStack itemstack = MapItem.create(serverlevel,
+                        blockpos.getX(), blockpos.getZ(), (byte)2, true, true);
+
+                    MapItem.renderBiomePreviewMap(serverlevel, itemstack);
+                    MapItemSavedData.addTargetDecoration(itemstack, blockpos, "+", this.destinationType);
+                    itemstack.setHoverName(Component.translatable(this.displayName));
+                    
+                    return new MerchantOffer(
+                        new ItemStack(Items.EMERALD, this.emeraldCost), 
+                        new ItemStack(Items.COMPASS), 
+                        itemstack, 
+                        this.maxUses, 
+                        this.villagerXp, 
+                        0.2F
+                    );
+                } else {
+                    return null;
+                }
             }
         }
     }
