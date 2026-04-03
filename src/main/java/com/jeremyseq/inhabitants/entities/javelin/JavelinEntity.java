@@ -199,7 +199,6 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
                     this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
                             ModSoundEvents.JAVELIN_ON_ENTITY_HIT.get(), SoundSource.NEUTRAL, 1.0f, 1.0f);
                     
-                    this.spawnAtLocation(this.getPickupItem());
                     this.discard();
                 }
             }
