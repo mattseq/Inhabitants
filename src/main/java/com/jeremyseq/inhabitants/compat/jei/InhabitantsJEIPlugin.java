@@ -4,8 +4,6 @@ import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.items.ModItems;
 import com.jeremyseq.inhabitants.recipe.BogreRecipeManager;
 import com.jeremyseq.inhabitants.recipe.CookingRecipe;
-import com.jeremyseq.inhabitants.recipe.TransformationRecipe;
-import com.jeremyseq.inhabitants.recipe.CarvingRecipe;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -29,12 +27,6 @@ public class InhabitantsJEIPlugin implements IModPlugin {
     public static final RecipeType<CookingRecipe> BOGRE_COOKING =
             RecipeType.create(Inhabitants.MODID, "cooking", CookingRecipe.class);
 
-    public static final RecipeType<TransformationRecipe> TRANSFORMATION =
-            RecipeType.create(Inhabitants.MODID, "transformation", TransformationRecipe.class);
-
-    public static final RecipeType<CarvingRecipe> CARVING =
-            RecipeType.create(Inhabitants.MODID, "carving", CarvingRecipe.class);
-
     @Override
     public @NotNull ResourceLocation getPluginUid() {
         return PLUGIN_ID;
@@ -43,22 +35,17 @@ public class InhabitantsJEIPlugin implements IModPlugin {
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
         registration.addRecipeCategories(
-            new CookingRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
-            new TransformationRecipeCategory(registration.getJeiHelpers().getGuiHelper()),
-            new CarvingRecipeCategory(registration.getJeiHelpers().getGuiHelper())
+            new CookingRecipeCategory(registration.getJeiHelpers().getGuiHelper())
         );
     }
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
         registration.addRecipes(BOGRE_COOKING, BogreRecipeManager.getAllCookingRecipes());
-        registration.addRecipes(TRANSFORMATION, new ArrayList<>(BogreRecipeManager.getTransformationRecipes().values()));
-        registration.addRecipes(CARVING, new ArrayList<>(BogreRecipeManager.getCarvingRecipes().values()));
     }
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(new ItemStack(Blocks.CAULDRON), BOGRE_COOKING);
-        registration.addRecipeCatalyst(new ItemStack(ModItems.BOGRE_SPAWN_EGG.get()), TRANSFORMATION, CARVING);
+        registration.addRecipeCatalyst(new ItemStack(ModItems.BOGRE_CAULDRON.get()), BOGRE_COOKING);
     }
 }

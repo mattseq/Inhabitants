@@ -60,6 +60,11 @@ public class ModItems {
     public static final RegistryObject<Item> JAVELIN = ITEMS.register("javelin",
             () -> new JavelinItem(new Item.Properties().stacksTo(16)));
 
+    /* this item show's ONLY in JEI, so don't dream getting it in-game *kiss*, *kiss* */
+    public static final RegistryObject<Item> BOGRE_CAULDRON = ITEMS.register("bogre_cauldron",
+            () -> new Item(new Item.Properties()));
+    /* the end of the joke, i hope */
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }

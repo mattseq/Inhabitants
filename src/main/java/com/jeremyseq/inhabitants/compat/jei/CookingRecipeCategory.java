@@ -34,7 +34,7 @@ public class CookingRecipeCategory implements IRecipeCategory<CookingRecipe> {
         this.title = Component.translatable("gui.inhabitants.jei.cooking");
         this.background = helper.createBlankDrawable(150, 50);
         this.icon = helper.drawableBuilder(
-            ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/misc/bogre_face_icon.png"), 
+            ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "textures/item/bogre_cauldron.png"), 
             0, 0, 16, 16)
             .setTextureSize(16, 16)
             .build();
