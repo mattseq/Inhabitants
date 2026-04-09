@@ -295,13 +295,12 @@ public class SpikeDrillItem extends PickaxeItem {
                             BlockState state = p.level().getBlockState(pos);
                             SoundType soundType = state.getSoundType();
                             
-                            float ratio = calculatingDrillSpeed(p, stack, 0f);
-                            float pitch = (soundType.getPitch() * 1.2F) + (ratio * 0.8F);
-                            float volume = soundType.getVolume() - (0.3f * p.getRandom().nextFloat());
+                            float pitch = 1.0F;
+                            float volume = soundType.getVolume() - (0.75f * p.getRandom().nextFloat());
 
                             p.level().playLocalSound(
                                 pos.getX(), pos.getY(), pos.getZ(),
-                                soundType.getHitSound(),
+                                ModSoundEvents.DRILL_DIG.get(),
                                 SoundSource.BLOCKS,
                                 volume,
                                 pitch,
@@ -429,7 +428,8 @@ public class SpikeDrillItem extends PickaxeItem {
             }
 
             if (!drill.isEmpty() && !snowball.isEmpty() &&
-                event.getClickAction() == ClickAction.PRIMARY) {
+                event.getClickAction() == ClickAction.PRIMARY &&
+                !player.getCooldowns().isOnCooldown(drill.getItem())) {
                 if (getTemperature(drill) > 0) {
                     addTemperature(drill, -20, player.level().getGameTime());
                     

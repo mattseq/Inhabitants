@@ -483,5 +483,14 @@
     ],
     "volume": 1.0,
     "pitch": 1.0
+  },
+  "item.spike_drill.drilling_dig": {
+    "sounds": [
+      "inhabitants:item/spike_drill/dig_0",
+      "inhabitants:item/spike_drill/dig_1",
+      "inhabitants:item/spike_drill/dig_2"
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
   }
 }

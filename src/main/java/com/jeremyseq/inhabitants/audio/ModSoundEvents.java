@@ -56,6 +56,7 @@ public class ModSoundEvents {
     public static final RegistryObject<SoundEvent> DRILL_LOOP = registerSoundEvent("item.spike_drill.drilling_loop");
     public static final RegistryObject<SoundEvent> DRILL_STOPPED = registerSoundEvent("item.spike_drill.drilling_stopped");
     public static final RegistryObject<SoundEvent> DRILL_START = registerSoundEvent("item.spike_drill.drilling_start");
+    public static final RegistryObject<SoundEvent> DRILL_DIG = registerSoundEvent("item.spike_drill.drilling_dig");
 
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, name)));
