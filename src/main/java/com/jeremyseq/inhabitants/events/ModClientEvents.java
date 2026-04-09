@@ -6,8 +6,9 @@ import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.networking.AscendPacketC2S;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
-import com.jeremyseq.inhabitants.audio.ConcussionBuzzSound;
+import com.jeremyseq.inhabitants.audio.ModTickableSounds;
 import com.jeremyseq.inhabitants.util.GhostTracker;
+import com.jeremyseq.inhabitants.items.SpikeDrillItem;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.core.BlockPos;
@@ -16,6 +17,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.InteractionHand;
 
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.api.distmarker.Dist;
@@ -24,6 +27,7 @@ import net.minecraftforge.client.event.RenderBlockScreenEffectEvent;
 import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.client.event.RenderHandEvent;
 
 @Mod.EventBusSubscriber(modid = Inhabitants.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ModClientEvents {
@@ -33,7 +37,7 @@ public class ModClientEvents {
     private static boolean lastJumpState = false;
     private static BlockPos lastPhasingPos = null;
     public static float muffleLerp = 0.0F;
-    private static ConcussionBuzzSound concussionBuzz = null;
+    private static ModTickableSounds.ConcussionBuzz concussionBuzz = null;
     private static float lastCameraYaw = 0;
     private static float lastCameraPitch = 0;
     private static boolean wasConcussed = false;
@@ -158,7 +162,7 @@ public class ModClientEvents {
 
         if (isConcussed) {
             if (concussionBuzz == null) {
-                concussionBuzz = new ConcussionBuzzSound(mc.player);
+                concussionBuzz = new ModTickableSounds.ConcussionBuzz(mc.player);
                 mc.getSoundManager().play(concussionBuzz);
             }
             if (!wasConcussed) {
@@ -261,4 +265,30 @@ public class ModClientEvents {
             }
         }
     }
+
+    @SubscribeEvent
+    public static void onRenderHand(RenderHandEvent event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player != null && mc.player.isUsingItem()) {
+
+            if (event.getHand() == InteractionHand.OFF_HAND) {
+                ItemStack mainHandItem = mc.player.getMainHandItem();
+
+                if (mainHandItem.getItem() instanceof SpikeDrillItem &&
+                        mc.player.getUsedItemHand() == InteractionHand.MAIN_HAND) {
+                    event.setCanceled(true);
+                }
+            } else if (event.getHand() == InteractionHand.MAIN_HAND) {
+                ItemStack offHandItem = mc.player.getOffhandItem();
+                ItemStack mainHandItem = mc.player.getMainHandItem();
+                
+                if (offHandItem.getItem() instanceof SpikeDrillItem &&
+                        mainHandItem.isEmpty() &&
+                        mc.player.getUsedItemHand() == InteractionHand.OFF_HAND) {
+                    event.setCanceled(true);
+                }
+            }
+        }
+    }
+
 }

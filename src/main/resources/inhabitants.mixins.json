@@ -9,7 +9,8 @@
     "StickyLegsMixin",
     "ReverseGrowthMixin$Physics",
     "GiantBoneSpecialAttackMixin",
-    "LivingEntityAccessor",
+    "LivingEntityMixin",
+    "LivingEntityMixin$LivingEntityAccessor",
     "ImmaterialMixin$Physics",
     "ConcussionMixins$Movement"
   ],
@@ -23,7 +24,8 @@
     "ConcussionMixins$ClientInput",
     "EntityRendererMixin",
     "ItemInHandRendererMixin",
-    "HumanoidModelMixin"
+    "HumanoidModelMixin",
+    "LocalPlayerMixin"
   ],
   "minVersion": "0.8"
 }

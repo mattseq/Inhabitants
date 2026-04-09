@@ -22,9 +22,14 @@
   "item.inhabitants.javelin": "Javelin",
   "item.inhabitants.swamp_lair_map": "Swamp Lair Map",
   "item.inhabitants.bogre_cauldron": "Bogre's Cauldron",
+  "item.inhabitants.spike_drill": "Spike Drill",
+
 
   "tooltip.inhabitants.special_effect": "Special Ability",
   "tooltip.inhabitants.giant_bone": "25% chance to perform a Shockwave on critical hit.",
+  "tooltip.inhabitants.spike_drill": "Cools down using Snowballs",
+  "tooltip.inhabitants.spike_drill.overheated": "Drill is overheated",
+  "tooltip.inhabitants.spike_drill.temperature": "Temperature: %s / %s",
 
   "effect.inhabitants.concussion": "Concussion",
   "effect.inhabitants.monster_disguise": "Monster Disguise",
@@ -69,5 +74,8 @@
 
   "gui.inhabitants.jei.cooking": "Bogre Cooking (Cauldron)",
   "gui.inhabitants.jei.transformation": "Bogre Transformation",
-  "gui.inhabitants.jei.carving": "Bogre Carving"
+  "gui.inhabitants.jei.carving": "Bogre Carving",
+
+  "enchantment.inhabitants.diamond_tip": "Diamond Tip",
+  "enchantment.inhabitants.thermal_capacity": "Thermal Capacity"
 }

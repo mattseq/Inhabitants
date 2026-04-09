@@ -30,6 +30,9 @@ into 3 states `start`, `loop`, `end`
 - New Item: Uncanny pottage, eating it triggers Reverse Growth effect
 - New Item: Javelin, Crafted diagonal Stick, Feather, Impaler Spike
 - New Item: Swamp Lair Map, Obtained by Cartographer Villager
+- New Item: Drill, Can be crafted in Crafting table
+- New Enchantment: Diamond tip, Raise drill speed to Diamond tier
+- New Enchantment: Thermal capacity, Increase thermal capacity twice
 - Giant bone: triggers shockwave by 25% chance on crit
 - New sprites for most of the items
 **Others**
@@ -37,6 +40,7 @@ into 3 states `start`, `loop`, `end`
 - Audio: new Lowpass filter, currently used in **Immaterial** & **Concussion** effects
 - JEI Compatibility for Cooking, Carving & Transformation recipes
 - New textures for Impaler
+- FPV animations system by JSON's
 
 ### Bugs & Fix's
 **Impaler**

@@ -462,5 +462,26 @@
     ],
     "volume": 1.0,
     "pitch": 1.0
+  },
+  "item.spike_drill.drilling_loop": {
+    "sounds": [
+      "inhabitants:item/spike_drill/drilling_loop"
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
+  "item.spike_drill.drilling_stopped": {
+    "sounds": [
+      "inhabitants:item/spike_drill/drilling_stopped"
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
+  "item.spike_drill.drilling_start": {
+    "sounds": [
+      "inhabitants:item/spike_drill/drilling_start"
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
   }
 }

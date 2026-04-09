@@ -1,6 +1,8 @@
 package com.jeremyseq.inhabitants.mixin;
 
 import com.jeremyseq.inhabitants.items.javelin.JavelinItem;
+import com.jeremyseq.inhabitants.animation.FPVAnimationPlayer;
+import com.jeremyseq.inhabitants.items.SpikeDrillItem;
 
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
@@ -8,11 +10,13 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.client.player.LocalPlayer;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.Unique;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -44,18 +48,34 @@ public abstract class ItemInHandRendererMixin {
             float remainingTicks = (float)pPlayer.getUseItemRemainingTicks() - pPartialTick + 1.0f;
             float chargeProgress = Mth.clamp((useDuration - remainingTicks) / 60.0f, 0.0f, 1.0f);
 
-            applyArmAim(pPoseStack, chargeProgress);
-            applyArmShake(pPoseStack, pPlayer, pPartialTick, chargeProgress);
+            inhabitants$applyArmAim(pPoseStack, chargeProgress);
+            inhabitants$applyArmShake(pPoseStack, pPlayer, pPartialTick, chargeProgress);
+        }
+        
+        if (!(pStack.getItem() instanceof SpikeDrillItem)) {
+            FPVAnimationPlayer.INSTANCE.apply(
+                null,
+                pPoseStack,
+                (LocalPlayer)pPlayer,
+                pHand == InteractionHand.MAIN_HAND ?
+                    pPlayer.getMainArm() : pPlayer.getMainArm().getOpposite(),
+                pStack,
+                pPartialTick,
+                pEquipProgress,
+                false
+            );
         }
     }
 
-    private void applyArmAim(PoseStack poseStack, float chargeProgress) {
+    @Unique
+    private void inhabitants$applyArmAim(PoseStack poseStack, float chargeProgress) {
         float xOffset = 0.05f - (chargeProgress * 0.15f);
         float yOffset = 0.05f + (chargeProgress * 0.05f);
         poseStack.translate(xOffset, yOffset, 0);
     }
 
-    private void applyArmShake(
+    @Unique
+    private void inhabitants$applyArmShake(
         PoseStack poseStack, 
         AbstractClientPlayer player, 
         float partialTick, 

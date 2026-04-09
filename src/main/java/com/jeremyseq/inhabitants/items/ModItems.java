@@ -65,6 +65,9 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
     /* the end of the joke, i hope */
 
+    public static final RegistryObject<Item> SPIKE_DRILL = ITEMS.register("spike_drill",
+            () -> new SpikeDrillItem(new Item.Properties().defaultDurability(2342)));
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }

@@ -1,14 +1,12 @@
 package com.jeremyseq.inhabitants;
 
 import com.jeremyseq.inhabitants.blocks.entity.ModBlockEntities;
-import com.jeremyseq.inhabitants.gui.ModMenuTypes;
 import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.debug.DebugCommands;
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeDispenserBehavior;
-import com.jeremyseq.inhabitants.items.ModCreativeModeTabs;
-import com.jeremyseq.inhabitants.items.ModItems;
+import com.jeremyseq.inhabitants.items.*;
 import com.jeremyseq.inhabitants.loot_modifiers.ModLootModifiers;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
 import com.jeremyseq.inhabitants.paintings.ModPaintings;
@@ -17,11 +15,14 @@ import com.jeremyseq.inhabitants.potions.ModPotions;
 import com.jeremyseq.inhabitants.recipe.BogreRecipeManager;
 import com.jeremyseq.inhabitants.gui.cauldron.CauldronScreen;
 import com.jeremyseq.inhabitants.audio.ModSoundEvents;
+import com.jeremyseq.inhabitants.items.SpikeDrillItem;
+import com.jeremyseq.inhabitants.animation.FPVAnimationManager;
+import com.jeremyseq.inhabitants.gui.*;
+import com.jeremyseq.inhabitants.enchantments.ModEnchantments;
 
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.CrossbowItem;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.server.level.ServerPlayer;
@@ -29,17 +30,15 @@ import net.minecraft.client.resources.model.ModelResourceLocation;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.*;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.*;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.client.event.ModelEvent;
+import net.minecraftforge.client.event.*;
 
 import org.slf4j.Logger;
 
@@ -60,6 +59,7 @@ public class Inhabitants
         ModItems.register(modEventBus);
         ModEffects.register(modEventBus);
         ModPotions.register(modEventBus);
+        ModEnchantments.register(modEventBus);
 
         modEventBus.addListener(this::commonSetup);
 
@@ -130,11 +130,40 @@ public class Inhabitants
                     entity.isUsingItem() &&
                     entity.getUseItem() == stack ? 1.0F : 0.0F;
                 });
+
+            ItemProperties.register(ModItems.SPIKE_DRILL.get(),
+                ResourceLocation.fromNamespaceAndPath(MODID, "drilling"), (stack, level, entity, seed) -> {
+                    return entity != null &&
+                    entity.isUsingItem() &&
+                    entity.getUseItem() == stack ? 1.0F : 0.0F;
+                });
+
+            ItemProperties.register(ModItems.SPIKE_DRILL.get(),
+                ResourceLocation.fromNamespaceAndPath(MODID, "drill_temperature"), (stack, level, entity, seed) -> {
+                    int temperature = SpikeDrillItem.getTemperature(stack);
+                    float ratio = (float) temperature / SpikeDrillItem.getTemperatureMax(stack);
+                    
+                    if (ratio >= 1.0F)  return 1.0F;
+                    if (ratio >= 0.75F) return 0.75F;
+                    if (ratio >= 0.50F) return 0.50F;
+                    if (ratio >= 0.25F) return 0.25F;
+                    return 0.0F;
+                });
         }
 
         @SubscribeEvent
         public static void onRegisterAdditional(ModelEvent.RegisterAdditional event) {
             event.register(new ModelResourceLocation(Inhabitants.MODID, "javelin_gui", "inventory"));
+        }
+
+        @SubscribeEvent
+        public static void onRegisterReloadListeners(RegisterClientReloadListenersEvent event) {
+            event.registerReloadListener(FPVAnimationManager.INSTANCE);
+        }
+
+        @SubscribeEvent
+        public static void onRegisterGuiOverlays(RegisterGuiOverlaysEvent event) {
+            event.registerAboveAll("drill_heat", DrillHeatOverlay.HUD_DRILL_HEAT);
         }
     }
 

@@ -52,6 +52,13 @@ public class ModNetworking {
                 AscendPacketC2S::decode,
                 AscendPacketC2S::handle
         );
+        CHANNEL.registerMessage(
+                packetId++,
+                DrillDamagePacketC2S.class,
+                DrillDamagePacketC2S::encode,
+                DrillDamagePacketC2S::decode,
+                DrillDamagePacketC2S::handle
+        );
 
         // Server → Client
         CHANNEL.registerMessage(

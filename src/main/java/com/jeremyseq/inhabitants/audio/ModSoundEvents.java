@@ -53,6 +53,10 @@ public class ModSoundEvents {
     public static final RegistryObject<SoundEvent> JAVELIN_ON_BLOCK_HIT = registerSoundEvent("item.javelin_on_block_hit");
     public static final RegistryObject<SoundEvent> JAVELIN_ON_ENTITY_HIT = registerSoundEvent("item.javelin_on_entity_hit");
 
+    public static final RegistryObject<SoundEvent> DRILL_LOOP = registerSoundEvent("item.spike_drill.drilling_loop");
+    public static final RegistryObject<SoundEvent> DRILL_STOPPED = registerSoundEvent("item.spike_drill.drilling_stopped");
+    public static final RegistryObject<SoundEvent> DRILL_START = registerSoundEvent("item.spike_drill.drilling_start");
+
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, name)));
     }

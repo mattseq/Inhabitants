@@ -30,6 +30,7 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.MARINATED_SPIDER.get());
                         pOutput.accept(ModItems.DIMENSIONAL_SERVING.get());
                         pOutput.accept(ModItems.JAVELIN.get());
+                        pOutput.accept(ModItems.SPIKE_DRILL.get());
                     })
                     .build());
 
