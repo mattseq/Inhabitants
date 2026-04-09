@@ -4,6 +4,7 @@ import com.jeremyseq.inhabitants.animation.FPVAnimationPlayer;
 import com.jeremyseq.inhabitants.audio.*;
 import com.jeremyseq.inhabitants.enchantments.ModEnchantments;
 import com.jeremyseq.inhabitants.networking.*;
+import com.jeremyseq.inhabitants.Inhabitants;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -22,9 +23,13 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.*;
+import net.minecraft.world.inventory.ClickAction;
 
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.event.ItemStackedOnOtherEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -400,5 +405,46 @@ public class SpikeDrillItem extends PickaxeItem {
             .withStyle(ChatFormatting.GRAY)
         );
         tooltipComponents.add(Component.literal(" "));
+    }
+
+    @Mod.EventBusSubscriber(modid = Inhabitants.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+    public static class InventoryEvents {
+        @SubscribeEvent
+        public static void onItemStackedOnOther(ItemStackedOnOtherEvent event) {
+            Player player = event.getPlayer();
+            ItemStack carried = event.getCarriedItem();
+            ItemStack stackedOn = event.getStackedOnItem();
+
+            ItemStack drill = ItemStack.EMPTY;
+            ItemStack snowball = ItemStack.EMPTY;
+
+            if (carried.is(Items.SNOWBALL) &&
+                stackedOn.getItem() instanceof SpikeDrillItem) {
+                snowball = carried;
+                drill = stackedOn;
+            } else if (carried.getItem() instanceof SpikeDrillItem &&
+                stackedOn.is(Items.SNOWBALL)) {
+                drill = carried;
+                snowball = stackedOn;
+            }
+
+            if (!drill.isEmpty() && !snowball.isEmpty() &&
+                event.getClickAction() == ClickAction.PRIMARY) {
+                if (getTemperature(drill) > 0) {
+                    addTemperature(drill, -20, player.level().getGameTime());
+                    
+                    if (!player.isCreative()) {
+                        snowball.shrink(1);
+                    }
+
+                    player.level().playSound(null, player.blockPosition(), 
+                        SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 1.0f, 1.0f);
+                    
+                    player.getCooldowns().addCooldown(ModItems.SPIKE_DRILL.get(), 20);
+                    
+                    event.setCanceled(true);
+                }
+            }
+        }
     }
 }
