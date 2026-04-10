@@ -4,6 +4,7 @@ import com.jeremyseq.inhabitants.entities.EntityUtil;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.ai.BogreAi;
 import com.jeremyseq.inhabitants.entities.bogre.ai.ShockwaveGoal;
+import com.jeremyseq.inhabitants.items.ModItems;
 
 import net.minecraft.tags.TagKey;
 import net.minecraft.core.BlockPos;
@@ -41,6 +42,8 @@ public class BogreUtil {
     private static boolean isWeapon(ItemStack stack) {
         if (stack.isEmpty()) return false;
         Item item = stack.getItem();
+
+        if (stack.is(ModItems.GIANT_BONE.get())) return false;
         
         if (stack.is(TAG_SWORDS) || stack.is(TAG_TRIDENTS) ||
         stack.is(TAG_BOWS) || stack.is(TAG_CROSSBOWS) ||
