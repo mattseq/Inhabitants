@@ -62,8 +62,7 @@ public class ModClientEvents {
             
             // track nearby entities for echo trail effect
             if (mc.level != null && mc.player != null &&
-                (mc.player.hasEffect(ModEffects.CONCUSSION.get()) ||
-                muffleLerp > 0.1F)) {
+                mc.player.hasEffect(ModEffects.CONCUSSION.get())) {
                 
                 float curYaw = mc.player.getYRot();
                 float curPitch = mc.player.getXRot();

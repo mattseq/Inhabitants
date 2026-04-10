@@ -46,8 +46,7 @@ public abstract class EntityRendererMixin<T extends Entity> {
         
         Minecraft mc = Minecraft.getInstance();
         if (mc.player != null &&
-            (mc.player.hasEffect(ModEffects.CONCUSSION.get()) ||
-            ModClientEvents.muffleLerp > 0.1F)) {
+            mc.player.hasEffect(ModEffects.CONCUSSION.get())) {
             
             List<GhostState> history = GhostTracker.getHistory(pEntity.getUUID());
 
