@@ -3,42 +3,35 @@ package com.jeremyseq.inhabitants.entities.javelin;
 import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.items.ModItems;
-import com.jeremyseq.inhabitants.debug.DevMode;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundSource;
+import net.minecraft.network.syncher.*;
+import net.minecraft.sounds.*;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
 
 import software.bernie.geckolib.animatable.GeoEntity;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.core.animation.AnimationController;
-import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.animatable.instance.*;
+import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.object.PlayState;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+
+import com.mojang.math.Axis;
+
+import org.joml.*;
 
 public class JavelinEntity extends AbstractArrow implements GeoEntity {
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
@@ -118,13 +111,11 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
 
         super.tick();
 
-        if (!this.level().isClientSide) {
-            if (this.inGround) {
-                if (bounceCooldown > 0) {
-                    bounceCooldown--;
-                } else {
-                    checkBounce();
-                }
+        if (this.inGround) {
+            if (bounceCooldown > 0) {
+                if (!this.level().isClientSide) bounceCooldown--;
+            } else {
+                checkBounce();
             }
         }
     }
@@ -135,23 +126,62 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
     }
 
     private void checkBounce() {
-        AABB box = this.getBoundingBox().inflate(0.2, 0.2, 0.2).move(0, 0.2, 0);
-        List<LivingEntity> entities = this.level().getEntitiesOfClass(LivingEntity.class, box);
+        float yRot = this.getYRot();
+        float xRot = this.getXRot();
+        
+        Vec3 tipRel = rotateJavelinVector(new Vec3(0, 0.5, 0), xRot, yRot);
+        Vec3 tailRel = rotateJavelinVector(new Vec3(0, -1.25, 0), xRot, yRot);
+        
+        Vec3 start = this.position().add(tipRel);
+        Vec3 end = this.position().add(tailRel);
+        
+        AABB broadBox = new AABB(start, end).inflate(1.2);
+        List<LivingEntity> entities = this.level().getEntitiesOfClass(LivingEntity.class, broadBox);
         
         for (LivingEntity entity : entities) {
-            if (entity.getDeltaMovement().y < 0) {
-                launch(entity);
-                break;
+            double dist = getDistanceToLine(entity.position(), start, end);
+            
+            if (dist < 0.75) {
+                if (entity.getDeltaMovement().y < 0) {
+                    if (!this.level().isClientSide) {
+                        launch(entity);
+                    }
+                    break;
+                }
             }
         }
     }
 
-    private void launch(LivingEntity entity) {
-        entity.setDeltaMovement(entity.getDeltaMovement().x,
-        0.85,
-        entity.getDeltaMovement().z);
+    private Vec3 rotateJavelinVector(Vec3 v, float xRot, float yRot) {
+        Quaternionf qY = Axis.YP.rotationDegrees(yRot - 90.0f);
+        Quaternionf qZ = Axis.ZP.rotationDegrees(xRot - 90.0f);
+        Quaternionf total = qY.mul(qZ);
+        
+        Vector3f v3 = new Vector3f((float)v.x, (float)v.y, (float)v.z);
+        v3.rotate(total);
+        return new Vec3(v3.x(), v3.y(), v3.z());
+    }
 
-        entity.hurtMarked = true;
+    private double getDistanceToLine(Vec3 p, Vec3 start, Vec3 end) {
+        Vec3 line = end.subtract(start);
+        double lenSq = line.lengthSqr();
+        if (lenSq == 0) return p.distanceTo(start);
+        
+        double t = Math.max(0, Math.min(1, p.subtract(start).dot(line) / lenSq));
+        Vec3 projection = start.add(line.scale(t));
+        return p.distanceTo(projection);
+    }
+
+    private void launch(LivingEntity entity) {
+        entity.setDeltaMovement(entity.getDeltaMovement().x, 0.85, entity.getDeltaMovement().z);
+
+        if (entity instanceof Player player) {
+            player.hurtMarked = true;
+            player.hasImpulse = true;
+        } else {
+            entity.hurtMarked = true;
+        }
+
         entity.resetFallDistance();
         
         this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
@@ -200,13 +230,6 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
                 
                 int knockback = baseKnockback + Mth.floor(this.getCharge() * extraKnockback);
                 this.setKnockback(knockback);
-
-                if(DevMode.isEnabled()) {
-                    if (this.getOwner() instanceof Player player) {
-                        player.displayClientMessage(Component.literal("Damage: " + damage + " | Knockback: " + knockback)
-                            .withStyle(ChatFormatting.GOLD), true);
-                    }
-                }
 
                 if (living.hurt(damageSource, (float)damage)) {
                     if (knockback > 0) {
