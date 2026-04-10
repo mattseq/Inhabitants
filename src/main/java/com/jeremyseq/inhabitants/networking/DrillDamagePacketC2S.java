@@ -269,7 +269,7 @@ public class DrillDamagePacketC2S {
                     .addCooldown(drill.getItem(), overheatCooldownTicks);
 
                 player.displayClientMessage(
-                    Component.translatable("item.inhabitants.spike_drill.overheated")
+                    Component.translatable("tooltip.inhabitants.spike_drill.overheated")
                     .withStyle(ChatFormatting.RED), true);
 
                 level.playSound(
