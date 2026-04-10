@@ -33,6 +33,7 @@ public class ModSoundEvents {
     public static final RegistryObject<SoundEvent> IMPALER_SCREAM = registerSoundEvent("impaler.scream");
     public static final RegistryObject<SoundEvent> IMPALER_SPIKES = registerSoundEvent("impaler.spikes");
     public static final RegistryObject<SoundEvent> IMPALER_CONCUSSION = registerSoundEvent("impaler.concussion");
+    public static final RegistryObject<SoundEvent> IMPALER_HEAD_ATTACK = registerSoundEvent("block.impaler_head.attack");
 
     public static final RegistryObject<SoundEvent> BOGRE_SONG = registerSoundEvent("disc.bogre");
     public static final RegistryObject<SoundEvent> BOGRE_HAMMER_KNOCK = registerSoundEvent("bogre.hammer_knock");

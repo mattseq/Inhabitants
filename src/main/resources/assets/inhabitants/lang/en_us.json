@@ -23,6 +23,11 @@
   "item.inhabitants.swamp_lair_map": "Swamp Lair Map",
   "item.inhabitants.bogre_cauldron": "Bogre's Cauldron",
   "item.inhabitants.spike_drill": "Spike Drill",
+  "item.inhabitants.impaler_head": "Impaler Head",
+  "item.inhabitants.dripstone_impaler_head": "Dripstone Impaler Head",
+
+  "block.inhabitants.impaler_head": "Impaler Head",
+  "block.inhabitants.dripstone_impaler_head": "Dripstone Impaler Head",
 
 
   "tooltip.inhabitants.special_effect": "Special Ability",

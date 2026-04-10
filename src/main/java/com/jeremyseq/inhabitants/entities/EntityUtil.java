@@ -167,10 +167,18 @@ public class EntityUtil {
     }
 
     public static void screamParticles(ClientLevel level, Vec3 pos, Vec3 lookAngle, double screamSpeed) {
+        screamParticles(level, pos, lookAngle, screamSpeed, 0, 4.0);
+    }
+
+    public static void screamParticles(ClientLevel level, Vec3 pos, Vec3 lookAngle, double screamSpeed, double scale) {
+        screamParticles(level, pos, lookAngle, screamSpeed, scale, 4.0);
+    }
+
+    public static void screamParticles(ClientLevel level, Vec3 pos, Vec3 lookAngle, double screamSpeed, double scale, double forwardOffset) {
         lookAngle = new Vec3(lookAngle.x, 0, lookAngle.z).normalize();
-        pos = pos.add(lookAngle.scale(4));
+        pos = pos.add(lookAngle.scale(forwardOffset));
         float yaw = (float) Math.atan2(lookAngle.z, lookAngle.x);
-        level.addParticle(ModParticles.IMPALER_SCREAM.get(), pos.x, pos.y, pos.z, screamSpeed, yaw, 0);
+        level.addParticle(ModParticles.IMPALER_SCREAM.get(), pos.x, pos.y, pos.z, screamSpeed, yaw, scale);
     }
 
     public static boolean isInScreamBox(LivingEntity source, Entity target, double forwardDist, double sideDist, double heightDist) {

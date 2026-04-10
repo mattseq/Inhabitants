@@ -31,6 +31,8 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.DIMENSIONAL_SERVING.get());
                         pOutput.accept(ModItems.JAVELIN.get());
                         pOutput.accept(ModItems.SPIKE_DRILL.get());
+                        pOutput.accept(ModItems.IMPALER_HEAD.get());
+                        pOutput.accept(ModItems.DRIPSTONE_IMPALER_HEAD.get());
                     })
                     .build());
 

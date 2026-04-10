@@ -23,7 +23,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.monster.*;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -150,6 +150,13 @@ public class ImpalerEntity extends Monster implements GeoEntity {
     protected void dropCustomDeathLoot(@NotNull DamageSource source, int looting, boolean recentlyHit) {
         super.dropCustomDeathLoot(source, looting, recentlyHit);
         this.spawnAtLocation(new ItemStack(ModItems.IMPALER_SPIKE.get(), new Random().nextInt(2, 4)));
+
+        if (source.getEntity() instanceof Creeper creeper &&
+            creeper.isPowered()) {
+            
+            this.spawnAtLocation(this.getTextureType() == 1 ?
+                ModItems.DRIPSTONE_IMPALER_HEAD.get() : ModItems.IMPALER_HEAD.get());
+        }
     }
 
     @Override

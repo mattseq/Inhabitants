@@ -31,6 +31,9 @@ into 3 states `start`, `loop`, `end`
 - New Item: Javelin, Crafted diagonal Stick, Feather, Impaler Spike
 - New Item: Swamp Lair Map, Obtained by Cartographer Villager
 - New Item: Drill, Can be crafted in Crafting table
+- New 2 Items:
+  - Impaler Head: Obtained by charged Creeper explosion
+  - Dripstone Impaler Head: Obtained by charged Creeper explosion 
 - New Enchantment: Diamond tip, Raise drill speed to Diamond tier
 - New Enchantment: Thermal capacity, Increase thermal capacity twice
 - Giant bone: triggers shockwave by 25% chance on crit

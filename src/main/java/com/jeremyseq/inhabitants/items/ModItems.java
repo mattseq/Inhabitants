@@ -5,6 +5,7 @@ import com.jeremyseq.inhabitants.audio.ModSoundEvents;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.items.food.*;
 import com.jeremyseq.inhabitants.items.javelin.JavelinItem;
+import com.jeremyseq.inhabitants.blocks.ModBlocks;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -67,6 +68,12 @@ public class ModItems {
 
     public static final RegistryObject<Item> SPIKE_DRILL = ITEMS.register("spike_drill",
             () -> new SpikeDrillItem(new Item.Properties().defaultDurability(2342)));
+
+    public static final RegistryObject<Item> IMPALER_HEAD = ITEMS.register("impaler_head",
+            () -> new BlockItem(ModBlocks.IMPALER_HEAD.get(), new Item.Properties()));
+
+    public static final RegistryObject<Item> DRIPSTONE_IMPALER_HEAD = ITEMS.register("dripstone_impaler_head",
+            () -> new BlockItem(ModBlocks.DRIPSTONE_IMPALER_HEAD.get(), new Item.Properties()));
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
