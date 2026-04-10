@@ -29,7 +29,6 @@ public class CauldronScreen extends AbstractContainerScreen<CauldronMenu> {
     private final CauldronRecipeBook recipeBookComponent = new CauldronRecipeBook();
     private boolean widthTooNarrow;
     private boolean hasPlayedOpenSound = false;
-    private ImageButton tipButton;
     private ImageButton recipeButton;
     private GuiLayout bgLayout;
     
@@ -50,10 +49,8 @@ public class CauldronScreen extends AbstractContainerScreen<CauldronMenu> {
         this.titleLabelX = (this.imageWidth - this.font.width(this.title)) / 2;
 
         playOpenSound();
-        createTipButton();
         createRecipeButton();
 
-        this.addRenderableWidget(this.tipButton);
         this.addRenderableWidget(this.recipeButton);
         this.addRenderableWidget(this.recipeBookComponent);
     }
@@ -64,39 +61,6 @@ public class CauldronScreen extends AbstractContainerScreen<CauldronMenu> {
                 .play(SimpleSoundInstance.forUI(ModSoundEvents.CAULDRON_GUI_OPEN.get(), 1.0F, 1.0F));
             this.hasPlayedOpenSound = true;
         }
-    }
-
-    private void createTipButton() {
-        GuiLayout btn = new GuiLayout(this.leftPos, this.topPos,
-            this.imageWidth, this.imageHeight)
-            .width("14").height("14")
-            .margin(65, 9, 0, 0).align("right", "top");
-
-        this.tipButton = new ImageButton(
-                btn.x, btn.y, btn.width, btn.height, 0, 0, 0,
-                ModGuiTextures.TIP_BUTTON, 14, 14, (button) -> {
-                    // tips ? pfft..
-                    // kinda feel lazy doing it rn
-                    // TODO REMINDER: tip gui
-                }
-        ) {
-            @Override
-            public void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-                ResourceLocation texture = ModGuiTextures.TIP_BUTTON;
-                if (this.isHoveredOrFocused()) {
-                    boolean clicking = GLFW.glfwGetMouseButton(
-                        Minecraft.getInstance().getWindow().getWindow(),
-                        GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS;
-                    texture = clicking ? ModGuiTextures.TIP_BUTTON_PRESSED : ModGuiTextures.TIP_BUTTON_HIGHLIGHT;
-                }
-
-                RenderSystem.enableBlend();
-                guiGraphics.blit(texture, this.getX(), this.getY(), 0, 0,
-                    this.width, this.height, this.width, this.height);
-                
-                RenderSystem.disableBlend();
-            }
-        };
     }
 
     private void createRecipeButton() {
