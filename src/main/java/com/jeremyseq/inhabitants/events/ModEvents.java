@@ -107,12 +107,7 @@ public class ModEvents {
             TagKey<Structure> swampLairTag = TagKey.create(Registries.STRUCTURE,
                 ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "swamp_lair"));
 
-            int randomLevel = new Random().nextInt(4) + 2;
-            boolean chance = new Random().nextFloat() < 0.90f;
-
-            if(!chance) return;
-
-            List<VillagerTrades.ItemListing> trades = event.getTrades().get(randomLevel);
+            List<VillagerTrades.ItemListing> trades = event.getTrades().get(3);
 
             if (trades != null) {
                 trades.add(new SwampLairMapTrade(
