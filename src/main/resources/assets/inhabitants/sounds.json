@@ -492,13 +492,5 @@
     ],
     "volume": 1.0,
     "pitch": 1.0
-  },
-  "block.impaler_head.attack": {
-    "sounds": [
-      "inhabitants:entity/impaler/head/attack_01",
-      "inhabitants:entity/impaler/head/attack_02"
-    ],
-    "volume": 1.0,
-    "pitch": 1.0
   }
 }

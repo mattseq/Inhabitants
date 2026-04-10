@@ -1,15 +1,13 @@
 package com.jeremyseq.inhabitants.particles;
 
 import com.jeremyseq.inhabitants.Inhabitants;
-import net.minecraft.core.particles.ParticleType;
-import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.core.particles.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraftforge.registries.*;
 
 @Mod.EventBusSubscriber(modid = Inhabitants.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ModParticles {
@@ -61,6 +59,5 @@ public class ModParticles {
         evt.registerSpriteSet(ModParticles.SONIC_WAVE.get(), SonicWaveParticle.Factory::new);
         evt.registerSpriteSet(ModParticles.SHOCKWAVE.get(), ShockwaveParticle.Factory::new);
         evt.registerSpriteSet(ModParticles.ABRACADABRA.get(), AbracadabraParticle.Factory::new);
-        evt.registerSpriteSet(ModParticles.IMPALER_HEAD_ATTACK.get(), ImpalerHeadAttackParticle.Factory::new);
     }
 }

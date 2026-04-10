@@ -229,14 +229,6 @@
 						}
 					}
 				}
-			},
-			"sound_effects": {
-				"0.0417": {
-					"effect": "attack_sound"
-				}
-			},
-			"timeline": {
-				"0.25": "trigger_attack;"
 			}
 		}
 	}

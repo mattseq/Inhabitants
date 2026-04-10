@@ -9,7 +9,6 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.*;
 import net.minecraft.world.level.block.state.properties.*;
-import net.minecraft.sounds.*;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
@@ -43,22 +42,12 @@ public class ImpalerHeadBlock extends BaseEntityBlock {
     @Override
     public @NotNull InteractionResult use(
             @NotNull BlockState pState,
-            Level pLevel,
+            @NotNull Level pLevel,
             @NotNull BlockPos pPos,
             @NotNull Player pPlayer,
             @NotNull InteractionHand pHand,
             @NotNull BlockHitResult pHit
     ) {
-        if (pLevel.getBlockEntity(pPos) instanceof ImpalerHeadBlockEntity be) {
-            boolean wasMuted = be.isMuted();
-            be.setMuted(!wasMuted);
-
-            float pitch = wasMuted ? 1.2f : 0.8f;
-            pLevel.playSound(pPlayer, pPos,
-                SoundEvents.DISPENSER_DISPENSE, SoundSource.BLOCKS, 0.5f, pitch);
-
-            return InteractionResult.sidedSuccess(pLevel.isClientSide);
-        }
         return InteractionResult.PASS;
     }
 
