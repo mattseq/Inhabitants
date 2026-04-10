@@ -44,6 +44,7 @@ into 3 states `start`, `loop`, `end`
 - JEI Compatibility for Cooking, Carving & Transformation recipes
 - New textures for Impaler
 - FPV animations system by JSON's
+- New Cauldron textures
 
 ### Bugs & Fix's
 **Impaler**
