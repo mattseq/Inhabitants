@@ -213,7 +213,7 @@
   "bogre.deposit_in_chest": {
     "sounds": [
       {
-        "name": "inhabitants:entity/bogre/nautral/deposit_in_chest",
+        "name": "inhabitants:entity/bogre/neutral/deposit_in_chest",
         "weight": 1
       }
     ],
