@@ -23,7 +23,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.*;
-import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.inventory.*;
+import net.minecraft.world.entity.SlotAccess;
 
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.common.ForgeMod;
@@ -47,12 +48,12 @@ public class SpikeDrillItem extends PickaxeItem {
     private static final Map<UUID, Long> clientLastUseTicks = new HashMap<>();
 
     private static final int ticksPerSecond = 20;
-    private static final int missTicks = 5;
+    private static final int maxMissTicks = 5;
     private static final int overheatCooldownTicks = 2 * ticksPerSecond;
     private static final int snowballCooldownTicks = ticksPerSecond;
     private static final int useDurationTicks = 60 * 60 * ticksPerSecond;
     
-    private static final int drillPacketInterval = 1;
+    private static final int drillPacketInterval = 2;
 
     public SpikeDrillItem(Properties properties) {
         super(Tiers.IRON, 1, -2.8F, properties);
@@ -151,6 +152,11 @@ public class SpikeDrillItem extends PickaxeItem {
         int count
     ) {
         if (entity instanceof Player player) {
+            if (!level.isClientSide) {
+                stack.getOrCreateTag()
+                    .putLong(TAG_LAST_USED, level.getGameTime());
+            }
+
             BlockHitResult hit = getPlayerPOVHitResult(
                 level,
                 player,
@@ -165,7 +171,7 @@ public class SpikeDrillItem extends PickaxeItem {
             if (!overBlock || !inReach) {
                 int missTicks = stack.getOrCreateTag().getInt("drill_missTicks") + 1;
 
-                if (missTicks > missTicks) {
+                if (missTicks > maxMissTicks) {
                     player.releaseUsingItem();
                     stack.getOrCreateTag().putInt("drill_missTicks", 0);
                     return;
@@ -255,6 +261,30 @@ public class SpikeDrillItem extends PickaxeItem {
         
         if (!level.isClientSide) {
             DrillDamagePacketC2S.clearMomentum(entityLiving);
+            stack.getOrCreateTag()
+                .putLong(TAG_LAST_USED, level.getGameTime());
+        }
+    }
+
+    @Override
+    public void inventoryTick(
+        @NotNull ItemStack stack,
+        Level level,
+        @NotNull Entity entity,
+        int slotId,
+        boolean isSelected
+    ) {
+        if (level.isClientSide) return;
+
+        int temperature = getTemperature(stack);
+        if (temperature > 0) {
+            long lastUsed = stack.getOrCreateTag().getLong(TAG_LAST_USED);
+            long currentTime = level.getGameTime();
+            long elapsed = currentTime - lastUsed;
+
+            if (elapsed >= 60 && (elapsed - 60) % 20 == 0) {
+                setTemperature(stack, temperature - 1);
+            }
         }
     }
 
@@ -280,7 +310,6 @@ public class SpikeDrillItem extends PickaxeItem {
         consumer.accept(new IClientItemExtensions() {
             private boolean wasOverheated = false;
             private boolean initialized = false;
-            private long miningStartTick = -1;
 
             private void init(Player player) {
                 if (initialized) return;
@@ -406,45 +435,50 @@ public class SpikeDrillItem extends PickaxeItem {
         tooltipComponents.add(Component.literal(" "));
     }
 
-    @Mod.EventBusSubscriber(modid = Inhabitants.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-    public static class InventoryEvents {
-        @SubscribeEvent
-        public static void onItemStackedOnOther(ItemStackedOnOtherEvent event) {
-            Player player = event.getPlayer();
-            ItemStack carried = event.getCarriedItem();
-            ItemStack stackedOn = event.getStackedOnItem();
+    @Override
+    public boolean overrideStackedOnOther(
+        ItemStack stack,
+        Slot slot,
+        ClickAction action,
+        Player player
+    ) {
+        ItemStack other = slot.getItem();
+        if (other.is(Items.SNOWBALL) && getTemperature(stack) > 0) {
+            if (!player.getCooldowns().isOnCooldown(this)) {
+                addTemperature(stack, -30, player.level().getGameTime());
+                if (!player.isCreative()) other.shrink(1);
 
-            ItemStack drill = ItemStack.EMPTY;
-            ItemStack snowball = ItemStack.EMPTY;
-
-            if (carried.is(Items.SNOWBALL) &&
-                stackedOn.getItem() instanceof SpikeDrillItem) {
-                snowball = carried;
-                drill = stackedOn;
-            } else if (carried.getItem() instanceof SpikeDrillItem &&
-                stackedOn.is(Items.SNOWBALL)) {
-                drill = carried;
-                snowball = stackedOn;
-            }
-
-            if (!drill.isEmpty() && !snowball.isEmpty() &&
-                event.getClickAction() == ClickAction.PRIMARY &&
-                !player.getCooldowns().isOnCooldown(drill.getItem())) {
-                if (getTemperature(drill) > 0) {
-                    addTemperature(drill, -20, player.level().getGameTime());
-                    
-                    if (!player.isCreative()) {
-                        snowball.shrink(1);
-                    }
-
-                    player.level().playSound(null, player.blockPosition(), 
+                player.level().playSound(null, player.blockPosition(),
                         SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 1.0f, 1.0f);
-                    
-                    player.getCooldowns().addCooldown(ModItems.SPIKE_DRILL.get(), 20);
-                    
-                    event.setCanceled(true);
-                }
+                player.getCooldowns().addCooldown(this, 20);
+                return true;
             }
         }
+        return false;
     }
+
+    @Override
+    public boolean overrideOtherStackedOnMe(
+            @NotNull ItemStack stack,
+            @NotNull ItemStack other,
+            @NotNull Slot slot,
+            @NotNull ClickAction action,
+            @NotNull Player player,
+            @NotNull SlotAccess access
+    ) {
+        if (other.is(Items.SNOWBALL) && getTemperature(stack) > 0) {
+            if (!player.getCooldowns().isOnCooldown(this)) {
+                addTemperature(stack, -30, player.level().getGameTime());
+                if (!player.isCreative()) other.shrink(1);
+
+                player.level().playSound(null, player.blockPosition(),
+                    SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 1.0f, 1.0f);
+                
+                player.getCooldowns().addCooldown(this, 20);
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
