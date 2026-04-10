@@ -4,10 +4,14 @@ import com.jeremyseq.inhabitants.effects.ModEffects;
 
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.BowlFoodItem;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.item.*;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 
-public class BakedBrainsItem extends BowlFoodItem {
+import org.jetbrains.annotations.NotNull;
+
+public class BakedBrainsItem extends Item {
     public BakedBrainsItem() {
         super(new Item.Properties().stacksTo(1).food(
                 new FoodProperties.Builder()
@@ -16,5 +20,16 @@ public class BakedBrainsItem extends BowlFoodItem {
                 .effect(() -> new MobEffectInstance(ModEffects.MONSTER_DISGUISE.get(), 2400, 0), 1.0f)
                 .alwaysEat()
                 .build()));
+    }
+
+    @Override
+    public @NotNull ItemStack finishUsingItem(@NotNull ItemStack stack, @NotNull Level level, @NotNull LivingEntity entity) {
+        super.finishUsingItem(stack, level, entity);
+        
+        if (!(entity instanceof Player player && player.getAbilities().instabuild)) {
+            return new ItemStack(Items.SKELETON_SKULL);
+        }
+        
+        return stack;
     }
 }
