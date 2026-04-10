@@ -70,10 +70,10 @@ public class ModItems {
             () -> new SpikeDrillItem(new Item.Properties().defaultDurability(2342)));
 
     public static final RegistryObject<Item> IMPALER_HEAD = ITEMS.register("impaler_head",
-            () -> new BlockItem(ModBlocks.IMPALER_HEAD.get(), new Item.Properties()));
+            () -> new BlockItem(ModBlocks.IMPALER_HEAD.get(), new Item.Properties().rarity(Rarity.UNCOMMON)));
 
     public static final RegistryObject<Item> DRIPSTONE_IMPALER_HEAD = ITEMS.register("dripstone_impaler_head",
-            () -> new BlockItem(ModBlocks.DRIPSTONE_IMPALER_HEAD.get(), new Item.Properties()));
+            () -> new BlockItem(ModBlocks.DRIPSTONE_IMPALER_HEAD.get(), new Item.Properties().rarity(Rarity.UNCOMMON)));
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
