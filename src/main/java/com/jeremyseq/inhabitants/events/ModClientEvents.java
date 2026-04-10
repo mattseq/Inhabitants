@@ -35,6 +35,7 @@ public class ModClientEvents {
     public static boolean isMuffled = false;
     private static boolean wasMuffled = false;
     private static boolean lastJumpState = false;
+    private static boolean lastSneakState = false;
     private static BlockPos lastPhasingPos = null;
     public static float muffleLerp = 0.0F;
     private static ModTickableSounds.ConcussionBuzz concussionBuzz = null;
@@ -148,8 +149,31 @@ public class ModClientEvents {
             }
 
             lastJumpState = currentJumpState;
+            
+            boolean currentSneakState = mc.player.isCrouching();
+            if (currentSneakState && !lastSneakState) {
+                if (isLocalPlayerInsideBlock(mc.player)) {
+                    double nudgeX = mc.player.getX();
+                    double nudgeY = mc.player.getY() - 0.4;
+                    double nudgeZ = mc.player.getZ();
+                    
+                    mc.player.setPos(
+                        nudgeX, 
+                        nudgeY, 
+                        nudgeZ
+                    );
+                    mc.player.setDeltaMovement(
+                        mc.player.getDeltaMovement().x, 
+                        -1.0, 
+                        mc.player.getDeltaMovement().z
+                    );
+                }
+            }
+            lastSneakState = currentSneakState;
+
         } else {
             lastJumpState = false;
+            lastSneakState = false;
         }
             
         // apply lowpass filter
@@ -289,6 +313,22 @@ public class ModClientEvents {
                 }
             }
         }
+    }
+
+    private static boolean isLocalPlayerInsideBlock(Player player) {
+        double px = player.getX();
+        double py = player.getY();
+        double pz = player.getZ();
+        
+        for (double dy : new double[]{0.1D, 0.8D, 1.62D}) {
+            BlockPos pos = BlockPos.containing(px, py + dy, pz);
+            if (!player.level().getBlockState(pos)
+                .getCollisionShape(player.level(), pos, CollisionContext.empty())
+                .isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

@@ -27,6 +27,7 @@ import software.bernie.geckolib.core.object.PlayState;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.Math;
 import java.util.List;
 
 import com.mojang.math.Axis;

@@ -53,12 +53,10 @@ public class ImmaterialMixin {
                         double shapeMaxY = shape.max(Direction.Axis.Y) + pPos.getY();
 
                         // if Player is strictly above the block, preserve floor collision
-                        if (player.getY() >= shapeMaxY - 0.001)
+                        double leniency = player.isCrouching() ? 0.05 : 0.001;
+                        if (player.getY() >= shapeMaxY - leniency)
                             return;
                         // if Player is strictly below the block, preserve ceiling collision
-                        if (player.getBoundingBox().maxY <= shapeMinY + 0.001)
-                            return;
-                        
                         BlockPos wallFootPos = new BlockPos(
                             pPos.getX(), 
                             (int)Math.floor(player.getY()), 

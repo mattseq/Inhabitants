@@ -61,16 +61,24 @@ public class ModEvents {
         if (isSneaking && !wasSneaking) {
             // Only descend if we are actually phasing inside a solid block
             if (isInsideBlock(player)) {
-                BlockPos targetPos = BlockPos.containing(
-                    player.getX(), 
-                    player.getY() - 1.0, 
-                    player.getZ());
+                double nudgeX = player.getX();
+                double nudgeY = player.getY() - 0.4;
+                double nudgeZ = player.getZ();
+
+                BlockPos targetPos = BlockPos.containing(nudgeX, nudgeY, nudgeZ);
                 if (!player.level().getBlockState(targetPos).is(Blocks.BEDROCK)) {
                     player.teleportTo(
-                        player.getX(),
-                        player.getY() - 1.0,
-                        player.getZ()
+                        nudgeX, 
+                        nudgeY, 
+                        nudgeZ
                     );
+                    player.setDeltaMovement(
+                        player.getDeltaMovement().x, 
+                        -1.0, 
+                        player.getDeltaMovement().z
+                    );
+                    
+                    player.hurtMarked = true;
                 }
             }
         }
