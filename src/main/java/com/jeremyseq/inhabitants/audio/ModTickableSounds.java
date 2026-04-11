@@ -61,4 +61,36 @@ public class ModTickableSounds {
             }
         }
     }
+
+    public static class ImmaterialInsideLoop extends AbstractTickableSoundInstance {
+        private final Player player;
+
+        public ImmaterialInsideLoop(Player player) {
+            super(ModSoundEvents.IMMATERIAL_INSIDE.get(),
+                SoundSource.AMBIENT,
+                SoundInstance.createUnseededRandom());
+            this.player = player;
+            this.looping = true;
+            this.delay = 0;
+            this.volume = 5.0F;
+            this.pitch = 1.0F;
+            this.relative = true;
+        }
+
+        @Override
+        public void tick() {
+            if (!player.isAlive() ||
+                !player.hasEffect(ModEffects.IMMATERIAL.get())) {
+                this.stop();
+            }
+        }
+
+        public void stopSound() {
+            this.stop();
+        }
+
+        public void setVolume(float volume) {
+            this.volume = volume;
+        }
+    }
 }

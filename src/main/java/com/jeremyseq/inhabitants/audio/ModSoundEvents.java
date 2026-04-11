@@ -45,6 +45,7 @@ public class ModSoundEvents {
     public static final RegistryObject<SoundEvent> REVERSE_GROWTH = registerSoundEvent("effects.reverse_growth");
     public static final RegistryObject<SoundEvent> IMMATERIAL_ENTER_WALL = registerSoundEvent("immaterial.enter_wall");
     public static final RegistryObject<SoundEvent> IMMATERIAL_EXIT_WALL = registerSoundEvent("immaterial.exit_wall");
+    public static final RegistryObject<SoundEvent> IMMATERIAL_INSIDE = registerSoundEvent("immaterial.inside");
     public static final RegistryObject<SoundEvent> CONCUSSION_BUZZ = registerSoundEvent("concussion.buzz");
     
     public static final RegistryObject<SoundEvent> JAVELIN_AIMING = registerSoundEvent("item.javelin_aiming");

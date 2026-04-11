@@ -417,6 +417,16 @@
     "volume": 0.8,
     "pitch": 1.0
   },
+  "immaterial.inside": {
+    "sounds": [
+      {
+        "name": "inhabitants:effects/immaterial_inside",
+        "stream": true
+      }
+    ],
+    "volume": 1.0,
+    "pitch": 1.0
+  },
   "concussion.buzz": {
     "sounds": [
       {
