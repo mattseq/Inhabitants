@@ -4,7 +4,7 @@
   "entity.inhabitants.warped_clam": "محارة ملتوية",
   "entity.inhabitants.impaler": "المخوزق",
 
-  "creativetab.inhabitants_tab": "inhabitants",
+  "creativetab.inhabitants_tab": "السكان",
 
   "item.inhabitants.bogre_spawn_egg": "بيضة ظهور بوجر",
   "item.inhabitants.giant_bone": "عظمة عملاقة",
@@ -17,7 +17,7 @@
   "item.inhabitants.baked_brains": "أدمغة مخبوزة",
   "item.inhabitants.dimensional_serving": "وجبة بعدية",
   "item.inhabitants.music_disc_bogre": "قرص موسيقي",
-  "item.inhabitants.music_disc_bogre.desc": "موسيقى BoboTweaks - الناسك",
+  "item.inhabitants.music_disc_bogre.desc": "BoboTweaks - Hermit",
   "item.inhabitants.javelin": "رمح",
   "item.inhabitants.swamp_lair_map": "خريطة وكر المستنقع",
   "item.inhabitants.bogre_cauldron": "مرجل بوجر",
@@ -65,8 +65,8 @@
   "subtitles.inhabitants.shockwave": "موجة صادمة",
   "subtitles.inhabitants.effects.reverse_growth": "نمو عكسي",
 
-  "key.categories.inhabitants": "inhabitants",
-  "key.inhabitants_key": "القدرة الخاصة لـ inhabitants",
+  "key.categories.inhabitants": "السكان",
+  "key.inhabitants_key": "القدرة الخاصة لـ السكان",
 
   "painting.inhabitants.my_precious.title": "عزيزي",
   "painting.inhabitants.my_precious.author": "Catalyst",
