@@ -1,12 +1,6 @@
 {
   "variants": {
-    "facing=north,powered=false": { "model": "inhabitants:block/dripstone_impaler_head" },
-    "facing=south,powered=false": { "model": "inhabitants:block/dripstone_impaler_head" },
-    "facing=east,powered=false":  { "model": "inhabitants:block/dripstone_impaler_head" },
-    "facing=west,powered=false":  { "model": "inhabitants:block/dripstone_impaler_head" },
-    "facing=north,powered=true":  { "model": "inhabitants:block/dripstone_impaler_head" },
-    "facing=south,powered=true":  { "model": "inhabitants:block/dripstone_impaler_head" },
-    "facing=east,powered=true":   { "model": "inhabitants:block/dripstone_impaler_head" },
-    "facing=west,powered=true":   { "model": "inhabitants:block/dripstone_impaler_head" }
+    "powered=false": { "model": "inhabitants:block/impaler_head" },
+    "powered=true":  { "model": "inhabitants:block/impaler_head" }
   }
 }

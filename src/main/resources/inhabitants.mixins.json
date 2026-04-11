@@ -12,7 +12,8 @@
     "LivingEntityMixin",
     "LivingEntityMixin$LivingEntityAccessor",
     "ImmaterialMixin$Physics",
-    "ConcussionMixins$Movement"
+    "ConcussionMixins$Movement",
+    "NoteBlockMixin"
   ],
   "client": [
     "SubtitleOverlayMixin",

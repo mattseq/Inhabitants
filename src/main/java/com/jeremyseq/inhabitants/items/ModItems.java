@@ -9,15 +9,13 @@ import com.jeremyseq.inhabitants.blocks.ModBlocks;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
+import net.minecraft.core.Direction;
 
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraftforge.registries.*;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -70,10 +68,16 @@ public class ModItems {
             () -> new SpikeDrillItem(new Item.Properties().defaultDurability(2342)));
 
     public static final RegistryObject<Item> IMPALER_HEAD = ITEMS.register("impaler_head",
-            () -> new BlockItem(ModBlocks.IMPALER_HEAD.get(), new Item.Properties().rarity(Rarity.UNCOMMON)));
+            () -> new StandingAndWallBlockItem(ModBlocks.IMPALER_HEAD.get(),
+            ModBlocks.IMPALER_WALL_HEAD.get(),
+            new Item.Properties().rarity(Rarity.UNCOMMON),
+            Direction.DOWN));
 
     public static final RegistryObject<Item> DRIPSTONE_IMPALER_HEAD = ITEMS.register("dripstone_impaler_head",
-            () -> new BlockItem(ModBlocks.DRIPSTONE_IMPALER_HEAD.get(), new Item.Properties().rarity(Rarity.UNCOMMON)));
+            () -> new StandingAndWallBlockItem(ModBlocks.DRIPSTONE_IMPALER_HEAD.get(),
+            ModBlocks.DRIPSTONE_IMPALER_WALL_HEAD.get(),
+            new Item.Properties().rarity(Rarity.UNCOMMON),
+            Direction.DOWN));
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

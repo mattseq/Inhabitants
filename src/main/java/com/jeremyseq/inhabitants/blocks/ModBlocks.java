@@ -2,16 +2,15 @@ package com.jeremyseq.inhabitants.blocks;
 
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.items.ModItems;
-import com.jeremyseq.inhabitants.blocks.impaler_head.ImpalerHeadBlock;
+import com.jeremyseq.inhabitants.blocks.impaler_head.*;
 
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraftforge.registries.*;
 
 import java.util.function.Supplier;
 
@@ -26,12 +25,26 @@ public class ModBlocks
 
     public static final RegistryObject<Block> IMPALER_HEAD = registerBlock(
             "impaler_head",
-            () -> new ImpalerHeadBlock(Block.Properties.of().strength(1.5F, 1.5F).noOcclusion())
+            () -> new ImpalerHeadBlock(Block.Properties.of().strength(1.5F, 1.5F)
+            .noOcclusion().instrument(NoteBlockInstrument.CUSTOM_HEAD))
     );
 
     public static final RegistryObject<Block> DRIPSTONE_IMPALER_HEAD = registerBlock(
             "dripstone_impaler_head",
-            () -> new ImpalerHeadBlock(Block.Properties.of().strength(1.5F, 1.5F).noOcclusion())
+            () -> new ImpalerHeadBlock(Block.Properties.of().strength(1.5F, 1.5F)
+            .noOcclusion().instrument(NoteBlockInstrument.CUSTOM_HEAD))
+    );
+
+    public static final RegistryObject<Block> IMPALER_WALL_HEAD = registerBlock(
+            "impaler_wall_head",
+            () -> new ImpalerWallHeadBlock(Block.Properties.of().strength(1.5F, 1.5F)
+            .noOcclusion().instrument(NoteBlockInstrument.CUSTOM_HEAD))
+    );
+
+    public static final RegistryObject<Block> DRIPSTONE_IMPALER_WALL_HEAD = registerBlock(
+            "dripstone_impaler_wall_head",
+            () -> new ImpalerWallHeadBlock(Block.Properties.of().strength(1.5F, 1.5F)
+            .noOcclusion().instrument(NoteBlockInstrument.CUSTOM_HEAD))
     );
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {

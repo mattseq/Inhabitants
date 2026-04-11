@@ -11,21 +11,23 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
+import net.minecraft.resources.ResourceLocation;
 
-import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.*;
 
 import java.util.List;
 
 public class ImpalerHeadBlockEntity extends BlockEntity implements GeoBlockEntity {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private int attackTimer = -1;
+    private ResourceLocation noteBlockSound = ResourceLocation
+        .fromNamespaceAndPath("inhabitants", "impaler.idle");
 
     public ImpalerHeadBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntities.IMPALER_HEAD_BLOCK_ENTITY.get(), pPos, pBlockState);
@@ -34,7 +36,7 @@ public class ImpalerHeadBlockEntity extends BlockEntity implements GeoBlockEntit
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "attack_controller", 0, state -> {
-            if (state.getAnimatable().getBlockState().getValue(ImpalerHeadBlock.POWERED)) {
+            if (state.getAnimatable().getBlockState().getValue(AbstractImpalerHeadBlock.POWERED)) {
                 return state.setAndContinue(RawAnimation.begin().thenLoop("attack"));
             }
             return PlayState.STOP;
@@ -49,11 +51,27 @@ public class ImpalerHeadBlockEntity extends BlockEntity implements GeoBlockEntit
     @Override
     protected void saveAdditional(@NotNull CompoundTag pTag) {
         super.saveAdditional(pTag);
+        if (this.noteBlockSound != null) {
+            pTag.putString("note_block_sound", this.noteBlockSound.toString());
+        }
     }
 
     @Override
     public void load(@NotNull CompoundTag pTag) {
         super.load(pTag);
+        if (pTag.contains("note_block_sound", 8)) {
+            this.noteBlockSound = ResourceLocation
+                .tryParse(pTag.getString("note_block_sound"));
+        }
+    }
+
+    @Nullable
+    public ResourceLocation getNoteBlockSound() {
+        return this.noteBlockSound;
+    }
+
+    public void setNoteBlockSound(@Nullable ResourceLocation pNoteBlockSound) {
+        this.noteBlockSound = pNoteBlockSound;
     }
 
     @Override
@@ -73,7 +91,7 @@ public class ImpalerHeadBlockEntity extends BlockEntity implements GeoBlockEntit
         BlockState state,
         ImpalerHeadBlockEntity blockEntity
     ) {
-        if (state.getValue(ImpalerHeadBlock.POWERED)) {
+        if (state.getValue(AbstractImpalerHeadBlock.POWERED)) {
             blockEntity.attackTimer++;
 
             if (blockEntity.attackTimer >= 13) {
@@ -92,16 +110,24 @@ public class ImpalerHeadBlockEntity extends BlockEntity implements GeoBlockEntit
         if (this.level == null || this.level.isClientSide) return;
 
         BlockState state = this.getBlockState();
-        if (state.getBlock() instanceof ImpalerHeadBlock) {
-            Direction facing = state.getValue(ImpalerHeadBlock.FACING);
-            BlockPos targetPos = this.worldPosition.relative(facing);
+        Direction facing;
+        
+        if (state.hasProperty(ImpalerWallHeadBlock.FACING)) {
+            facing = state.getValue(ImpalerWallHeadBlock.FACING);
+        } else if (state.hasProperty(ImpalerHeadBlock.ROTATION)) {
+            int rotation = state.getValue(ImpalerHeadBlock.ROTATION);
+            
+            facing = Direction.fromYRot(rotation * 22.5f);
+        } else {
+            return;
+        }
 
-            AABB area = new AABB(targetPos);
-            List<LivingEntity> entities = this.level.getEntitiesOfClass(LivingEntity.class, area);
+        BlockPos targetPos = this.worldPosition.relative(facing);
+        AABB area = new AABB(targetPos);
+        List<LivingEntity> entities = this.level.getEntitiesOfClass(LivingEntity.class, area);
 
-            for (LivingEntity entity : entities) {
-                entity.hurt(this.level.damageSources().magic(), 1.0F);
-            }
+        for (LivingEntity entity : entities) {
+            entity.hurt(this.level.damageSources().magic(), 1.0F);
         }
     }
 }

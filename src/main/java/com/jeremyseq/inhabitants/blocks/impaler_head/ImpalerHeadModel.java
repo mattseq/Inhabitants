@@ -9,6 +9,11 @@ import software.bernie.geckolib.model.GeoModel;
 public class ImpalerHeadModel extends GeoModel<ImpalerHeadBlockEntity> {
     @Override
     public ResourceLocation getModelResource(ImpalerHeadBlockEntity animatable) {
+        if (animatable.getBlockState().hasProperty(ImpalerWallHeadBlock.FACING)) {
+            return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID,
+                "geo/impaler_wall_head.geo.json");
+        }
+
         return ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID,
             "geo/impaler_head.geo.json");
     }
