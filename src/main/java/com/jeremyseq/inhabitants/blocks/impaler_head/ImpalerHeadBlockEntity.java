@@ -113,11 +113,11 @@ public class ImpalerHeadBlockEntity extends BlockEntity implements GeoBlockEntit
         Direction facing;
         
         if (state.hasProperty(ImpalerWallHeadBlock.FACING)) {
-            facing = state.getValue(ImpalerWallHeadBlock.FACING);
+            facing = state.getValue(ImpalerWallHeadBlock.FACING).getOpposite();
         } else if (state.hasProperty(ImpalerHeadBlock.ROTATION)) {
             int rotation = state.getValue(ImpalerHeadBlock.ROTATION);
             
-            facing = Direction.fromYRot(rotation * 22.5f);
+            facing = Direction.fromYRot(rotation * 22.5f).getOpposite();
         } else {
             return;
         }
