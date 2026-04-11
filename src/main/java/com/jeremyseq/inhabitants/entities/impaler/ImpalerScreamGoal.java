@@ -5,6 +5,7 @@ import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.entities.EntityUtil;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
 import com.jeremyseq.inhabitants.networking.TinnitusPacketS2C;
+import com.jeremyseq.inhabitants.damagesource.ModDamageTypes;
 
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
@@ -120,7 +121,7 @@ public class ImpalerScreamGoal extends Goal {
         // Knockback
         Vec3 knockbackDir = target.position().subtract(mob.position()).normalize();
         target.knockback(1.5, -knockbackDir.x, -knockbackDir.z);
-        target.hurt(mob.damageSources().mobAttack(mob), 4.0f);
+        target.hurt(ModDamageTypes.causeImpaledDamage(mob.level(), mob), 4.0f);
     }
 
     // make pointed dripstone attached to ceilings fall
