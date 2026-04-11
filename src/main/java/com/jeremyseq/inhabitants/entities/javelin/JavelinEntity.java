@@ -211,7 +211,7 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
 
     @Override
     protected boolean canHitEntity(@NotNull Entity pEntity) {
-        return super.canHitEntity(pEntity);
+        return super.canHitEntity(pEntity) && pEntity != this.getOwner();
     }
 
     @Override
