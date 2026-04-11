@@ -7,8 +7,7 @@ import com.jeremyseq.inhabitants.paintings.ModPaintings;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.enchantment.EnchantmentInstance;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.enchantment.*;
 
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -40,21 +39,25 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.DRIPSTONE_IMPALER_HEAD.get());
 
                         //ench
-                        pOutput.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(ModEnchantments.DIAMOND_TIP.get(), 1)));
-                        pOutput.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(ModEnchantments.THERMAL_CAPACITY.get(), 1)));
+                        addEnchantedBook(ModEnchantments.DIAMOND_TIP.get(), 1, pOutput);
+                        addEnchantedBook(ModEnchantments.THERMAL_CAPACITY.get(), 1, pOutput);
 
                         //paintings
-                        ItemStack myPrecious = new ItemStack(Items.PAINTING);
-                        ItemStack endermansLastDay = new ItemStack(Items.PAINTING);
-                        myPrecious.getOrCreateTagElement("EntityTag").putString("variant", ModPaintings.MY_PRECIOUS.getId().toString());
-                        endermansLastDay.getOrCreateTagElement("EntityTag").putString("variant", ModPaintings.ENDERMANS_LAST_DAY.getId().toString());
-
-                        pOutput.accept(myPrecious);
-                        pOutput.accept(endermansLastDay);
+                        addPainting(new ItemStack(Items.PAINTING), ModPaintings.MY_PRECIOUS.getId().toString(), pOutput);
+                        addPainting(new ItemStack(Items.PAINTING), ModPaintings.ENDERMANS_LAST_DAY.getId().toString(), pOutput);
                     })
                     .build());
 
     public static void register(IEventBus eventBus) {
         CREATIVE_MODE_TABS.register(eventBus);
+    }
+
+    private static void addPainting(ItemStack stack, String variant, CreativeModeTab.Output output) {
+        stack.getOrCreateTagElement("EntityTag").putString("variant", variant);
+        output.accept(stack);
+    }
+
+    private static void addEnchantedBook(Enchantment enchantment, int level, CreativeModeTab.Output output) {
+        output.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(enchantment, level)));
     }
 }
