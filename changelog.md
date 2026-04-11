@@ -45,6 +45,7 @@ into 3 states `start`, `loop`, `end`
 - New textures for Impaler
 - FPV animations system by JSON's
 - New Cauldron textures
+- New Damage source: Impaled
 
 ### Bugs & Fix's
 **Impaler**
