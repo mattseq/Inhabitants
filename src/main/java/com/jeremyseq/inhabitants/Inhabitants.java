@@ -19,6 +19,13 @@ import com.jeremyseq.inhabitants.items.SpikeDrillItem;
 import com.jeremyseq.inhabitants.animation.FPVAnimationManager;
 import com.jeremyseq.inhabitants.gui.*;
 import com.jeremyseq.inhabitants.enchantments.ModEnchantments;
+import com.jeremyseq.inhabitants.entities.bogre.render.BogreRenderer;
+import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronRenderer;
+import com.jeremyseq.inhabitants.entities.impaler.ImpalerRenderer;
+import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeRenderer;
+import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamRenderer;
+import com.jeremyseq.inhabitants.entities.javelin.JavelinRenderer;
+import com.jeremyseq.inhabitants.blocks.impaler_head.ImpalerHeadRenderer;
 
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
@@ -81,7 +88,10 @@ public class Inhabitants
 
     private void commonSetup(final FMLCommonSetupEvent event)
     {
-
+        event.enqueueWork(() -> {
+            DispenserBlock.registerBehavior(ModItems.IMPALER_SPIKE.get(),
+            new ImpalerSpikeDispenserBehavior());
+        });
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event)
@@ -108,9 +118,6 @@ public class Inhabitants
         public static void onClientSetup(FMLClientSetupEvent event)
         {
             event.enqueueWork(() -> {
-                DispenserBlock.registerBehavior(ModItems.IMPALER_SPIKE.get(),
-                new ImpalerSpikeDispenserBehavior());
-                
                 MenuScreens.register(ModMenuTypes.CAULDRON_MENU.get(),
                 CauldronScreen::new);
             });
@@ -164,6 +171,19 @@ public class Inhabitants
         @SubscribeEvent
         public static void onRegisterGuiOverlays(RegisterGuiOverlaysEvent event) {
             event.registerAboveAll("drill_heat", DrillHeatOverlay.HUD_DRILL_HEAT);
+        }
+
+        @SubscribeEvent
+        public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
+            event.registerEntityRenderer(ModEntities.BOGRE.get(), BogreRenderer::new);
+            event.registerEntityRenderer(ModEntities.BOGRE_CAULDRON.get(), BogreCauldronRenderer::new);
+            event.registerEntityRenderer(ModEntities.WARPED_CLAM.get(), WarpedClamRenderer::new);
+            event.registerEntityRenderer(ModEntities.IMPALER.get(), ImpalerRenderer::new);
+            event.registerEntityRenderer(ModEntities.IMPALER_SPIKE_PROJECTILE.get(), ImpalerSpikeRenderer::new);
+            event.registerEntityRenderer(ModEntities.JAVELIN.get(), JavelinRenderer::new);
+
+            event.registerBlockEntityRenderer(ModBlockEntities.IMPALER_HEAD_BLOCK_ENTITY.get(),
+                    context -> new ImpalerHeadRenderer());
         }
     }
 

@@ -2,18 +2,15 @@ package com.jeremyseq.inhabitants.blocks.entity;
 
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.blocks.ModBlocks;
-import com.jeremyseq.inhabitants.blocks.impaler_head.ImpalerHeadRenderer;
 import com.jeremyseq.inhabitants.blocks.impaler_head.ImpalerHeadBlockEntity;
 
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 
 import net.minecraftforge.eventbus.api.*;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.*;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
             DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, Inhabitants.MODID);
@@ -29,9 +26,4 @@ public class ModBlockEntities {
         BLOCK_ENTITIES.register(eventBus);
     }
 
-    @SubscribeEvent
-    public static void onClientSetup(FMLClientSetupEvent event) {
-        BlockEntityRenderers.register(IMPALER_HEAD_BLOCK_ENTITY.get(),
-                context -> new ImpalerHeadRenderer());
-    }
 }
