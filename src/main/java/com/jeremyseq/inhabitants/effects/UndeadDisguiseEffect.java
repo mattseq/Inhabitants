@@ -3,8 +3,8 @@ package com.jeremyseq.inhabitants.effects;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 
-public class MonsterDisguiseEffect extends MobEffect {
-    protected MonsterDisguiseEffect() {
+public class UndeadDisguiseEffect extends MobEffect {
+    protected UndeadDisguiseEffect() {
         super(MobEffectCategory.BENEFICIAL, 0x834418);
     }
 

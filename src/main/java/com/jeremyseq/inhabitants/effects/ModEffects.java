@@ -6,8 +6,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.world.effect.MobEffect;
 
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraftforge.registries.*;
 
 public class ModEffects {
     public static final DeferredRegister<MobEffect> EFFECTS =
@@ -16,8 +15,8 @@ public class ModEffects {
     public static final RegistryObject<MobEffect> CONCUSSION =
             EFFECTS.register("concussion", ConcussionEffect::new);
 
-    public static final RegistryObject<MobEffect> MONSTER_DISGUISE =
-            EFFECTS.register("monster_disguise", MonsterDisguiseEffect::new);
+    public static final RegistryObject<MobEffect> UNDEAD_DISGUISE =
+            EFFECTS.register("undead_disguise", UndeadDisguiseEffect::new);
 
     public static final RegistryObject<MobEffect> STICKY_LEGS =
             EFFECTS.register("sticky_legs", StickyLegsEffect::new);

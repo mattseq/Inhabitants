@@ -35,7 +35,7 @@
   "tooltip.inhabitants.spike_drill.temperature": "درجة الحرارة: %s / %s",
 
   "effect.inhabitants.concussion": "ارتجاج في المخ",
-  "effect.inhabitants.monster_disguise": "تنكر الوحش",
+  "effect.inhabitants.undead_disguise": "تنكر الموتى الأحياء",
   "effect.inhabitants.sticky_legs": "أرجل لزجة",
   "effect.inhabitants.reverse_growth": "نمو عكسي",
   "effect.inhabitants.immaterial": "غير مادي",
