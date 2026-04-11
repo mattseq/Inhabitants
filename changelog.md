@@ -46,6 +46,7 @@ into 3 states `start`, `loop`, `end`
 - FPV animations system by JSON's
 - New Cauldron textures
 - New Damage source: Impaled
+- Arabic language supported
 
 ### Bugs & Fix's
 **Impaler**
