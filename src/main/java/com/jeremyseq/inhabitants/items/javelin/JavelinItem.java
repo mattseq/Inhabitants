@@ -5,23 +5,18 @@ import com.jeremyseq.inhabitants.entities.javelin.JavelinEntity;
 
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.*;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.util.Mth;
 
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 
 import software.bernie.geckolib.animatable.GeoItem;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
+import software.bernie.geckolib.core.animatable.instance.*;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 
 import org.jetbrains.annotations.NotNull;
@@ -37,17 +32,7 @@ public class JavelinItem extends Item implements GeoItem {
 
     @Override
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(new IClientItemExtensions() {
-            private JavelinItemRenderer renderer;
-
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                if (this.renderer == null)
-                    this.renderer = new JavelinItemRenderer();
-
-                return this.renderer;
-            }
-        });
+        JavelinClient.initializeJavelinClient(consumer);
     }
 
     @Override public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {}

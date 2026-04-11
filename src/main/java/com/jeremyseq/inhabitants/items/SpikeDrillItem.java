@@ -1,14 +1,10 @@
 package com.jeremyseq.inhabitants.items;
 
-import com.jeremyseq.inhabitants.animation.FPVAnimationPlayer;
-import com.jeremyseq.inhabitants.audio.*;
 import com.jeremyseq.inhabitants.enchantments.ModEnchantments;
 import com.jeremyseq.inhabitants.networking.*;
-import com.jeremyseq.inhabitants.Inhabitants;
+import com.jeremyseq.inhabitants.util.ClientHooks;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.*;
@@ -19,8 +15,6 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.*;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.Mth;
-import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.*;
 import net.minecraft.world.inventory.*;
@@ -28,14 +22,8 @@ import net.minecraft.world.entity.SlotAccess;
 
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.event.ItemStackedOnOtherEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-
-import com.mojang.blaze3d.vertex.PoseStack;
 
 import org.jetbrains.annotations.*;
-
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -187,7 +175,8 @@ public class SpikeDrillItem extends PickaxeItem {
                 clientLastUseTicks.put(player.getUUID(), level.getGameTime());
 
                 int elapsed = useDurationTicks - count;
-                if (elapsed % drillPacketInterval == 0) {
+                if (elapsed % drillPacketInterval == 0 &&
+                    player.getUUID().equals(ClientHooks.getLocalPlayerUUID())) {
                     ModNetworking.sendToServer(new DrillDamagePacketC2S());
                 }
             }
@@ -288,6 +277,11 @@ public class SpikeDrillItem extends PickaxeItem {
         }
     }
 
+    @Override
+    public void initializeClient(@NotNull Consumer<IClientItemExtensions> consumer) {
+        SpikeDrillClient.initializeDrillClient(consumer);
+    }
+
     public static float calculatingDrillSpeed(Player player, ItemStack stack, float partialTick) {
         if (player == null) return 0f;
         
@@ -303,116 +297,6 @@ public class SpikeDrillItem extends PickaxeItem {
 
         float duration = (player.level().getGameTime() - start) + partialTick;
         return Math.min(1.0f, duration / (float) DrillDamagePacketC2S.RAMP_UP_TICKS);
-    }
-
-    @Override
-    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(new IClientItemExtensions() {
-            private boolean wasOverheated = false;
-            private boolean initialized = false;
-
-            private void init(Player player) {
-                if (initialized) return;
-                initialized = true;
-
-                FPVAnimationPlayer.INSTANCE.setTriggerCallback((id, p, arm, stack) -> {
-                    if ("inhabitants:drill_dig".equals(id)) {
-                        HitResult hit = Minecraft.getInstance().hitResult;
-
-                        if (hit instanceof BlockHitResult bhr) {
-                            BlockPos pos = bhr.getBlockPos();
-                            BlockState state = p.level().getBlockState(pos);
-                            SoundType soundType = state.getSoundType();
-                            
-                            float pitch = 1.0F;
-                            float volume = soundType.getVolume() - (0.75f * p.getRandom().nextFloat());
-
-                            p.level().playLocalSound(
-                                pos.getX(), pos.getY(), pos.getZ(),
-                                ModSoundEvents.DRILL_DIG.get(),
-                                SoundSource.BLOCKS,
-                                volume,
-                                pitch,
-                                false
-                            );
-                            
-                            for (int i = 0; i < 5; i++) {
-                                Minecraft.getInstance().particleEngine
-                                    .addBlockHitEffects(pos, bhr);
-                            }
-                        }
-                    } else if ("inhabitants:drill_start_sound".equals(id)) {
-
-                        p.level().playLocalSound(
-                            p.getX(), p.getY(), p.getZ(),
-                            ModSoundEvents.DRILL_START.get(), SoundSource.PLAYERS,
-                            0.25f, 1.0f, false);
-                        
-                    } else if ("inhabitants:drill_loop_sound".equals(id)) {
-                        if (ModTickableSounds.DrillLoop.currentSound == null ||
-                            ModTickableSounds.DrillLoop.currentSound.isStopped()) {
-                            
-                            ModTickableSounds.DrillLoop.currentSound = new ModTickableSounds.DrillLoop(p);
-                            Minecraft.getInstance().getSoundManager()
-                                .play(ModTickableSounds.DrillLoop.currentSound);
-                        }
-                    } else if ("inhabitants:drill_stop_sound".equals(id)) {
-                        if (ModTickableSounds.DrillLoop.currentSound != null) {
-
-                            ModTickableSounds.DrillLoop.currentSound.stopLoop();
-                            ModTickableSounds.DrillLoop.currentSound = null;
-                        }
-
-                        p.level().playLocalSound(
-                            p.getX(), p.getY(), p.getZ(),
-                            ModSoundEvents.DRILL_STOPPED.get(), SoundSource.PLAYERS,
-                            0.25f, 1.0f, false);
-                    }
-                });
-            }
-
-            @Override
-            public boolean applyForgeHandTransform(
-                PoseStack poseStack,
-                LocalPlayer player,
-                HumanoidArm arm,
-                ItemStack itemInHand,
-                float partialTick,
-                float equipProcess,
-                float swingProcess
-            ) {
-                init(player);
-
-                boolean isOverheated = SpikeDrillItem.getTemperature(itemInHand) >=
-                    SpikeDrillItem.getTemperatureMax(itemInHand);
-                
-                if (isOverheated && !wasOverheated) {
-                    FPVAnimationPlayer.INSTANCE.playOverridePhase(arm, "spike_drill_overheat");
-                }
-
-                wasOverheated = isOverheated;
-
-                float ratio = calculatingDrillSpeed(player, itemInHand, partialTick);
-                float speedMultiplier = 0.9f;
-                
-                if (ratio >= 0.1f) {
-                    float alpha = (ratio - 0.1f) / 0.9f;
-                    speedMultiplier = Mth.lerp(alpha, 0.9f, 1.5f);
-                }
-
-                FPVAnimationPlayer.INSTANCE.setSpeed(arm, speedMultiplier);
-
-                return FPVAnimationPlayer.INSTANCE.apply("spike_drill_start",
-                    poseStack,
-                    player,
-                    arm,
-                    itemInHand,
-                    partialTick,
-                    equipProcess,
-                    true
-                );
-            }
-        });
     }
     
     @Override

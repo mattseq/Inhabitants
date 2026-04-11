@@ -77,7 +77,12 @@ public class DrillDamagePacketC2S {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
             if (player != null) {
-                handleDamage(player);
+                ItemStack stack = player.getUseItem();
+                if (stack.getItem() instanceof SpikeDrillItem) {
+                    handleDamage(player);
+                } else {
+                    clearMomentum(player);
+                }
             }
         });
 
