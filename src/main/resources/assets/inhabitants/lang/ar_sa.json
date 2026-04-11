@@ -59,7 +59,7 @@
   "subtitles.inhabitants.impaler.hurt": "المخوزق يتألم",
   "subtitles.inhabitants.impaler.idle": "المخوزق يضحك",
   "subtitles.inhabitants.impaler.scream": "المخوزق يصرخ",
-  "subtitles.inhabitants.impaler.spikes": "المخوزق يفعل الأشواك",
+  "subtitles.inhabitants.impaler.spikes": "المخوزق يُنشّط أشواكه",
   "subtitles.inhabitants.impaler.concussion": "ارتجاج",
   "subtitles.inhabitants.inaudible": "[غير مسموع]",
   "subtitles.inhabitants.shockwave": "موجة صادمة",
@@ -73,7 +73,7 @@
   "painting.inhabitants.endermans_last_day.title": "اليوم الأخير للأندرمان",
   "painting.inhabitants.endermans_last_day.author": "Cucuber",
 
-  "gui.inhabitants.missing_heat_source": "يحتاج إلى مصدر حرارة (مثل النار)",
+  "gui.inhabitants.missing_heat_source": "يحتاج إلى مصدر حرارة (مثل نار المخيم)",
   "gui.inhabitants.jei.cooking": "طبخ بوجر (المرجل)",
   "gui.inhabitants.jei.transformation": "تحويل بوجر",
   "gui.inhabitants.jei.carving": "نحت بوجر",
