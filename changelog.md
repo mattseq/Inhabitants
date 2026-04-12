@@ -15,6 +15,7 @@ into 3 states `start`, `loop`, `end`
   - Smooth rotation + rotation value change depends on whether Bogre is in `Neutral`, `Aggressive`, or `Skilling` states 
 - Cooking, Carving & Transformation using JSON's, all recipes must be placed in `data/inhabitants/bogre_recipes/`
 - Taming is removed from the system
+
 **Skills & Recipes**
 - Cooking using `time_ticks` from recipes
 - Carving & Transformation uses `hammer_hits` from recipes
@@ -22,6 +23,7 @@ into 3 states `start`, `loop`, `end`
 - Cauldron GUI
   - Heat system + Feedbacks
   - Bogre will get aggressive in case a Player placed a non ingredient food
+  
 **Items**
 - Item Removed: Baneful potato
 - Item Adjusted: Dimensional snack → Dimensional serving + new effect [**Immaterial**]
@@ -38,6 +40,7 @@ into 3 states `start`, `loop`, `end`
 - New Enchantment: Thermal capacity, Increase thermal capacity twice
 - Giant bone: triggers shockwave by 25% chance on crit
 - New sprites for most of the items
+
 **Others**
 - New visual feedbacks for Concussion effect
 - Audio: new Lowpass filter, currently used in **Immaterial** & **Concussion** effects
