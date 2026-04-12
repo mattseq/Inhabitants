@@ -13,10 +13,10 @@ into 3 states `start`, `loop`, `end`
   - Shockwaves are avoidable by jumping if you time it well
   - Adjusted speeds, rotations, detections values
   - Smooth rotation + rotation value change depends on whether Bogre is in `Neutral`, `Aggressive`, or `Skilling` states 
-- Cooking, Carving & Transformation using JSON's, all recipes must be placed in `data/inhabitants/bogre_recipes/`
 - Taming is removed from the system
 
 **Skills & Recipes**
+- Cooking, Carving & Transformation using JSON's, all recipes must be placed in `data/inhabitants/bogre_recipes/`
 - Cooking using `time_ticks` from recipes
 - Carving & Transformation uses `hammer_hits` from recipes
 - New visuals feedback for Carving & Transformation skills
