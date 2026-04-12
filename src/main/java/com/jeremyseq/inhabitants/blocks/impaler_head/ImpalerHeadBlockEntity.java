@@ -12,6 +12,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.state.properties.RotationSegment;
 
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -109,21 +110,22 @@ public class ImpalerHeadBlockEntity extends BlockEntity implements GeoBlockEntit
     private void performAttack() {
         if (this.level == null || this.level.isClientSide) return;
 
-        BlockState state = this.getBlockState();
+        BlockPos pos = this.getBlockPos();
+        BlockState state = this.level.getBlockState(pos);
         Direction facing;
         
         if (state.hasProperty(ImpalerWallHeadBlock.FACING)) {
             facing = state.getValue(ImpalerWallHeadBlock.FACING).getOpposite();
         } else if (state.hasProperty(ImpalerHeadBlock.ROTATION)) {
             int rotation = state.getValue(ImpalerHeadBlock.ROTATION);
-            
-            facing = Direction.fromYRot(rotation * 22.5f).getOpposite();
+            facing = Direction.fromYRot(RotationSegment.convertToDegrees(rotation)).getOpposite();
         } else {
             return;
         }
 
-        BlockPos targetPos = this.worldPosition.relative(facing);
-        AABB area = new AABB(targetPos);
+        BlockPos targetPos = pos.relative(facing);
+        AABB area = new AABB(targetPos).inflate(0.25D);
+        
         List<LivingEntity> entities = this.level.getEntitiesOfClass(LivingEntity.class, area);
 
         for (LivingEntity entity : entities) {
