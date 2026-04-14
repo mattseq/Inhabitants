@@ -145,7 +145,8 @@ public class CauldronMenu extends RecipeBookMenu<Container> {
             if (cauldron != null && cauldron.isCooking()) {
                 boolean isRemoval = clickType == ClickType.PICKUP
                         || clickType == ClickType.QUICK_MOVE
-                        || clickType == ClickType.THROW;
+                        || clickType == ClickType.THROW
+                        || clickType == ClickType.SWAP;
                 if (isRemoval) {
                     cauldron.notifyTheft(player);
                 }
