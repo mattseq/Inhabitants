@@ -72,7 +72,7 @@ public class BogreCauldronEntity extends Entity implements GeoEntity, MenuProvid
     private final ItemStackHandler itemHandler = new ItemStackHandler(5) {
         @Override
         public int getSlotLimit(int slot) {
-            return 1;
+            return 16;
         }
     };
     private final LazyOptional<IItemHandler> optionalItemHandler =
@@ -427,9 +427,6 @@ public class BogreCauldronEntity extends Entity implements GeoEntity, MenuProvid
                 }
                 // consume container 4
                 itemHandler.getStackInSlot(4).shrink(1);
-
-                // put result in container slot 4, replaces the consumed container
-                itemHandler.setStackInSlot(4, result);
                 
                 level().playSound(null, blockPosition(), SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT,
                 SoundSource.BLOCKS, 1.0F, 0.8F);
