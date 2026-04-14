@@ -142,11 +142,14 @@ public class CauldronMenu extends RecipeBookMenu<Container> {
         // triggers Bogre to get angry if player try to remove ingredints while cooking
         if (slotId >= 0 && slotId < CONTAINER_SLOT + 1) { // 0-4 (ingredients + bowl)
             BogreCauldronEntity cauldron = getCauldronEntity();
-            if (cauldron != null && cauldron.isCooking()) {
-                boolean isRemoval = clickType == ClickType.PICKUP
+            if (cauldron != null) {
+
+                boolean isRemoval = (clickType == ClickType.PICKUP &&
+                    !this.getSlot(slotId).getItem().isEmpty())
                         || clickType == ClickType.QUICK_MOVE
                         || clickType == ClickType.THROW
                         || clickType == ClickType.SWAP;
+                
                 if (isRemoval) {
                     cauldron.notifyTheft(player);
                 }

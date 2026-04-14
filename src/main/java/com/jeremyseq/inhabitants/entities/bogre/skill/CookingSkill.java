@@ -83,16 +83,9 @@ public class CookingSkill extends BogreSkills.Skill {
             handleSkilling(bogre);
             return;
         }
-        
-        if (!bogre.getItemHeld().isEmpty()) {
-            if (state == BogreAi.SkillingState.MOVING_TO_TARGET) {
-                handleMovement(bogre);
-            }
-            return;
-        }
 
         // Bogre only cooks items already in the cauldron Gui
-        if (cauldron != null && cauldron.getItemCount() > 0) {
+        if (cauldron != null && cauldron.isReadyToCook()) {
             if (state == BogreAi.SkillingState.MOVING_TO_TARGET) {
                 handleMovement(bogre);
             }
@@ -172,6 +165,11 @@ public class CookingSkill extends BogreSkills.Skill {
         int startDuration = getAnimationDuration(Animation.START);
 
         if (bogre.getCookingTicks() == 0) {
+            if (!bogreCauldron_final.isReadyToCook()) {
+                finishSkill(bogre);
+                return;
+            }
+            
             bogre.getEntityData().set(BogreEntity.ANIMATION_PHASE, 0); // Start
             bogre.getEntityData().set(BogreEntity.COOKING_ANIM, true);
             bogreCauldron_final.setCooking(true);

@@ -374,19 +374,23 @@ public class BogreCauldronEntity extends Entity implements GeoEntity, MenuProvid
                 this.position(),
                 10,
                 bogre -> {
-                    boolean isSkillingAtThisCauldron = bogre.getAIState() == BogreAi.State.SKILLING && 
-                            bogre.cauldronPos != null && bogre.cauldronPos.distSqr(this.blockPosition()) < 4;
-                    return isSkillingAtThisCauldron || bogre.getAIState() == BogreAi.State.NEUTRAL;
+                    if (bogre.getAIState() != BogreAi.State.SKILLING) return false;
+                    if (bogre.cauldronPos == null || !bogre.cauldronPos.equals(this.blockPosition())) return false;
+                    
+                    BogreAi.SkillingState state = bogre.getCraftingState();
+                    return state == BogreAi.SkillingState.COOKING || state == BogreAi.SkillingState.MOVING_TO_TARGET;
                 }
         );
 
         if (closest.isPresent()) {
             BogreEntity bogre = closest.get();
+            BogreAi.SkillingState prevState = bogre.getCraftingState();
+
             if (bogre.getAIState() == BogreAi.State.SKILLING) {
                 bogre.getAi().interruptSkilling();
             }
 
-            if (!player.isCreative() && !player.isSpectator()) {
+            if (prevState == BogreAi.SkillingState.COOKING && !player.isCreative()) {
                 var attackGoal = bogre.getAttackGoal();
                 if (attackGoal != null) {
                     attackGoal.getAttackedByPlayers().add(player.getUUID());
