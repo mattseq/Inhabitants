@@ -37,15 +37,9 @@ public class CookingSkill extends BogreSkills.Skill {
     public int getDuration(BogreEntity bogre) {
         IBogreRecipe activeRecipe = bogre.getAi().getActiveRecipe();
         if (activeRecipe instanceof CookingRecipe cooking) {
-            return BogreSkillingGoal.COOKING_START_OFFSET +
-            getAnimationDuration(Animation.START) +
-            cooking.time_ticks() +
-            getAnimationDuration(Animation.END);
+            return cooking.time_ticks();
         }
-        return BogreSkillingGoal.COOKING_START_OFFSET +
-        getAnimationDuration(Animation.START) +
-        55 +
-        getAnimationDuration(Animation.END);
+        return 160;
     }
 
     @Override
