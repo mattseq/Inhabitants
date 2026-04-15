@@ -180,7 +180,9 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
                                    getDistanceToLine(midPos, start, end)));
             
             if (dist < 0.75) {
-                if (entity.getDeltaMovement().y < 0 || entity.onGround()) {
+                if (!entity.isCrouching() &&
+                (entity.getDeltaMovement().y < 0 || entity.onGround())) {
+                    
                     launch(entity);
                     break;
                 }
