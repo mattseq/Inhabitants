@@ -50,11 +50,13 @@ public class ModEvents {
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.phase == TickEvent.Phase.START) {
-            // immaterial sneak
+            Player player = event.player;
+            // immaterial movement
             if (ModEffects.IMMATERIAL.isPresent() && 
-                event.player.hasEffect(ModEffects.IMMATERIAL.get()) &&
-                !event.player.level().isClientSide) {
-                HandleImmaterialSneak(event.player);
+                player.hasEffect(ModEffects.IMMATERIAL.get()) &&
+                !player.level().isClientSide) {
+                
+                HandleImmaterialSneak(player);
             }
         }
     }
