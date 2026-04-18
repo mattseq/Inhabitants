@@ -6,7 +6,7 @@
   "biomes": "#inhabitants:has_structure/swamp_lair",
   "step": "surface_structures",
   "start_height": {
-    "absolute": 0
+    "absolute": -1
   },
   "project_start_to_heightmap": "WORLD_SURFACE_WG",
   "terrain_adaptation": "beard_thin",
