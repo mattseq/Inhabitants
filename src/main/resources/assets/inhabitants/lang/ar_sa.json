@@ -1,5 +1,6 @@
 {
   "entity.inhabitants.bogre": "بوجر",
+
   "entity.inhabitants.bogre_cauldron": "مرجل بوجر",
   "entity.inhabitants.warped_clam": "محارة ملتوية",
   "entity.inhabitants.impaler": "المخوزق",
@@ -27,6 +28,7 @@
 
   "block.inhabitants.impaler_head": "رأس المخوزق",
   "block.inhabitants.dripstone_impaler_head": "رأس المخوزق المنقط",
+
 
   "tooltip.inhabitants.special_effect": "قدرة خاصة",
   "tooltip.inhabitants.giant_bone": "فرصة بنسبة 25٪ لإحداث موجة صادمة عند الضربة القاضية.",
@@ -64,6 +66,21 @@
   "subtitles.inhabitants.inaudible": "[غير مسموع]",
   "subtitles.inhabitants.shockwave": "موجة صادمة",
   "subtitles.inhabitants.effects.reverse_growth": "نمو عكسي",
+  "subtitles.inhabitants.bogre.hammer_knock": "Hammer knocks",
+  "subtitles.inhabitants.bogre.carving_finish": "Carving finishes",
+  "subtitles.inhabitants.effects.immaterial.enter_wall": "Enters wall",
+  "subtitles.inhabitants.effects.immaterial.exit_wall": "Exits wall",
+  "subtitles.inhabitants.effects.immaterial.inside": "Inside wall",
+  "subtitles.inhabitants.effects.concussion.buzz": "[buzz]",
+  "subtitles.inhabitants.item.javelin.aiming": "Aiming javelin",
+  "subtitles.inhabitants.item.javelin.bounce": "Javelin bounces",
+  "subtitles.inhabitants.item.javelin.launch": "Javelin launches",
+  "subtitles.inhabitants.item.javelin.on_block_hit": "Javelin hits block",
+  "subtitles.inhabitants.item.javelin.on_entity_hit": "Javelin hits entity",
+  "subtitles.inhabitants.item.spike_drill.drilling_loop": "Spike drill drilling",
+  "subtitles.inhabitants.item.spike_drill.drilling_stopped": "Spike drill stopped drilling",
+  "subtitles.inhabitants.item.spike_drill.drilling_start": "Spike drill starts drilling",
+  "subtitles.inhabitants.item.spike_drill.drilling_dig": "Spike drill digs",
 
   "key.categories.inhabitants": "السكان",
   "key.inhabitants_key": "القدرة الخاصة لـ السكان",
@@ -74,6 +91,7 @@
   "painting.inhabitants.endermans_last_day.author": "Cucuber",
 
   "gui.inhabitants.missing_heat_source": "يحتاج إلى مصدر حرارة (مثل نار المخيم)",
+
   "gui.inhabitants.jei.cooking": "طبخ بوجر (المرجل)",
   "gui.inhabitants.jei.transformation": "تحويل بوجر",
   "gui.inhabitants.jei.carving": "نحت بوجر",
