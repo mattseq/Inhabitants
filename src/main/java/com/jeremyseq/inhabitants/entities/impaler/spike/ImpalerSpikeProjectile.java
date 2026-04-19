@@ -1,11 +1,14 @@
 package com.jeremyseq.inhabitants.entities.impaler.spike;
 
+import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.items.ModItems;
 import com.jeremyseq.inhabitants.damagesource.ModDamageTypes;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
 
 import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -93,7 +96,11 @@ public class ImpalerSpikeProjectile extends AbstractArrow implements GeoAnimatab
         DamageSource damagesource =
             ModDamageTypes.causeImpaledDamage(this.level(), this, shooter);
 
-        if (entity.hurt(damagesource, (float)i)) {
+        if (entity instanceof Player player) {
+            player.addEffect(new MobEffectInstance(ModEffects.CONCUSSION.get(), 100, 0));
+        }
+
+        if (entity.hurt(damagesource, (float) i)) {
             this.discard();
         } else {
             this.setDeltaMovement(this.getDeltaMovement().scale(-0.1D));
