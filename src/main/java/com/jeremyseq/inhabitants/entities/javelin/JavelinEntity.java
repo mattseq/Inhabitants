@@ -19,8 +19,6 @@ import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.*;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -236,6 +234,10 @@ public class JavelinEntity extends AbstractArrow implements GeoEntity {
         ModEvents.LAST_BOUNCE_TICKS.put(entity.getUUID(), this.level().getGameTime());
 
         if (!this.level().isClientSide) {
+            if (entity instanceof ServerPlayer serverPlayer) {
+                serverPlayer.connection.aboveGroundTickCount = 0;
+            }
+
             this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
                 ModSoundEvents.JAVELIN_BOUNCE.get(), SoundSource.NEUTRAL, 1.0f, 1.0f);
             

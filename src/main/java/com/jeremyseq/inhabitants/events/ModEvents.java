@@ -5,10 +5,8 @@ import com.jeremyseq.inhabitants.entities.bogre.skill.BogreSkills;
 import com.jeremyseq.inhabitants.effects.ModEffects;
 import com.jeremyseq.inhabitants.items.SpikeDrillItem;
 
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -63,28 +61,6 @@ public class ModEvents {
                 !player.level().isClientSide) {
                 
                 HandleImmaterialSneak(player);
-            }
-        }
-
-        if (event.phase == TickEvent.Phase.END && event.player instanceof ServerPlayer player) {
-            // prevent fly kick
-            Long lastBounce = LAST_BOUNCE_TICKS.get(player.getUUID());
-            if (lastBounce != null) {
-                if (player.onGround()) {
-                    if (player.getAbilities().mayfly &&
-                            player.gameMode.getGameModeForPlayer() != GameType.CREATIVE &&
-                            player.gameMode.getGameModeForPlayer() != GameType.SPECTATOR) {
-                        player.getAbilities().mayfly = false;
-                        player.onUpdateAbilities();
-                    }
-                    LAST_BOUNCE_TICKS.remove(player.getUUID());
-                    BOUNCE_COMBOS.remove(player.getUUID());
-                } else {
-                    if (!player.getAbilities().mayfly) {
-                        player.getAbilities().mayfly = true;
-                        player.onUpdateAbilities();
-                    }
-                }
             }
         }
     }
