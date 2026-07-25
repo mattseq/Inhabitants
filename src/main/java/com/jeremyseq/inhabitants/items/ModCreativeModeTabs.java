@@ -70,6 +70,9 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.IMPALER_HEAD_DRIPSTONE.get());
                         pOutput.accept(ModItems.IMPALER_HEAD_ALBINO.get());
                         pOutput.accept(ModItems.IMPALER_HEAD_FORLORN_HOLLOWS.get());
+                        pOutput.accept(ModItems.NIGHTMARE_SPAWN_EGG.get());
+                        pOutput.accept(ModItems.DREAD_CLOTH.get());
+                        pOutput.accept(ModItems.RIFTBLADE.get());
 
                         // misc special items
                         pOutput.accept(ModItems.MUSIC_DISC_BOGRE.get());

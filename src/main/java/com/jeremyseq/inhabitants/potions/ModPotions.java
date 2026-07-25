@@ -21,6 +21,10 @@ public class ModPotions {
             POTIONS.register("concussion", () ->
                     new Potion(new MobEffectInstance(ModEffects.CONCUSSION.get(), 300)));
 
+    public static final RegistryObject<Potion> PANIC_POTION =
+            POTIONS.register("panic", () ->
+                    new Potion(new MobEffectInstance(ModEffects.PANIC.get(), 300)));
+
     public static void register(IEventBus bus) {
         POTIONS.register(bus);
     }
@@ -34,6 +38,16 @@ public class ModPotions {
         ));
         BrewingRecipeRegistry.addRecipe(new SimpleBrewingRecipe(
                 Items.LINGERING_POTION, Potions.AWKWARD, ModItems.IMPALER_SPIKE.get(), ModPotions.CONCUSSION_POTION.get()
+        ));
+
+        BrewingRecipeRegistry.addRecipe(new SimpleBrewingRecipe(
+                Items.POTION, Potions.AWKWARD, ModItems.DREAD_CLOTH.get(), ModPotions.PANIC_POTION.get()
+        ));
+        BrewingRecipeRegistry.addRecipe(new SimpleBrewingRecipe(
+                Items.SPLASH_POTION, Potions.AWKWARD, ModItems.DREAD_CLOTH.get(), ModPotions.PANIC_POTION.get()
+        ));
+        BrewingRecipeRegistry.addRecipe(new SimpleBrewingRecipe(
+                Items.LINGERING_POTION, Potions.AWKWARD, ModItems.DREAD_CLOTH.get(), ModPotions.PANIC_POTION.get()
         ));
     }
 }

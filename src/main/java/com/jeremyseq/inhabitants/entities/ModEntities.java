@@ -6,13 +6,13 @@ import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEnti
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeProjectile;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
 import com.jeremyseq.inhabitants.entities.impaler.arrow.ConcussionArrowProjectile;
+import com.jeremyseq.inhabitants.entities.nightmare.NightmareEntity;
+import com.jeremyseq.inhabitants.entities.nightmare.slash_projectile.SlashProjectile;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamEntity;
 import com.jeremyseq.inhabitants.entities.javelin.JavelinEntity;
-
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -74,10 +74,27 @@ public class ModEntities {
                             .updateInterval(20)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "concussion_arrow").toString()));
 
+    public static final RegistryObject<EntityType<NightmareEntity>> NIGHTMARE =
+            REGISTRY.register("nightmare",
+                    () -> EntityType.Builder.<NightmareEntity>of(NightmareEntity::new, MobCategory.MONSTER)
+                            .sized(1, 2.0f)
+                            .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "nightmare").toString()));
+
+    public static final RegistryObject<EntityType<SlashProjectile>> SLASH_PROJECTILE =
+            REGISTRY.register("slash_projectile",
+                    () -> EntityType.Builder.<SlashProjectile>of(
+                                    SlashProjectile::new, MobCategory.MISC)
+                            .sized(1f, 1f)
+                            .clientTrackingRange(4)
+                            .updateInterval(20)
+                            .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "slash_projectile").toString()));
+
+
     @SubscribeEvent
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntities.BOGRE.get(), BogreEntity.setAttributes());
         event.put(ModEntities.WARPED_CLAM.get(), WarpedClamEntity.setAttributes());
         event.put(ModEntities.IMPALER.get(), ImpalerEntity.setAttributes());
+        event.put(ModEntities.NIGHTMARE.get(), NightmareEntity.setAttributes());
     }
 }

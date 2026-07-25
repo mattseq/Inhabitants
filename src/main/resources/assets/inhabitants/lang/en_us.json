@@ -6,6 +6,7 @@
   "entity.inhabitants.warped_clam.description": "A peaceful creature that quietly lies in the End landscapes. It can be used as a trampoline to launch players into the air, and can be brushed for Ender pearls.",
   "entity.inhabitants.impaler": "Impaler",
   "entity.inhabitants.impaler.description": "Impalers are underground dwellers that can be very dangerous for the unprepared explorer. They can sprint unnaturally fast at their target, throw spikes that cause concussions, and perform melee attacks with their sharp teeth.",
+  "entity.inhabitants.nightmare": "Nightmare",
 
   "creativetab.inhabitants_tab": "Inhabitants",
 
@@ -21,6 +22,9 @@
   "item.inhabitants.dimensional_serving": "Dimensional Serving",
   "item.inhabitants.music_disc_bogre": "Music Disc",
   "item.inhabitants.music_disc_bogre.desc": "BoboTweaks - Hermit",
+  "item.inhabitants.nightmare_spawn_egg": "Nightmare Spawn Egg",
+  "item.inhabitants.dread_cloth": "Dread Cloth",
+  "item.inhabitants.riftblade": "Riftblade",
   "item.inhabitants.javelin": "Javelin",
   "item.inhabitants.swamp_lair_map": "Swamp Lair Map",
   "item.inhabitants.bogre_cauldron": "Bogre's Cauldron",
@@ -48,6 +52,12 @@
   "effect.inhabitants.sticky_legs": "Sticky Legs",
   "effect.inhabitants.reverse_growth": "Reverse Growth",
   "effect.inhabitants.immaterial": "Immaterial",
+  "effect.inhabitants.panic": "Panic",
+
+  "item.minecraft.tipped_arrow.effect.panic": "Tipped Arrow of Panic",
+  "item.minecraft.potion.effect.panic": "Potion of Panic",
+  "item.minecraft.splash_potion.effect.panic": "Splash Potion of Panic",
+  "item.minecraft.lingering_potion.effect.panic": "Lingering Potion of Panic",
 
   "item.minecraft.tipped_arrow.effect.concussion": "Tipped Arrow of Concussion",
   "item.minecraft.potion.effect.concussion": "Potion of Concussion",

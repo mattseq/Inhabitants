@@ -8,6 +8,8 @@ import com.jeremyseq.inhabitants.blocks.ModBlocks;
 import com.jeremyseq.inhabitants.entities.ModEntities;
 import com.jeremyseq.inhabitants.entities.impaler.arrow.ConcussionArrowDispenserBehavior;
 import com.jeremyseq.inhabitants.entities.impaler.arrow.ConcussionArrowRenderer;
+import com.jeremyseq.inhabitants.entities.nightmare.NightmareRenderer;
+import com.jeremyseq.inhabitants.entities.nightmare.slash_projectile.SlashProjectileRenderer;
 import com.jeremyseq.inhabitants.items.*;
 import com.jeremyseq.inhabitants.loot_modifiers.ModLootModifiers;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
@@ -183,6 +185,8 @@ public class Inhabitants
             event.registerEntityRenderer(ModEntities.IMPALER.get(), ImpalerRenderer::new);
             event.registerEntityRenderer(ModEntities.IMPALER_SPIKE_PROJECTILE.get(), ImpalerSpikeRenderer::new);
             event.registerEntityRenderer(ModEntities.JAVELIN.get(), JavelinRenderer::new);
+            event.registerEntityRenderer(ModEntities.NIGHTMARE.get(), NightmareRenderer::new);
+            event.registerEntityRenderer(ModEntities.SLASH_PROJECTILE.get(), SlashProjectileRenderer::new);
             event.registerEntityRenderer(ModEntities.CONCUSSION_ARROW_PROJECTILE.get(), ConcussionArrowRenderer::new);
 
             event.registerBlockEntityRenderer(ModBlockEntities.IMPALER_HEAD_BLOCK_ENTITY.get(),
