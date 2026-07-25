@@ -3,6 +3,7 @@ package com.jeremyseq.inhabitants.entities;
 import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
+import com.jeremyseq.inhabitants.entities.bulltoad.BulltoadEntity;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeProjectile;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
 import com.jeremyseq.inhabitants.entities.impaler.arrow.ConcussionArrowProjectile;
@@ -27,12 +28,12 @@ public class ModEntities {
     public static final RegistryObject<EntityType<BogreEntity>> BOGRE =
             REGISTRY.register("bogre",
                     () -> EntityType.Builder.of(BogreEntity::new, MobCategory.MONSTER)
-                            .sized(1.75f, 3.5f)
+                            .sized(2f, 3.5f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "bogre").toString()));
 
     public static final RegistryObject<EntityType<BogreCauldronEntity>> BOGRE_CAULDRON =
             REGISTRY.register("bogre_cauldron",
-                    () -> EntityType.Builder.of(BogreCauldronEntity::new, MobCategory.MISC)
+                    () -> EntityType.Builder.of(BogreCauldronEntity::new, MobCategory.MONSTER)
                             .sized(2f, 1.3f)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "bogre_cauldron").toString()));
 
@@ -90,11 +91,18 @@ public class ModEntities {
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "slash_projectile").toString()));
 
 
+    public static final RegistryObject<EntityType<BulltoadEntity>> BULLTOAD =
+            REGISTRY.register("bulltoad",
+                    () -> EntityType.Builder.of(BulltoadEntity::new, MobCategory.MONSTER)
+                            .sized(2, 1.6f)
+                            .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "bulltoad").toString()));
+
     @SubscribeEvent
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntities.BOGRE.get(), BogreEntity.setAttributes());
         event.put(ModEntities.WARPED_CLAM.get(), WarpedClamEntity.setAttributes());
         event.put(ModEntities.IMPALER.get(), ImpalerEntity.setAttributes());
         event.put(ModEntities.NIGHTMARE.get(), NightmareEntity.setAttributes());
+        event.put(ModEntities.BULLTOAD.get(), BulltoadEntity.setAttributes());
     }
 }
