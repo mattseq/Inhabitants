@@ -49,6 +49,7 @@ public class ModCreativeModeTabs {
                         warped_clam_voidblue.getOrCreateTag().putBoolean("has_pearl", true);
                         pOutput.accept(warped_clam_voidblue);
                         pOutput.accept(ModItems.WARPED_CLAM_ITEM.get());
+                        pOutput.accept(ModItems.CONCHER_SPAWN_EGG.get());
 
                         pOutput.accept(ModItems.NIGHTMARE_SPAWN_EGG.get());
                         pOutput.accept(ModItems.BULLTOAD_SPAWN_EGG.get());
@@ -56,6 +57,7 @@ public class ModCreativeModeTabs {
                         // mob drops / materials
                         pOutput.accept(ModItems.IMPALER_SPIKE.get());
                         pOutput.accept(ModItems.BULLTOAD_HORN.get());
+                        pOutput.accept(ModItems.CONCHER_SHELL_SHARD.get());
 
                         // weapons / tools
                         pOutput.accept(ModItems.GIANT_BONE.get());
@@ -78,6 +80,9 @@ public class ModCreativeModeTabs {
                         pOutput.accept(ModItems.IMPALER_HEAD_FORLORN_HOLLOWS.get());
                         pOutput.accept(ModItems.DREAD_CLOTH.get());
                         pOutput.accept(ModItems.RIFTBLADE.get());
+                        pOutput.accept(ModItems.CONCHER_SHELL_BLOCK_STAGE_1.get());
+                        pOutput.accept(ModItems.CONCHER_SHELL_BLOCK_STAGE_2.get());
+                        pOutput.accept(ModItems.CONCHER_SHELL_BLOCK_STAGE_3.get());
 
                         // misc special items
                         pOutput.accept(ModItems.MUSIC_DISC_BOGRE.get());

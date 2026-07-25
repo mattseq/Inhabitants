@@ -4,6 +4,7 @@ import com.jeremyseq.inhabitants.Inhabitants;
 import com.jeremyseq.inhabitants.entities.bogre.BogreEntity;
 import com.jeremyseq.inhabitants.entities.bogre.bogre_cauldron.BogreCauldronEntity;
 import com.jeremyseq.inhabitants.entities.bulltoad.BulltoadEntity;
+import com.jeremyseq.inhabitants.entities.concher.ConcherEntity;
 import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeProjectile;
 import com.jeremyseq.inhabitants.entities.impaler.ImpalerEntity;
 import com.jeremyseq.inhabitants.entities.impaler.arrow.ConcussionArrowProjectile;
@@ -58,6 +59,13 @@ public class ModEntities {
                             .updateInterval(20)
                             .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "impaler_spike").toString()));
 
+    public static final RegistryObject<EntityType<ConcherEntity>> CONCHER =
+            REGISTRY.register("concher",
+                    () -> EntityType.Builder.of(ConcherEntity::new, MobCategory.WATER_CREATURE)
+                            .sized(2f, 2f)
+                            .build(ResourceLocation.fromNamespaceAndPath(Inhabitants.MODID, "concher").toString()));
+
+
     public static final RegistryObject<EntityType<JavelinEntity>> JAVELIN =
             REGISTRY.register("javelin",
                     () -> EntityType.Builder.<JavelinEntity>of(JavelinEntity::new, MobCategory.MISC)
@@ -104,5 +112,6 @@ public class ModEntities {
         event.put(ModEntities.IMPALER.get(), ImpalerEntity.setAttributes());
         event.put(ModEntities.NIGHTMARE.get(), NightmareEntity.setAttributes());
         event.put(ModEntities.BULLTOAD.get(), BulltoadEntity.setAttributes());
+        event.put(ModEntities.CONCHER.get(), ConcherEntity.setAttributes());
     }
 }

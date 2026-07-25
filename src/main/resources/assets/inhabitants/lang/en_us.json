@@ -7,6 +7,7 @@
   "entity.inhabitants.impaler": "Impaler",
   "entity.inhabitants.impaler.description": "Impalers are underground dwellers that can be very dangerous for the unprepared explorer. They can sprint unnaturally fast at their target, throw spikes that cause concussions, and perform melee attacks with their sharp teeth.",
   "entity.inhabitants.nightmare": "Nightmare",
+  "entity.inhabitants.concher": "Concher",
 
   "creativetab.inhabitants_tab": "Inhabitants",
 
@@ -25,6 +26,7 @@
   "item.inhabitants.nightmare_spawn_egg": "Nightmare Spawn Egg",
   "item.inhabitants.dread_cloth": "Dread Cloth",
   "item.inhabitants.riftblade": "Riftblade",
+  "item.inhabitants.concher_spawn_egg": "Concher Spawn Egg",
   "item.inhabitants.javelin": "Javelin",
   "item.inhabitants.swamp_lair_map": "Swamp Lair Map",
   "item.inhabitants.bogre_cauldron": "Bogre's Cauldron",
@@ -39,11 +41,18 @@
   "item.inhabitants.bulltoad_spawn_egg": "Bulltoad Spawn Egg",
   "item.inhabitants.bulltoad_horn": "Bulltoad Horn",
   "item.inhabitants.cornucopia": "Cornucopia",
+  "item.inhabitants.concher_shell_shard": "Concher Shell Shard",
+  "item.inhabitants.concher_shell_block_stage_1": "Concher Shell Block",
+  "item.inhabitants.concher_shell_block_stage_2": "Concher Shell Block",
+  "item.inhabitants.concher_shell_block_stage_3": "Concher Shell Block",
 
   "block.inhabitants.impaler_head": "Impaler Head",
   "block.inhabitants.impaler_head_dripstone": "Dripstone Impaler Head",
   "block.inhabitants.impaler_head_albino": "Albino Impaler Head",
   "block.inhabitants.impaler_head_forlorn_hollows": "Forlorn Hollows Impaler Head",
+  "block.inhabitants.concher_shell_block_stage_1": "Concher Shell Block",
+  "block.inhabitants.concher_shell_block_stage_2": "Concher Shell Block",
+  "block.inhabitants.concher_shell_block_stage_3": "Concher Shell Block",
 
 
   "tooltip.inhabitants.special_effect": "Special Ability",

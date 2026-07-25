@@ -11,6 +11,7 @@ import com.jeremyseq.inhabitants.entities.impaler.arrow.ConcussionArrowRenderer;
 import com.jeremyseq.inhabitants.entities.nightmare.NightmareRenderer;
 import com.jeremyseq.inhabitants.entities.nightmare.slash_projectile.SlashProjectileRenderer;
 import com.jeremyseq.inhabitants.entities.bulltoad.BulltoadRenderer;
+import com.jeremyseq.inhabitants.entities.concher.render.ConcherRenderer;
 import com.jeremyseq.inhabitants.items.*;
 import com.jeremyseq.inhabitants.loot_modifiers.ModLootModifiers;
 import com.jeremyseq.inhabitants.networking.ModNetworking;
@@ -31,6 +32,7 @@ import com.jeremyseq.inhabitants.entities.impaler.spike.ImpalerSpikeRenderer;
 import com.jeremyseq.inhabitants.entities.warped_clam.WarpedClamRenderer;
 import com.jeremyseq.inhabitants.entities.javelin.JavelinRenderer;
 import com.jeremyseq.inhabitants.blocks.impaler_head.ImpalerHeadRenderer;
+import com.jeremyseq.inhabitants.blocks.entity.render.ConcherShellRenderer;
 
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
@@ -190,9 +192,13 @@ public class Inhabitants
             event.registerEntityRenderer(ModEntities.NIGHTMARE.get(), NightmareRenderer::new);
             event.registerEntityRenderer(ModEntities.SLASH_PROJECTILE.get(), SlashProjectileRenderer::new);
             event.registerEntityRenderer(ModEntities.BULLTOAD.get(), BulltoadRenderer::new);
+            event.registerEntityRenderer(ModEntities.CONCHER.get(), ConcherRenderer::new);
+
 
             event.registerBlockEntityRenderer(ModBlockEntities.IMPALER_HEAD_BLOCK_ENTITY.get(),
                     context -> new ImpalerHeadRenderer());
+            event.registerBlockEntityRenderer(ModBlockEntities.CONCHER_SHELL_BLOCK_ENTITY.get(),
+                    ConcherShellRenderer::new);
         }
     }
 
